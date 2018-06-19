@@ -49,9 +49,11 @@
 	random_icon_states = list("gib1", "gib2", "gib3", "gib4", "gib5", "gib6")
 	mergeable_decal = FALSE
 
-/obj/effect/decal/cleanable/blood/gibs/Initialize(mapload, list/datum/disease/diseases)
+/obj/effect/decal/cleanable/blood/gibs/Initialize(mapload, list/datum/disease/diseases, gibs_blood)
 	. = ..()
 	reagents.add_reagent("liquidgibs", 5)
+	if(gibs_blood)
+		bloodiness = gibs_blood
 
 /obj/effect/decal/cleanable/blood/gibs/ex_act(severity, target)
 	return
