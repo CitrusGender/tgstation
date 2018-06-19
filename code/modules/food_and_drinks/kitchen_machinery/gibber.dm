@@ -157,8 +157,6 @@
 	var/obj/item/stack/sheet/animalhide/skin
 	var/list/datum/disease/diseases = mob_occupant.get_static_viruses()
 
-
-
 	if(iscarbon(occupant))
 		var/mob/living/carbon/C = occupant
 		gibs_blood = round(C.blood_volume / meat_produced**2) // gibs produced equal to meat_produced squared
