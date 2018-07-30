@@ -1,0 +1,11 @@
+{
+    "map_name": "ToolboxStation",
+    "map_path": "map_files/ToolboxStation",
+    "map_file": "ToolboxStation.dmm",
+    "shuttles": {
+	    "cargo": "cargo_delta",
+	    "ferry": "ferry_fancy",
+	    "whiteship": "whiteship_cere",
+	    "emergency": "emergency_cere"
+    }
+}
