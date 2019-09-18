@@ -219,16 +219,16 @@
 
 
 /obj/machinery/computer/arena_controller/arena/small
-	offline_program = /area/holodeck/arena/arena/small/offline
-	holodeck_type = /area/holodeck/arena/arena/small
-	program_type = /area/holodeck/arena/arena/small
+	offline_program = /area/holodeck/arena/small/offline
+	holodeck_type = /area/holodeck/arena/small
+	program_type = /area/holodeck/arena/small
 
 /obj/machinery/computer/arena_controller/arena/medium
-	offline_program = /area/holodeck/arena/arena/medium/offline
-	holodeck_type = /area/holodeck/arena/arena/medium
-	program_type = /area/holodeck/arena/arena/medium
+	offline_program = /area/holodeck/arena/medium/offline
+	holodeck_type = /area/holodeck/arena/medium
+	program_type = /area/holodeck/arena/medium
 
 /obj/machinery/computer/arena_controller/arena/large
-	offline_program = /area/holodeck/arena/arena/large/offline
-	holodeck_type = /area/holodeck/arena/arena/large
-	program_type = /area/holodeck/arena/arena/large
+	offline_program = /area/holodeck/arena/large/offline
+	holodeck_type = /area/holodeck/arena/large
+	program_type = /area/holodeck/arena/large
