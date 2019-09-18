@@ -127,3 +127,21 @@
 /area/holodeck/rec_center/thunderdome1218
 	name = "Holodeck - 1218 AD"
 	restricted = 1
+
+/area/holodeck/arena/small
+	name = "Small Arena"
+
+/area/holodeck/arena/small/offline
+	name = "Small Arena - Disabled"
+
+/area/holodeck/arena/medium
+	name = "Medium Arena"
+
+/area/holodeck/arena/medium/offline
+	name = "Medium Arena - Disabled"
+
+/area/holodeck/arena/large
+	name = "Large Arena"
+
+/area/holodeck/arena/large/offline
+	name = "Large Arena - Disabled"
