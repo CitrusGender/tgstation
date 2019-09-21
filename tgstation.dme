@@ -13,8 +13,7 @@
 // END_PREFERENCES
 
 // BEGIN_INCLUDE
-#include "_maps\multiz_debug.dm"
-#include "_maps\backup\multiztest_2.dmm"
+#include "_maps\runtimestation.dm"
 #include "code\_compile_options.dm"
 #include "code\world.dm"
 #include "code\__DEFINES\_globals.dm"
