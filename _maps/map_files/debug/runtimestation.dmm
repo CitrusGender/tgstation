@@ -171,16 +171,16 @@
 	dir = 8
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "as" = (
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "at" = (
 /obj/effect/turf_decal/bot,
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "au" = (
 /obj/machinery/igniter/on,
@@ -190,37 +190,29 @@
 	dir = 4
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "av" = (
-/obj/machinery/igniter/on,
 /obj/effect/turf_decal/delivery,
-/obj/machinery/light{
-	icon_state = "tube";
-	dir = 8
-	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
 "aw" = (
+/obj/effect/turf_decal/tile/neutral,
 /obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
 "ax" = (
-/obj/effect/turf_decal/bot,
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
-"ay" = (
-/obj/machinery/igniter/on,
-/obj/effect/turf_decal/delivery,
-/obj/machinery/light{
-	icon_state = "tube";
+/obj/structure/sign/poster/contraband/smoke{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
 	dir = 4
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
 "az" = (
 /obj/machinery/door/airlock/highsecurity{
 	name = "Arena Equipment Room";
@@ -243,17 +235,17 @@
 	dir = 8
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "aB" = (
 /obj/effect/turf_decal/delivery,
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "aC" = (
 /obj/effect/turf_decal/tile/neutral,
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "aD" = (
 /obj/structure/sign/poster/contraband/smoke{
@@ -264,42 +256,29 @@
 	dir = 4
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
-/area/holodeck/arena/small)
-"aE" = (
-/obj/structure/sign/poster/contraband/robust_softdrinks{
-	pixel_x = -32
-	},
-/obj/effect/turf_decal/tile/red{
-	dir = 1
-	},
-/obj/effect/turf_decal/tile/red{
-	dir = 8
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "aF" = (
-/obj/effect/turf_decal/delivery,
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
-"aG" = (
-/obj/effect/turf_decal/tile/neutral,
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
-"aH" = (
-/obj/structure/sign/poster/contraband/smoke{
-	pixel_x = 32
-	},
-/obj/effect/turf_decal/tile/green,
 /obj/effect/turf_decal/tile/green{
 	dir = 4
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"aG" = (
+/obj/machinery/camera{
+	c_tag = "Arena";
+	network = list("thunder");
+	pixel_x = 10;
+	resistance_flags = 64
+	},
+/obj/machinery/flasher{
+	id = "tdomeflash";
+	name = "Thunderdome Flash"
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
 "aI" = (
 /obj/structure/rack,
 /obj/effect/turf_decal/stripes/line{
@@ -352,14 +331,14 @@
 	dir = 1
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "aN" = (
 /obj/effect/turf_decal/tile/green{
 	dir = 4
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "aO" = (
 /obj/effect/turf_decal/loading_area{
@@ -388,20 +367,6 @@
 	name = "Arena Halls";
 	requires_power = 0
 	})
-"aQ" = (
-/obj/effect/turf_decal/tile/red{
-	dir = 1
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
-"aR" = (
-/obj/effect/turf_decal/tile/green{
-	dir = 4
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
 "aS" = (
 /obj/structure/rack,
 /obj/effect/turf_decal/stripes/line{
@@ -423,11 +388,7 @@
 	dir = 4
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
-/area/holodeck/arena/small)
-"aU" = (
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit/green,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "aV" = (
 /obj/machinery/camera{
@@ -441,14 +402,14 @@
 	name = "Thunderdome Flash"
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/circuit/green,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "aW" = (
 /obj/effect/turf_decal/loading_area{
 	dir = 8
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "aX" = (
 /obj/structure/rack,
@@ -467,57 +428,17 @@
 	name = "Arena Halls";
 	requires_power = 0
 	})
-"aY" = (
-/obj/effect/turf_decal/loading_area{
-	dir = 4
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
-"aZ" = (
-/obj/machinery/camera{
-	c_tag = "Arena";
-	network = list("thunder");
-	pixel_x = 10;
-	resistance_flags = 64
-	},
-/obj/machinery/flasher{
-	id = "tdomeflash";
-	name = "Thunderdome Flash"
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
-"ba" = (
-/obj/effect/turf_decal/loading_area{
-	dir = 8
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
 "bb" = (
 /obj/effect/turf_decal/tile/red{
 	dir = 8
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "bc" = (
 /obj/effect/turf_decal/tile/green,
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
-/area/holodeck/arena/small)
-"bd" = (
-/obj/effect/turf_decal/tile/red{
-	dir = 8
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
-"be" = (
-/obj/effect/turf_decal/tile/green,
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "bf" = (
 /obj/structure/sign/poster/contraband/sun_kist{
@@ -530,7 +451,7 @@
 	dir = 8
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "bg" = (
 /obj/structure/sign/poster/contraband/donut_corp{
@@ -541,31 +462,7 @@
 	dir = 4
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
-/area/holodeck/arena/small)
-"bh" = (
-/obj/structure/sign/poster/contraband/sun_kist{
-	pixel_x = -32
-	},
-/obj/effect/turf_decal/tile/red{
-	dir = 1
-	},
-/obj/effect/turf_decal/tile/red{
-	dir = 8
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
-/area/holodeck/arena/small)
-"bi" = (
-/obj/structure/sign/poster/contraband/donut_corp{
-	pixel_x = 32
-	},
-/obj/effect/turf_decal/tile/green,
-/obj/effect/turf_decal/tile/green{
-	dir = 4
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "bj" = (
 /obj/machinery/camera/xray{
@@ -576,18 +473,7 @@
 	network = list("Arenas","Arena 2")
 	},
 /obj/screen/plane_master/floor,
-/turf/open/floor/plasteel,
-/area/holodeck/arena/small)
-"bk" = (
-/obj/machinery/camera/xray{
-	c_tag = "Arena 2";
-	dir = 1;
-	icon_state = "xraycam";
-	name = "arena camera";
-	network = list("Arenas","Arena 2")
-	},
-/obj/screen/plane_master/floor,
-/turf/open/floor/circuit,
+/turf/open/floor/holofloor,
 /area/holodeck/arena/small)
 "bl" = (
 /obj/structure/chair/comfy/shuttle{
@@ -644,7 +530,7 @@
 /obj/effect/step_trigger/teleporter{
 	teleport_x = 23;
 	teleport_y = 3;
-	teleport_z = 2
+	teleport_z = 1
 	},
 /turf/open/floor/circuit,
 /area/awaymission/research/interior/maint{
@@ -652,6 +538,728 @@
 	name = "Arena Halls";
 	requires_power = 0
 	})
+"cH" = (
+/obj/structure/sign/poster/contraband/sun_kist{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"dp" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"dH" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"ee" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"ek" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"er" = (
+/obj/effect/turf_decal/bot,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"fx" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"fH" = (
+/obj/machinery/camera/xray{
+	c_tag = "Arena 2";
+	dir = 1;
+	icon_state = "xraycam";
+	name = "arena camera";
+	network = list("Arenas","Arena 2")
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"gi" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"gT" = (
+/obj/effect/turf_decal/tile/green,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"hd" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"iR" = (
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"jg" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"jk" = (
+/obj/structure/sign/poster/contraband/sun_kist{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"jL" = (
+/obj/structure/sign/poster/contraband/robust_softdrinks{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"kS" = (
+/obj/machinery/camera/xray{
+	c_tag = "Arena 2";
+	dir = 1;
+	icon_state = "xraycam";
+	name = "arena camera";
+	network = list("Arenas","Arena 2")
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"mq" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"mY" = (
+/obj/machinery/camera/xray{
+	c_tag = "Arena 2";
+	dir = 1;
+	icon_state = "xraycam";
+	name = "arena camera";
+	network = list("Arenas","Arena 2")
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"oD" = (
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"oV" = (
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"pb" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"pu" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"pP" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"pU" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"qT" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"qU" = (
+/obj/structure/sign/poster/contraband/robust_softdrinks{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"rK" = (
+/obj/effect/turf_decal/delivery,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"rO" = (
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"sg" = (
+/obj/structure/sign/poster/contraband/robust_softdrinks{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"sI" = (
+/obj/structure/sign/poster/contraband/donut_corp{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"sV" = (
+/obj/effect/turf_decal/bot,
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"tp" = (
+/obj/structure/sign/poster/contraband/smoke{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"tM" = (
+/obj/effect/turf_decal/delivery,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"tQ" = (
+/obj/effect/turf_decal/tile/neutral,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"uQ" = (
+/obj/effect/turf_decal/bot,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"vh" = (
+/obj/structure/sign/poster/contraband/sun_kist{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"vi" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"xJ" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"xK" = (
+/obj/screen/plane_master/floor,
+/turf/open/floor/circuit/green,
+/area/holodeck/arena/small/offline)
+"yM" = (
+/obj/effect/turf_decal/bot,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"zG" = (
+/obj/effect/turf_decal/tile/green,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"zT" = (
+/obj/effect/turf_decal/tile/green,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"Ac" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"As" = (
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Bp" = (
+/obj/machinery/camera/xray{
+	c_tag = "Arena 2";
+	dir = 1;
+	icon_state = "xraycam";
+	name = "arena camera";
+	network = list("Arenas","Arena 2")
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Cr" = (
+/obj/structure/sign/poster/contraband/donut_corp{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"CH" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"DU" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"DX" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"En" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"EF" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"GI" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Hf" = (
+/obj/structure/sign/poster/contraband/robust_softdrinks{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"Hj" = (
+/obj/effect/turf_decal/delivery,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Ig" = (
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"IM" = (
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"IS" = (
+/obj/effect/turf_decal/tile/green,
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"Jj" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"JL" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Ke" = (
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"Kt" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"KN" = (
+/obj/machinery/camera{
+	c_tag = "Arena";
+	network = list("thunder");
+	pixel_x = 10;
+	resistance_flags = 64
+	},
+/obj/machinery/flasher{
+	id = "tdomeflash";
+	name = "Thunderdome Flash"
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"KT" = (
+/obj/structure/sign/poster/contraband/smoke{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"Lu" = (
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"LI" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"MR" = (
+/obj/structure/sign/poster/contraband/smoke{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"NR" = (
+/obj/structure/sign/poster/contraband/donut_corp{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"Ok" = (
+/obj/effect/turf_decal/tile/neutral,
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"PO" = (
+/obj/structure/sign/poster/contraband/donut_corp{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"Qt" = (
+/obj/effect/turf_decal/tile/neutral,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Sj" = (
+/obj/machinery/igniter/on,
+/obj/effect/turf_decal/delivery,
+/obj/machinery/light{
+	icon_state = "tube";
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"Sk" = (
+/obj/structure/sign/poster/contraband/donut_corp{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Tb" = (
+/obj/effect/turf_decal/delivery,
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"VS" = (
+/obj/effect/turf_decal/loading_area{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Wg" = (
+/obj/structure/sign/poster/contraband/sun_kist{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"WZ" = (
+/obj/structure/sign/poster/contraband/sun_kist{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/beach,
+/area/holodeck/arena/small/two)
+"Xl" = (
+/obj/machinery/camera/xray{
+	c_tag = "Arena 2";
+	dir = 1;
+	icon_state = "xraycam";
+	name = "arena camera";
+	network = list("Arenas","Arena 2")
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
+"XZ" = (
+/obj/machinery/camera{
+	c_tag = "Arena";
+	network = list("thunder");
+	pixel_x = 10;
+	resistance_flags = 64
+	},
+/obj/machinery/flasher{
+	id = "tdomeflash";
+	name = "Thunderdome Flash"
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Yh" = (
+/obj/effect/turf_decal/tile/green,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/carpet,
+/area/holodeck/arena/small/one)
+"Yi" = (
+/obj/machinery/camera{
+	c_tag = "Arena";
+	network = list("thunder");
+	pixel_x = 10;
+	resistance_flags = 64
+	},
+/obj/machinery/flasher{
+	id = "tdomeflash";
+	name = "Thunderdome Flash"
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/circuit/green,
+/area/holodeck/arena/small/offline)
+"YB" = (
+/obj/effect/turf_decal/tile/neutral,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"YQ" = (
+/obj/structure/sign/poster/contraband/smoke{
+	pixel_x = 32
+	},
+/obj/effect/turf_decal/tile/green,
+/obj/effect/turf_decal/tile/green{
+	dir = 4
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"Zb" = (
+/obj/structure/sign/poster/contraband/robust_softdrinks{
+	pixel_x = -32
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"Ze" = (
+/obj/machinery/camera{
+	c_tag = "Arena";
+	network = list("thunder");
+	pixel_x = 10;
+	resistance_flags = 64
+	},
+/obj/machinery/flasher{
+	id = "tdomeflash";
+	name = "Thunderdome Flash"
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/basalt,
+/area/holodeck/arena/small/three)
+"Zh" = (
+/obj/effect/turf_decal/bot,
+/obj/screen/plane_master/floor,
+/turf/open/floor/holofloor/asteroid,
+/area/holodeck/arena/small/four)
+"Zo" = (
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/screen/plane_master/floor,
+/turf/open/floor/plasteel,
+/area/holodeck/arena/small/offline)
 
 (1,1,1) = {"
 aa
@@ -1185,15 +1793,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 aa
 aa
 ab
@@ -1237,15 +1845,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+Kt
+sg
+Zo
+pU
+pP
+vh
+Kt
+aq
 aa
 aa
 ab
@@ -1262,7 +1870,7 @@ ao
 as
 aC
 aC
-aU
+as
 aC
 aC
 as
@@ -1289,15 +1897,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+iR
+iR
+iR
+iR
+iR
+iR
+iR
+aq
 aa
 aa
 ab
@@ -1341,15 +1949,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+sV
+Tb
+Tb
+Tb
+Tb
+Tb
+sV
+aq
 aa
 aa
 ab
@@ -1366,7 +1974,7 @@ ao
 as
 aC
 aC
-aU
+as
 aC
 aC
 as
@@ -1393,15 +2001,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+iR
+Ok
+Ok
+Ok
+Ok
+Ok
+iR
+aq
 aa
 aa
 ab
@@ -1445,15 +2053,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+iR
+Ok
+Ok
+Ok
+Ok
+Ok
+iR
+aq
 aa
 aa
 ab
@@ -1497,15 +2105,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+iR
+Ok
+Ok
+xK
+Ok
+Ok
+iR
+aq
 aa
 aa
 ab
@@ -1549,15 +2157,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+iR
+Ok
+Ok
+Yi
+Ok
+Ok
+Xl
+aq
 aa
 aa
 ab
@@ -1601,15 +2209,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+iR
+Ok
+Ok
+xK
+Ok
+Ok
+iR
+aq
 aa
 aa
 ab
@@ -1653,15 +2261,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+iR
+Ok
+Ok
+Ok
+Ok
+Ok
+iR
+aq
 aa
 aa
 ab
@@ -1705,15 +2313,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+iR
+iR
+iR
+iR
+iR
+iR
+iR
+aq
 aa
 aa
 ab
@@ -1757,15 +2365,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+sV
+Tb
+Tb
+Tb
+Tb
+Tb
+sV
+aq
 aa
 aa
 ab
@@ -1809,15 +2417,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+iR
+iR
+iR
+iR
+iR
+iR
+iR
+aq
 aa
 aa
 ab
@@ -1861,15 +2469,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+EF
+tp
+Ig
+LI
+IS
+PO
+EF
+aq
 aa
 aa
 ab
@@ -1913,15 +2521,15 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 aa
 aa
 ab
@@ -2017,45 +2625,45 @@ aa
 aa
 aa
 aa
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 aa
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 aa
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 "}
 (28,1,1) = {"
 aa
@@ -2069,45 +2677,45 @@ aa
 aa
 aa
 aa
+aq
+qT
+Hf
+pu
+gi
+ee
+cH
+qT
+aq
 aa
+aq
+Sj
+Zb
+dH
+dp
+xJ
+jk
+Sj
+aq
 aa
+aq
+mq
+jL
+hd
+pb
+jg
+WZ
+mq
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+CH
+qU
+GI
+VS
+Jj
+Wg
+CH
+aq
 "}
 (29,1,1) = {"
 aa
@@ -2121,45 +2729,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-aq
-aq
-aq
-aq
-aq
-aq
-aq
+rO
+rO
+rO
+rO
+rO
+rO
+rO
 aq
 aa
+aq
+Lu
+Lu
+Lu
+Lu
+Lu
+Lu
+Lu
+aq
 aa
+aq
+oD
+oD
+oD
+oD
+oD
+oD
+oD
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+oV
+oV
+oV
+oV
+oV
+oV
+oV
+aq
 "}
 (30,1,1) = {"
 aa
@@ -2173,45 +2781,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-av
-aE
-aQ
-aY
-bd
-bh
-av
+Zh
+tM
+tM
+tM
+tM
+tM
+Zh
 aq
 aa
+aq
+yM
+rK
+rK
+rK
+rK
+rK
+yM
+aq
 aa
+aq
+uQ
+av
+av
+av
+av
+av
+uQ
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+er
+Hj
+Hj
+Hj
+Hj
+Hj
+er
+aq
 "}
 (31,1,1) = {"
 aa
@@ -2225,45 +2833,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-aw
-aw
-aw
-aw
-aw
-aw
-aw
+rO
+YB
+YB
+YB
+YB
+YB
+rO
 aq
 aa
+aq
+Lu
+tQ
+tQ
+tQ
+tQ
+tQ
+Lu
+aq
 aa
+aq
+oD
+aw
+aw
+aw
+aw
+aw
+oD
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+oV
+Qt
+Qt
+Qt
+Qt
+Qt
+oV
+aq
 "}
 (32,1,1) = {"
 aa
@@ -2277,45 +2885,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-ax
-aF
-aF
-aF
-aF
-aF
-ax
+rO
+YB
+YB
+YB
+YB
+YB
+rO
 aq
 aa
+aq
+Lu
+tQ
+tQ
+tQ
+tQ
+tQ
+Lu
+aq
 aa
+aq
+oD
+aw
+aw
+aw
+aw
+aw
+oD
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+oV
+Qt
+Qt
+Qt
+Qt
+Qt
+oV
+aq
 "}
 (33,1,1) = {"
 aa
@@ -2329,45 +2937,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-aw
-aG
-aG
-aG
-aG
-aG
-aw
+rO
+YB
+YB
+rO
+YB
+YB
+rO
 aq
 aa
+aq
+Lu
+tQ
+tQ
+Lu
+tQ
+tQ
+Lu
+aq
 aa
+aq
+oD
+aw
+aw
+oD
+aw
+aw
+oD
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+oV
+Qt
+Qt
+oV
+Qt
+Qt
+oV
+aq
 "}
 (34,1,1) = {"
 aa
@@ -2381,45 +2989,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-aw
-aG
-aG
-aG
-aG
-aG
-aw
+rO
+YB
+YB
+KN
+YB
+YB
+fH
 aq
 aa
+aq
+Lu
+tQ
+tQ
+Ze
+tQ
+tQ
+mY
+aq
 aa
+aq
+oD
+aw
+aw
+aG
+aw
+aw
+kS
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+oV
+Qt
+Qt
+XZ
+Qt
+Qt
+Bp
+aq
 "}
 (35,1,1) = {"
 aa
@@ -2433,45 +3041,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-aw
-aG
-aG
-aw
-aG
-aG
-aw
+rO
+YB
+YB
+rO
+YB
+YB
+rO
 aq
 aa
+aq
+Lu
+tQ
+tQ
+Lu
+tQ
+tQ
+Lu
+aq
 aa
+aq
+oD
+aw
+aw
+oD
+aw
+aw
+oD
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+oV
+Qt
+Qt
+oV
+Qt
+Qt
+oV
+aq
 "}
 (36,1,1) = {"
 aa
@@ -2485,45 +3093,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+rO
+YB
+YB
+YB
+YB
+YB
+rO
+aq
 aa
 aq
+Lu
+tQ
+tQ
+tQ
+tQ
+tQ
+Lu
+aq
+aa
+aq
+oD
 aw
-aG
-aG
-aZ
-aG
-aG
-bk
+aw
+aw
+aw
+aw
+oD
 aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+oV
+Qt
+Qt
+Qt
+Qt
+Qt
+oV
+aq
 "}
 (37,1,1) = {"
 aa
@@ -2537,45 +3145,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-aw
-aG
-aG
-aw
-aG
-aG
-aw
+rO
+rO
+rO
+rO
+rO
+rO
+rO
 aq
 aa
+aq
+Lu
+Lu
+Lu
+Lu
+Lu
+Lu
+Lu
+aq
 aa
+aq
+oD
+oD
+oD
+oD
+oD
+oD
+oD
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+oV
+oV
+oV
+oV
+oV
+oV
+oV
+aq
 "}
 (38,1,1) = {"
 aa
@@ -2589,45 +3197,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-aw
-aG
-aG
-aG
-aG
-aG
-aw
+Zh
+tM
+tM
+tM
+tM
+tM
+Zh
 aq
 aa
+aq
+yM
+rK
+rK
+rK
+rK
+rK
+yM
+aq
 aa
+aq
+uQ
+av
+av
+av
+av
+av
+uQ
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+er
+Hj
+Hj
+Hj
+Hj
+Hj
+er
+aq
 "}
 (39,1,1) = {"
 aa
@@ -2641,45 +3249,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-aw
-aw
-aw
-aw
-aw
-aw
-aw
+rO
+rO
+rO
+rO
+rO
+rO
+rO
 aq
 aa
+aq
+Lu
+Lu
+Lu
+Lu
+Lu
+Lu
+Lu
+aq
 aa
+aq
+oD
+oD
+oD
+oD
+oD
+oD
+oD
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+oV
+oV
+oV
+oV
+oV
+oV
+oV
+aq
 "}
 (40,1,1) = {"
 aa
@@ -2693,45 +3301,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-ax
-aF
-aF
-aF
-aF
-aF
-ax
+En
+KT
+Ke
+vi
+zT
+NR
+En
 aq
 aa
+aq
+DX
+YQ
+IM
+ek
+zG
+Cr
+DX
+aq
 aa
+aq
+fx
+ax
+aF
+Ac
+gT
+sI
+fx
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+DU
+MR
+As
+JL
+Yh
+Sk
+DU
+aq
 "}
 (41,1,1) = {"
 aa
@@ -2745,45 +3353,45 @@ aa
 aa
 aa
 aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
-aa
 aq
-aw
-aw
-aw
-aw
-aw
-aw
-aw
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 aq
 aa
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 aa
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 aa
-aa
-aa
-aa
-aa
-aa
-aa
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
+aq
 "}
 (42,1,1) = {"
 aa
@@ -2818,15 +3426,15 @@ aa
 aa
 aa
 aa
-aq
-ay
-aH
-aR
-ba
-be
-bi
-ay
-aq
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
 aa
 aa
 aa
@@ -2870,15 +3478,15 @@ aa
 aa
 aa
 aa
-aq
-aq
-aq
-aq
-aq
-aq
-aq
-aq
-aq
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
 aa
 aa
 aa

@@ -134,6 +134,21 @@
 /area/holodeck/arena/small/offline
 	name = "Small Arena - Disabled"
 
+/area/holodeck/arena/small/one
+	name = "Small Arena - one"
+
+/area/holodeck/arena/small/two
+	name = "Small Arena - two"
+
+/area/holodeck/arena/small/three
+	name = "Small Arena - three"
+
+/area/holodeck/arena/small/four
+	name = "Small Arena - four"
+
+/area/holodeck/arena/small/five
+	name = "Small Arena - five"
+
 /area/holodeck/arena/medium
 	name = "Medium Arena"
 

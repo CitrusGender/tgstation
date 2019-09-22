@@ -43,6 +43,7 @@
 	// the following is necessary for power reasons
 	if(!linked || !offline_program)
 		log_world("No matching arena area found")
+		log_world("linked is [linked] and offline_program is [offline_program]")
 		qdel(src)
 		return
 	var/area/AS = get_area(src)
