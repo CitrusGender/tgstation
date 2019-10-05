@@ -14,6 +14,8 @@
 
 // BEGIN_INCLUDE
 #include "_maps\_basemap.dm"
+#include "_maps\runtimestation.dm"
+#include "_maps\map_files\debug\domelvl2.dmm"
 #include "code\_compile_options.dm"
 #include "code\world.dm"
 #include "code\__DEFINES\_globals.dm"
@@ -1922,6 +1924,7 @@
 #include "code\modules\jobs\job_types\security_officer.dm"
 #include "code\modules\jobs\job_types\shaft_miner.dm"
 #include "code\modules\jobs\job_types\station_engineer.dm"
+#include "code\modules\jobs\job_types\VIP.dm"
 #include "code\modules\jobs\job_types\virologist.dm"
 #include "code\modules\jobs\job_types\warden.dm"
 #include "code\modules\jobs\map_changes\map_changes.dm"
