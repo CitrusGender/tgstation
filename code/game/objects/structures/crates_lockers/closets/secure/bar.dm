@@ -1,17 +1,24 @@
 /obj/structure/closet/secure_closet/bar
-	name = "booze storage"
-	req_access = list(ACCESS_BAR)
-	icon_state = "cabinet"
-	resistance_flags = FLAMMABLE
-	max_integrity = 70
-	open_sound = 'sound/machines/wooden_closet_open.ogg'
-	close_sound = 'sound/machines/wooden_closet_close.ogg'
-	open_sound_volume = 25
-	close_sound_volume = 50
+	name = "booze closet"
+	req_access = list(access_bar)
+	icon_state = "cabinetdetective_locked"
+	icon_closed = "cabinetdetective"
+	icon_locked = "cabinetdetective_locked"
+	icon_opened = "cabinetdetective_open"
+	icon_broken = "cabinetdetective_broken"
+	icon_off = "cabinetdetective_broken"
 
-/obj/structure/closet/secure_closet/bar/PopulateContents()
-	..()
-	for(var/i in 1 to 10)
-		new /obj/item/reagent_containers/food/drinks/beer( src )
-	new /obj/item/etherealballdeployer(src)
-	new /obj/item/roulette_wheel_beacon(src)
+	starts_with = list(
+		/obj/item/weapon/reagent_containers/food/drinks/bottle/small/beer = 10)
+
+/obj/structure/closet/secure_closet/bar/update_icon()
+	if(broken)
+		icon_state = icon_broken
+	else
+		if(!opened)
+			if(locked)
+				icon_state = icon_locked
+			else
+				icon_state = icon_closed
+		else
+			icon_state = icon_opened

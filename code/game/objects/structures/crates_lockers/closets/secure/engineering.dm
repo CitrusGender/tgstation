@@ -1,100 +1,150 @@
 /obj/structure/closet/secure_closet/engineering_chief
-	name = "\proper chief engineer's locker"
-	req_access = list(ACCESS_CE)
-	icon_state = "ce"
+	name = "chief engineer's locker"
+	icon_state = "securece1"
+	icon_closed = "securece"
+	icon_locked = "securece1"
+	icon_opened = "secureceopen"
+	icon_broken = "securecebroken"
+	icon_off = "secureceoff"
+	req_access = list(access_ce)
 
-/obj/structure/closet/secure_closet/engineering_chief/PopulateContents()
-	..()
-	new /obj/item/clothing/neck/cloak/ce(src)
-	new /obj/item/clothing/under/rank/engineering/chief_engineer(src)
-	new /obj/item/clothing/under/rank/engineering/chief_engineer/skirt(src)
-	new /obj/item/clothing/head/hardhat/white(src)
-	new /obj/item/clothing/head/hardhat/weldhat/white(src)
-	new /obj/item/clothing/head/welding(src)
-	new /obj/item/clothing/gloves/color/yellow(src)
-	new /obj/item/clothing/shoes/sneakers/brown(src)
-	new /obj/item/tank/jetpack/suit(src)
-	new /obj/item/cartridge/ce(src)
-	new /obj/item/radio/headset/heads/ce(src)
-	new /obj/item/storage/toolbox/mechanical(src)
-	new /obj/item/clothing/suit/hazardvest(src)
-	new /obj/item/megaphone/command(src)
-	new /obj/item/areaeditor/blueprints(src)
-	new /obj/item/airlock_painter(src)
-	new /obj/item/holosign_creator/engineering(src)
-	new /obj/item/clothing/mask/gas(src)
-	new /obj/item/multitool(src)
-	new /obj/item/assembly/flash/handheld(src)
-	new /obj/item/clothing/glasses/meson/engine(src)
-	new /obj/item/door_remote/chief_engineer(src)
-	new /obj/item/pipe_dispenser(src)
-	new /obj/item/inducer(src)
-	new /obj/item/circuitboard/machine/techfab/department/engineering(src)
-	new /obj/item/extinguisher/advanced(src)
-	new /obj/item/storage/photo_album/CE(src)
-	new /obj/item/card/id/departmental_budget/eng(src)
+	starts_with = list(
+		/obj/item/clothing/accessory/storage/brown_vest,
+		/obj/item/blueprints,
+		///obj/item/clamp,	//VOREStation Removal: without leaks those are pointless,
+		///obj/item/clamp,	//VOREStation Removal: without leaks those are pointless,
+		/obj/item/clothing/under/rank/chief_engineer,
+		/obj/item/clothing/under/rank/chief_engineer/skirt,
+		/obj/item/clothing/head/hardhat/white,
+		/obj/item/clothing/head/welding,
+		/obj/item/clothing/gloves/yellow,
+		/obj/item/clothing/shoes/brown,
+		/obj/item/weapon/cartridge/ce,
+		/obj/item/device/radio/headset/heads/ce,
+		/obj/item/device/radio/headset/heads/ce/alt,
+		/obj/item/weapon/storage/toolbox/mechanical,
+		/obj/item/clothing/suit/storage/hazardvest,
+		/obj/item/clothing/mask/gas,
+		/obj/item/device/multitool,
+		/obj/item/weapon/storage/belt/utility/chief/full,
+		/obj/item/device/flash,
+		/obj/item/device/t_scanner/upgraded,
+		/obj/item/taperoll/engineering,
+		/obj/item/clothing/suit/storage/hooded/wintercoat/engineering,
+		/obj/item/clothing/shoes/boots/winter/engineering,
+		/obj/item/weapon/tank/emergency/oxygen/engi,
+		/obj/item/weapon/reagent_containers/spray/windowsealant) //VOREStation Add
+
+/obj/structure/closet/secure_closet/engineering_chief/Initialize()
+	if(prob(50))
+		starts_with += /obj/item/weapon/storage/backpack/industrial
+	else
+		starts_with += /obj/item/weapon/storage/backpack/satchel/eng
+	if(prob(50))
+		starts_with += /obj/item/weapon/storage/backpack/dufflebag/eng
+	return ..()
 
 /obj/structure/closet/secure_closet/engineering_electrical
-	name = "electrical supplies locker"
-	req_access = list(ACCESS_ENGINE_EQUIP)
-	icon_state = "eng"
-	icon_door = "eng_elec"
+	name = "electrical supplies"
+	icon_state = "secureengelec1"
+	icon_closed = "secureengelec"
+	icon_locked = "secureengelec1"
+	icon_opened = "toolclosetopen"
+	icon_broken = "secureengelecbroken"
+	icon_off = "secureengelecoff"
+	req_access = list(access_engine_equip)
 
-/obj/structure/closet/secure_closet/engineering_electrical/PopulateContents()
-	..()
-	var/static/items_inside = list(
-		/obj/item/clothing/gloves/color/yellow = 2,
-		/obj/item/inducer = 2,
-		/obj/item/storage/toolbox/electrical = 3,
-		/obj/item/electronics/apc = 3,
-		/obj/item/multitool = 3)
-	generate_items_inside(items_inside,src)
+	starts_with = list(
+		/obj/item/clothing/gloves/yellow = 2,
+		/obj/item/weapon/storage/toolbox/electrical = 3,
+		/obj/item/weapon/module/power_control = 3,
+		/obj/item/device/multitool = 3)
+
 
 /obj/structure/closet/secure_closet/engineering_welding
-	name = "welding supplies locker"
-	req_access = list(ACCESS_ENGINE_EQUIP)
-	icon_state = "eng"
-	icon_door = "eng_weld"
+	name = "welding supplies"
+	icon_state = "secureengweld1"
+	icon_closed = "secureengweld"
+	icon_locked = "secureengweld1"
+	icon_opened = "toolclosetopen"
+	icon_broken = "secureengweldbroken"
+	icon_off = "secureengweldoff"
+	req_access = list(access_construction)
 
-/obj/structure/closet/secure_closet/engineering_welding/PopulateContents()
-	..()
-	for(var/i in 1 to 3)
-		new /obj/item/clothing/head/welding(src)
-	for(var/i in 1 to 3)
-		new /obj/item/weldingtool(src)
+	starts_with = list(
+		/obj/item/clothing/head/welding = 3,
+		/obj/item/weapon/weldingtool/largetank = 3,
+		/obj/item/weapon/weldpack = 3,
+		/obj/item/clothing/glasses/welding = 3)
 
 /obj/structure/closet/secure_closet/engineering_personal
 	name = "engineer's locker"
-	req_access = list(ACCESS_ENGINE_EQUIP)
-	icon_state = "eng_secure"
+	icon_state = "secureeng1"
+	icon_closed = "secureeng"
+	icon_locked = "secureeng1"
+	icon_opened = "secureengopen"
+	icon_broken = "secureengbroken"
+	icon_off = "secureengoff"
+	req_access = list(access_engine_equip)
 
-/obj/structure/closet/secure_closet/engineering_personal/PopulateContents()
-	..()
-	new /obj/item/radio/headset/headset_eng(src)
-	new /obj/item/storage/toolbox/mechanical(src)
-	new /obj/item/tank/internals/emergency_oxygen/engi(src)
-	new /obj/item/holosign_creator/engineering(src)
-	new /obj/item/clothing/mask/gas(src)
-	new /obj/item/clothing/glasses/meson/engine(src)
-	new /obj/item/storage/box/emptysandbags(src)
-	new /obj/item/storage/bag/construction(src)
+	starts_with = list(
+		/obj/item/clothing/accessory/storage/brown_vest,
+		/obj/item/weapon/storage/toolbox/mechanical,
+		/obj/item/device/radio/headset/headset_eng,
+		/obj/item/device/radio/headset/headset_eng/alt,
+		/obj/item/clothing/suit/storage/hazardvest,
+		/obj/item/clothing/mask/gas,
+		/obj/item/clothing/glasses/meson,
+		/obj/item/weapon/cartridge/engineering,
+		/obj/item/taperoll/engineering,
+		/obj/item/clothing/head/hardhat,
+		/obj/item/clothing/suit/storage/hooded/wintercoat/engineering,
+		/obj/item/clothing/shoes/boots/winter/engineering,
+		/obj/item/weapon/tank/emergency/oxygen/engi,
+		/obj/item/weapon/reagent_containers/spray/windowsealant) //VOREStation Add
+
+/obj/structure/closet/secure_closet/engineering_personal/Initialize()
+	if(prob(50))
+		starts_with += /obj/item/weapon/storage/backpack/industrial
+	else
+		starts_with += /obj/item/weapon/storage/backpack/satchel/eng
+	if(prob(50))
+		starts_with += /obj/item/weapon/storage/backpack/dufflebag/eng
+	return ..()
 
 
-/obj/structure/closet/secure_closet/atmospherics
-	name = "\proper atmospheric technician's locker"
-	req_access = list(ACCESS_ATMOSPHERICS)
-	icon_state = "atmos"
+/obj/structure/closet/secure_closet/atmos_personal
+	name = "technician's locker"
+	icon_state = "secureatm1"
+	icon_closed = "secureatm"
+	icon_locked = "secureatm1"
+	icon_opened = "secureatmopen"
+	icon_broken = "secureatmbroken"
+	icon_off = "secureatmoff"
+	req_access = list(access_atmospherics)
 
-/obj/structure/closet/secure_closet/atmospherics/PopulateContents()
-	..()
-	new /obj/item/radio/headset/headset_eng(src)
-	new /obj/item/pipe_dispenser(src)
-	new /obj/item/storage/toolbox/mechanical(src)
-	new /obj/item/tank/internals/emergency_oxygen/engi(src)
-	new /obj/item/holosign_creator/atmos(src)
-	new /obj/item/watertank/atmos(src)
-	new /obj/item/clothing/suit/fire/atmos(src)
-	new /obj/item/clothing/mask/gas/atmos(src)
-	new /obj/item/clothing/head/hardhat/atmos(src)
-	new /obj/item/clothing/glasses/meson/engine/tray(src)
-	new /obj/item/extinguisher/advanced(src)
+	starts_with = list(
+		/obj/item/clothing/accessory/storage/brown_vest,
+		/obj/item/clothing/suit/fire/firefighter,
+		/obj/item/clothing/head/hardhat/red,
+		/obj/item/device/flashlight,
+		/obj/item/weapon/extinguisher,
+		///obj/item/clamp,	//VOREStation Removal: without leaks those are pointless,
+		/obj/item/device/radio/headset/headset_eng,
+		/obj/item/device/radio/headset/headset_eng/alt,
+		/obj/item/clothing/suit/storage/hazardvest,
+		/obj/item/clothing/mask/gas,
+		/obj/item/weapon/cartridge/atmos,
+		/obj/item/taperoll/atmos,
+		/obj/item/clothing/suit/storage/hooded/wintercoat/engineering/atmos,
+		/obj/item/clothing/shoes/boots/winter/atmos,
+		/obj/item/weapon/tank/emergency/oxygen/engi)
+
+/obj/structure/closet/secure_closet/atmos_personal/Initialize()
+	if(prob(50))
+		starts_with += /obj/item/weapon/storage/backpack/industrial
+	else
+		starts_with += /obj/item/weapon/storage/backpack/satchel/eng
+	if(prob(50))
+		starts_with += /obj/item/weapon/storage/backpack/dufflebag/eng
+	return ..()

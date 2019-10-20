@@ -62,7 +62,7 @@ GLOBAL_PROTECT(VVpixelmovement)
 		if (!lentext(shorttype))
 			shorttype = "/"
 
-		.["[D]([shorttype])[REF(D)]#[i]"] = D
+		.["[D]([shorttype])\ref[D]#[i]"] = D
 
 /client/proc/mod_list_add_ass(atom/O) //hehe
 
@@ -120,12 +120,13 @@ GLOBAL_PROTECT(VVpixelmovement)
 		if(confirm != "Continue")
 			return
 
-	var/is_normal_list = IS_NORMAL_LIST(L)
+
+
 	var/list/names = list()
 	for (var/i in 1 to L.len)
 		var/key = L[i]
 		var/value
-		if (is_normal_list && !isnum(key))
+		if (IS_NORMAL_LIST(L) && !isnum(key))
 			value = L[key]
 		if (value == null)
 			value = "null"
@@ -187,17 +188,15 @@ GLOBAL_PROTECT(VVpixelmovement)
 	var/default
 	var/variable
 	var/old_assoc_value		//EXPERIMENTAL - Keep old associated value while modifying key, if any
-	if(is_normal_list)
-		if (assoc)
-			variable = L[assoc_key]
-		else
-			variable = L[index]
-			//EXPERIMENTAL - Keep old associated value while modifying key, if any
-			if(IS_VALID_ASSOC_KEY(variable))
-				var/found = L[variable]
-				if(!isnull(found))
-					old_assoc_value = found
-			//
+	if (assoc)
+		variable = L[assoc_key]
+	else
+		variable = L[index]
+		//EXPERIMENTAL - Keep old associated value while modifying key, if any
+		var/found = L[variable]
+		if(!isnull(found))
+			old_assoc_value = found
+		//
 
 	default = vv_get_class(objectvar, variable)
 
@@ -260,13 +259,12 @@ GLOBAL_PROTECT(VVpixelmovement)
 				new_var = replacetext(new_var,"\[[V]]","[O.vars[V]]")
 
 
-	if(is_normal_list)
-		if(assoc)
-			L[assoc_key] = new_var
-		else
-			L[index] = new_var
-			if(!isnull(old_assoc_value) && IS_VALID_ASSOC_KEY(new_var))
-				L[new_var] = old_assoc_value
+	if(assoc)
+		L[assoc_key] = new_var
+	else
+		L[index] = new_var
+		if(!isnull(old_assoc_value) && IS_VALID_ASSOC_KEY(new_var))
+			L[new_var] = old_assoc_value
 	if (O)
 		if (O.vv_edit_var(objectvar, L) == FALSE)
 			to_chat(src, "Your edit was rejected by the object.")
@@ -296,7 +294,7 @@ GLOBAL_PROTECT(VVpixelmovement)
 	var/var_value
 
 	if(param_var_name)
-		if(!(param_var_name in O.vars))
+		if(!param_var_name in O.vars)
 			to_chat(src, "A variable with this name ([param_var_name]) doesn't exist in this datum ([O])")
 			return
 		variable = param_var_name

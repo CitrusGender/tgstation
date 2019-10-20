@@ -1,131 +1,101 @@
 /obj/item/clothing/head/soft
 	name = "cargo cap"
-	desc = "It's a baseball hat in a tasteless yellow colour."
+	desc = "It's a peaked cap in a tasteless yellow color."
 	icon_state = "cargosoft"
-	item_state = "helmet"
-	var/soft_type = "cargo"
-
-	dog_fashion = /datum/dog_fashion/head/cargo_tech
-
+	item_state_slots = list(slot_r_hand_str = "cargosoft", slot_l_hand_str = "cargosoft")
 	var/flipped = 0
+	siemens_coefficient = 0.9
+	body_parts_covered = 0
 
 /obj/item/clothing/head/soft/dropped()
-	icon_state = "[soft_type]soft"
+	icon_state = initial(icon_state)
 	flipped=0
 	..()
 
-/obj/item/clothing/head/soft/verb/flipcap()
-	set category = "Object"
-	set name = "Flip cap"
-
-	flip(usr)
-
-
-/obj/item/clothing/head/soft/AltClick(mob/user)
-	..()
-	if(!user.canUseTopic(src, BE_CLOSE, ismonkey(user)))
-		return
+/obj/item/clothing/head/soft/attack_self(mob/user)
+	flipped = !flipped
+	if(flipped)
+		icon_state = "[icon_state]_flipped"
+		user << "You flip the hat backwards."
 	else
-		flip(user)
-
-
-/obj/item/clothing/head/soft/proc/flip(mob/user)
-	if(!user.incapacitated())
-		flipped = !flipped
-		if(src.flipped)
-			icon_state = "[soft_type]soft_flipped"
-			to_chat(user, "<span class='notice'>You flip the hat backwards.</span>")
-		else
-			icon_state = "[soft_type]soft"
-			to_chat(user, "<span class='notice'>You flip the hat back in normal position.</span>")
-		usr.update_inv_head()	//so our mob-overlays update
-
-/obj/item/clothing/head/soft/examine(mob/user)
-	. = ..()
-	. += "<span class='notice'>Alt-click the cap to flip it [flipped ? "forwards" : "backwards"].</span>"
+		icon_state = initial(icon_state)
+		user << "You flip the hat back in normal position."
+	update_clothing_icon()	//so our mob-overlays update
 
 /obj/item/clothing/head/soft/red
 	name = "red cap"
-	desc = "It's a baseball hat in a tasteless red colour."
+	desc = "It's a baseball hat in a tasteless red color."
 	icon_state = "redsoft"
-	soft_type = "red"
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "redsoft", slot_l_hand_str = "redsoft")
 
 /obj/item/clothing/head/soft/blue
 	name = "blue cap"
-	desc = "It's a baseball hat in a tasteless blue colour."
+	desc = "It's a peaked cap in a tasteless blue color."
 	icon_state = "bluesoft"
-	soft_type = "blue"
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "bluesoft", slot_l_hand_str = "bluesoft")
 
 /obj/item/clothing/head/soft/green
 	name = "green cap"
-	desc = "It's a baseball hat in a tasteless green colour."
+	desc = "It's a peaked cap in a tasteless green color."
 	icon_state = "greensoft"
-	soft_type = "green"
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "greensoft", slot_l_hand_str = "greensoft")
 
 /obj/item/clothing/head/soft/yellow
 	name = "yellow cap"
-	desc = "It's a baseball hat in a tasteless yellow colour."
+	desc = "It's a peaked cap in a tasteless yellow color."
 	icon_state = "yellowsoft"
-	soft_type = "yellow"
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "yellowsoft", slot_l_hand_str = "yellowsoft")
 
 /obj/item/clothing/head/soft/grey
 	name = "grey cap"
-	desc = "It's a baseball hat in a tasteful grey colour."
+	desc = "It's a peaked cap in a tasteful grey color."
 	icon_state = "greysoft"
-	soft_type = "grey"
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "greysoft", slot_l_hand_str = "greysoft")
 
 /obj/item/clothing/head/soft/orange
 	name = "orange cap"
-	desc = "It's a baseball hat in a tasteless orange colour."
+	desc = "It's a peaked cap in a tasteless orange color."
 	icon_state = "orangesoft"
-	soft_type = "orange"
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "orangesoft", slot_l_hand_str = "orangesoft")
 
 /obj/item/clothing/head/soft/mime
 	name = "white cap"
-	desc = "It's a baseball hat in a tasteless white colour."
+	desc = "It's a peaked cap in a tasteless white color."
 	icon_state = "mimesoft"
-	soft_type = "mime"
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "mimesoft", slot_l_hand_str = "mimesoft")
 
 /obj/item/clothing/head/soft/purple
 	name = "purple cap"
-	desc = "It's a baseball hat in a tasteless purple colour."
+	desc = "It's a peaked cap in a tasteless purple color."
 	icon_state = "purplesoft"
-	soft_type = "purple"
-	dog_fashion = null
-
-/obj/item/clothing/head/soft/black
-	name = "black cap"
-	desc = "It's a baseball hat in a tasteless black colour."
-	icon_state = "blacksoft"
-	soft_type = "black"
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "purplesoft", slot_l_hand_str = "purplesoft")
 
 /obj/item/clothing/head/soft/rainbow
 	name = "rainbow cap"
-	desc = "It's a baseball hat in a bright rainbow of colors."
+	desc = "It's a peaked cap in a bright rainbow of colors."
 	icon_state = "rainbowsoft"
-	soft_type = "rainbow"
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "rainbowsoft", slot_l_hand_str = "rainbowsoft")
 
 /obj/item/clothing/head/soft/sec
 	name = "security cap"
-	desc = "It's a robust baseball hat in tasteful red colour."
+	desc = "It's a field cap in tasteful red color."
 	icon_state = "secsoft"
-	soft_type = "sec"
-	armor = list("melee" = 30, "bullet" = 25, "laser" = 25, "energy" = 10, "bomb" = 25, "bio" = 0, "rad" = 0, "fire" = 20, "acid" = 50)
-	strip_delay = 60
-	dog_fashion = null
+	item_state_slots = list(slot_r_hand_str = "secsoft", slot_l_hand_str = "secsoft")
 
-/obj/item/clothing/head/soft/emt
-	name = "EMT cap"
-	desc = "It's a baseball hat with a dark turquoise color and a reflective cross on the top."
-	icon_state = "emtsoft"
-	soft_type = "emt"
-	dog_fashion = null
+/obj/item/clothing/head/soft/sec/corp
+	name = "corporate security cap"
+	desc = "It's field cap in corporate colors."
+	icon_state = "corpsoft"
+	item_state_slots = list(slot_r_hand_str = "corpsoft", slot_l_hand_str = "corpsoft")
+
+/obj/item/clothing/head/soft/black
+	name = "black cap"
+	desc = "It's a peaked cap in a tasteful black color."
+	icon_state = "blacksoft"
+	item_state_slots = list(slot_r_hand_str = "blacksoft", slot_l_hand_str = "blacksoft")
+
+/obj/item/clothing/head/soft/mbill
+	name = "shipping cap"
+	desc = "It's a ballcap bearing the colors of Major Bill's Shipping."
+	icon_state = "mbillsoft"
+	catalogue_data = list(/datum/category_item/catalogue/information/organization/major_bills)

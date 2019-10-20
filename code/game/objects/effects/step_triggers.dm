@@ -3,42 +3,24 @@
 /obj/effect/step_trigger
 	var/affect_ghosts = 0
 	var/stopper = 1 // stops throwers
-	var/mobs_only = FALSE
-	invisibility = INVISIBILITY_ABSTRACT // nope cant see this shit
-	anchored = TRUE
+	invisibility = 99 // nope cant see this shit
+	plane = ABOVE_PLANE
+	anchored = 1
+	icon = 'icons/mob/screen1.dmi' //VS Edit
+	icon_state = "centermarker" //VS Edit
 
-/obj/effect/step_trigger/proc/Trigger(atom/movable/A)
+/obj/effect/step_trigger/proc/Trigger(var/atom/movable/A)
 	return 0
 
 /obj/effect/step_trigger/Crossed(H as mob|obj)
 	..()
 	if(!H)
 		return
-	if(isobserver(H) && !affect_ghosts)
-		return
-	if(!ismob(H) && mobs_only)
+	if(istype(H, /mob/observer) && !affect_ghosts)
 		return
 	Trigger(H)
 
 
-/obj/effect/step_trigger/singularity_act()
-	return
-
-/obj/effect/step_trigger/singularity_pull()
-	return
-
-/* Sends a message to mob when triggered*/
-
-/obj/effect/step_trigger/message
-	var/message	//the message to give to the mob
-	var/once = 1
-	mobs_only = TRUE
-
-/obj/effect/step_trigger/message/Trigger(mob/M)
-	if(M.client)
-		to_chat(M, "<span class='info'>[message]</span>")
-		if(once)
-			qdel(src)
 
 /* Tosses things in a certain direction */
 
@@ -51,58 +33,57 @@
 	var/nostop = 0 // if 1: will only be stopped by teleporters
 	var/list/affecting = list()
 
-/obj/effect/step_trigger/thrower/Trigger(atom/A)
-	if(!A || !ismovableatom(A))
-		return
-	var/atom/movable/AM = A
-	var/curtiles = 0
-	var/stopthrow = 0
-	for(var/obj/effect/step_trigger/thrower/T in orange(2, src))
-		if(AM in T.affecting)
+	Trigger(var/atom/A)
+		if(!A || !istype(A, /atom/movable))
 			return
+		var/atom/movable/AM = A
+		var/curtiles = 0
+		var/stopthrow = 0
+		for(var/obj/effect/step_trigger/thrower/T in orange(2, src))
+			if(AM in T.affecting)
+				return
 
-	if(isliving(AM))
-		var/mob/living/M = AM
-		if(immobilize)
-			M.mobility_flags &= ~MOBILITY_MOVE
+		if(ismob(AM))
+			var/mob/M = AM
+			if(immobilize)
+				M.canmove = 0
 
-	affecting.Add(AM)
-	while(AM && !stopthrow)
-		if(tiles)
-			if(curtiles >= tiles)
+		affecting.Add(AM)
+		while(AM && !stopthrow)
+			if(tiles)
+				if(curtiles >= tiles)
+					break
+			if(AM.z != src.z)
 				break
-		if(AM.z != src.z)
-			break
 
-		curtiles++
+			curtiles++
 
-		sleep(speed)
+			sleep(speed)
 
-		// Calculate if we should stop the process
-		if(!nostop)
-			for(var/obj/effect/step_trigger/T in get_step(AM, direction))
-				if(T.stopper && T != src)
-					stopthrow = 1
-		else
-			for(var/obj/effect/step_trigger/teleporter/T in get_step(AM, direction))
-				if(T.stopper)
-					stopthrow = 1
+			// Calculate if we should stop the process
+			if(!nostop)
+				for(var/obj/effect/step_trigger/T in get_step(AM, direction))
+					if(T.stopper && T != src)
+						stopthrow = 1
+			else
+				for(var/obj/effect/step_trigger/teleporter/T in get_step(AM, direction))
+					if(T.stopper)
+						stopthrow = 1
 
-		if(AM)
-			var/predir = AM.dir
-			step(AM, direction)
-			if(!facedir)
-				AM.setDir(predir)
+			if(AM)
+				var/predir = AM.dir
+				step(AM, direction)
+				if(!facedir)
+					AM.set_dir(predir)
 
 
 
-	affecting.Remove(AM)
+		affecting.Remove(AM)
 
-	if(isliving(AM))
-		var/mob/living/M = AM
-		if(immobilize)
-			M.mobility_flags |= MOBILITY_MOVE
-		M.update_mobility()
+		if(ismob(AM))
+			var/mob/M = AM
+			if(immobilize)
+				M.canmove = 1
 
 /* Stops things thrown by a thrower, doesn't do anything */
 
@@ -115,11 +96,56 @@
 	var/teleport_y = 0
 	var/teleport_z = 0
 
-/obj/effect/step_trigger/teleporter/Trigger(atom/movable/A)
+/obj/effect/step_trigger/teleporter/Trigger(atom/movable/AM)
 	if(teleport_x && teleport_y && teleport_z)
-
 		var/turf/T = locate(teleport_x, teleport_y, teleport_z)
-		A.forceMove(T)
+		move_object(AM, T)
+
+
+/obj/effect/step_trigger/teleporter/proc/move_object(atom/movable/AM, turf/T)
+	if(AM.anchored && !istype(AM, /obj/mecha))
+		return
+
+	if(isliving(AM))
+		var/mob/living/L = AM
+		if(L.pulling)
+			var/atom/movable/P = L.pulling
+			L.stop_pulling()
+			P.forceMove(T)
+			L.forceMove(T)
+			L.start_pulling(P)
+		else
+			L.forceMove(T)
+	else
+		AM.forceMove(T)
+
+/* Moves things by an offset, useful for 'Bridges'. Uses dir and a distance var to work with maploader direction changes. */
+/obj/effect/step_trigger/teleporter/offset
+	icon = 'icons/effects/effects.dmi'
+	icon_state = "arrow"
+	var/distance = 3
+
+/obj/effect/step_trigger/teleporter/offset/north
+	dir = NORTH
+
+/obj/effect/step_trigger/teleporter/offset/south
+	dir = SOUTH
+
+/obj/effect/step_trigger/teleporter/offset/east
+	dir = EAST
+
+/obj/effect/step_trigger/teleporter/offset/west
+	dir = WEST
+
+/obj/effect/step_trigger/teleporter/offset/Trigger(atom/movable/AM)
+	var/turf/T = get_turf(src)
+	for(var/i = 1 to distance)
+		T = get_step(T, dir)
+		if(!istype(T))
+			return
+	move_object(AM, T)
+
+
 
 /* Random teleporter, teleports atoms to locations ranging from teleport_x - teleport_x_offset, etc */
 
@@ -128,73 +154,92 @@
 	var/teleport_y_offset = 0
 	var/teleport_z_offset = 0
 
-/obj/effect/step_trigger/teleporter/random/Trigger(atom/movable/A)
-	if(teleport_x && teleport_y && teleport_z)
-		if(teleport_x_offset && teleport_y_offset && teleport_z_offset)
-
-			var/turf/T = locate(rand(teleport_x, teleport_x_offset), rand(teleport_y, teleport_y_offset), rand(teleport_z, teleport_z_offset))
-			if (T)
+	Trigger(var/atom/movable/A)
+		if(teleport_x && teleport_y && teleport_z)
+			if(teleport_x_offset && teleport_y_offset && teleport_z_offset)
+				var/turf/T = locate(rand(teleport_x, teleport_x_offset), rand(teleport_y, teleport_y_offset), rand(teleport_z, teleport_z_offset))
 				A.forceMove(T)
 
-/* Fancy teleporter, creates sparks and smokes when used */
+/* Teleporter that sends objects stepping on it to a specific landmark. */
 
-/obj/effect/step_trigger/teleport_fancy
-	var/locationx
-	var/locationy
-	var/uses = 1	//0 for infinite uses
-	var/entersparks = 0
-	var/exitsparks = 0
-	var/entersmoke = 0
-	var/exitsmoke = 0
+/obj/effect/step_trigger/teleporter/landmark
+	var/obj/effect/landmark/the_landmark = null
+	var/landmark_id = null
 
-/obj/effect/step_trigger/teleport_fancy/Trigger(mob/M)
-	var/dest = locate(locationx, locationy, z)
-	M.Move(dest)
+/obj/effect/step_trigger/teleporter/landmark/Initialize()
+	. = ..()
+	for(var/obj/effect/landmark/teleport_mark/mark in tele_landmarks)
+		if(mark.landmark_id == landmark_id)
+			the_landmark = mark
+			return
 
-	if(entersparks)
-		var/datum/effect_system/spark_spread/s = new
-		s.set_up(4, 1, src)
-		s.start()
-	if(exitsparks)
-		var/datum/effect_system/spark_spread/s = new
-		s.set_up(4, 1, dest)
-		s.start()
-
-	if(entersmoke)
-		var/datum/effect_system/smoke_spread/s = new
-		s.set_up(4, 1, src, 0)
-		s.start()
-	if(exitsmoke)
-		var/datum/effect_system/smoke_spread/s = new
-		s.set_up(4, 1, dest, 0)
-		s.start()
-
-	uses--
-	if(uses == 0)
-		qdel(src)
-
-/* Simple sound player, Mapper friendly! */
-
-/obj/effect/step_trigger/sound_effect
-	var/sound //eg. path to the sound, inside '' eg: 'growl.ogg'
-	var/volume = 100
-	var/freq_vary = 1 //Should the frequency of the sound vary?
-	var/extra_range = 0 // eg World.view = 7, extra_range = 1, 7+1 = 8, 8 turfs radius
-	var/happens_once = 0
-	var/triggerer_only = 0 //Whether the triggerer is the only person who hears this
+/obj/effect/step_trigger/teleporter/landmark/Trigger(var/atom/movable/A)
+	if(the_landmark)
+		A.forceMove(get_turf(the_landmark))
 
 
-/obj/effect/step_trigger/sound_effect/Trigger(atom/movable/A)
-	var/turf/T = get_turf(A)
+var/global/list/tele_landmarks = list() // Terrible, but the alternative is looping through world.
 
-	if(!T)
-		return
+/obj/effect/landmark/teleport_mark
+	var/landmark_id = null
 
-	if(triggerer_only && ismob(A))
-		var/mob/B = A
-		B.playsound_local(T, sound, volume, freq_vary)
+/obj/effect/landmark/teleport_mark/New()
+	..()
+	tele_landmarks += src
+
+/obj/effect/landmark/teleport_mark/Destroy()
+	tele_landmarks -= src
+	return ..()
+
+/* Teleporter which simulates falling out of the sky. */
+
+/obj/effect/step_trigger/teleporter/planetary_fall
+	var/datum/planet/planet = null
+
+// First time setup, which planet are we aiming for?
+/obj/effect/step_trigger/teleporter/planetary_fall/proc/find_planet()
+	return
+
+/obj/effect/step_trigger/teleporter/planetary_fall/Trigger(var/atom/movable/A)
+	if(!planet)
+		find_planet()
+
+	if(planet)
+		if(!planet.planet_floors.len)
+			message_admins("ERROR: planetary_fall step trigger's list of outdoor floors was empty.")
+			return
+		var/turf/simulated/T = null
+		var/safety = 100 // Infinite loop protection.
+		while(!T && safety)
+			var/turf/simulated/candidate = pick(planet.planet_floors)
+			if(!istype(candidate) || istype(candidate, /turf/simulated/sky))
+				safety--
+				continue
+			else if(candidate && !candidate.outdoors)
+				safety--
+				continue
+			else
+				T = candidate
+				break
+
+		if(!T)
+			message_admins("ERROR: planetary_fall step trigger could not find a suitable landing turf.")
+			return
+
+		if(isobserver(A))
+			A.forceMove(T) // Harmlessly move ghosts.
+			return
+		//VOREStation Edit Start
+		if(!(A.can_fall()))
+			return // Phased shifted kin should not fall
+		//VOREStation Edit End
+
+		A.forceMove(T)
+		// Living things should probably be logged when they fall...
+		if(isliving(A))
+			message_admins("\The [A] fell out of the sky.")
+		// ... because they're probably going to die from it.
+		A.fall_impact(T, 42, 90, FALSE, TRUE)	//You will not be defibbed from this.
 	else
-		playsound(T, sound, volume, freq_vary, extra_range)
-
-	if(happens_once)
-		qdel(src)
+		message_admins("ERROR: planetary_fall step trigger lacks a planet to fall onto.")
+		return

@@ -1,12 +1,10 @@
-/mob/living/silicon/ai/Login()
+/mob/living/silicon/ai/Login()	//ThisIsDumb(TM) TODO: tidy this up ¬_¬ ~Carn
 	..()
+	for(var/obj/effect/rune/rune in rune_list)
+		client.images += rune.blood_image
 	if(stat != DEAD)
-		for(var/each in GLOB.ai_status_displays) //change status
-			var/obj/machinery/status_display/ai/O = each
+		for(var/obj/machinery/ai_status_display/O in machines) //change status
 			O.mode = 1
 			O.emotion = "Neutral"
-			O.update()
-	set_eyeobj_visible(TRUE)
-	if(multicam_on)
-		end_multicam()
-	view_core()
+	src.view_core()
+	return

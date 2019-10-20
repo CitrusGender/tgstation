@@ -3,10 +3,12 @@
 
 GLOBAL_LIST_EMPTY(radial_menus)
 
+// Ported from TG
+
 /obj/screen/radial
 	icon = 'icons/mob/radial.dmi'
-	layer = ABOVE_HUD_LAYER
-	plane = ABOVE_HUD_PLANE
+	layer = LAYER_HUD_ABOVE
+	plane = PLANE_PLAYER_HUD_ABOVE
 	var/datum/radial_menu/parent
 
 /obj/screen/radial/slice
@@ -237,7 +239,7 @@ GLOBAL_LIST_EMPTY(radial_menus)
 /datum/radial_menu/proc/extract_image(E)
 	var/mutable_appearance/MA = new /mutable_appearance(E)
 	if(MA)
-		MA.layer = ABOVE_HUD_LAYER
+		MA.layer = LAYER_HUD_ABOVE
 		MA.appearance_flags |= RESET_TRANSFORM
 	return MA
 
@@ -254,7 +256,7 @@ GLOBAL_LIST_EMPTY(radial_menus)
 		return
 	current_user = M.client
 	//Blank
-	menu_holder = image(icon='icons/effects/effects.dmi',loc=anchor,icon_state="nothing",layer = ABOVE_HUD_LAYER)
+	menu_holder = image(icon='icons/effects/effects.dmi',loc=anchor,icon_state="nothing",layer = LAYER_HUD_ABOVE)
 	menu_holder.appearance_flags |= KEEP_APART
 	menu_holder.vis_contents += elements + close_button
 	current_user.images += menu_holder
@@ -306,6 +308,6 @@ GLOBAL_LIST_EMPTY(radial_menus)
 	menu.show_to(user)
 	menu.wait(user, anchor, require_near)
 	var/answer = menu.selected_choice
-	qdel(menu)
+	QDEL_NULL(menu)
 	GLOB.radial_menus -= uniqueid
 	return answer

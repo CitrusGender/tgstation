@@ -1,46 +1,82 @@
-/obj/item/reagent_containers/pill/patch
-	name = "chemical patch"
-	desc = "A chemical patch for touch based applications."
-	icon = 'icons/obj/chemical.dmi'
-	icon_state = "bandaid"
-	item_state = "bandaid"
-	possible_transfer_amounts = list()
-	volume = 40
-	apply_type = PATCH
-	apply_method = "apply"
-	self_delay = 30		// three seconds
-	dissolvable = FALSE
 
-/obj/item/reagent_containers/pill/patch/attack(mob/living/L, mob/user)
-	if(ishuman(L))
-		var/obj/item/bodypart/affecting = L.get_bodypart(check_zone(user.zone_selected))
+/*
+ * Patches. A subtype of pills, in order to inherit the possible future produceability within chem-masters, and dissolving.
+ */
+
+/obj/item/weapon/reagent_containers/pill/patch
+	name = "patch"
+	desc = "A patch."
+	icon = 'icons/obj/chemical.dmi'
+	icon_state = null
+	item_state = "pill"
+
+	base_state = "patch"
+
+	possible_transfer_amounts = null
+	w_class = ITEMSIZE_TINY
+	slot_flags = SLOT_EARS
+	volume = 60
+
+	var/pierce_material = FALSE	// If true, the patch can be used through thick material.
+
+/obj/item/weapon/reagent_containers/pill/patch/attack(mob/M as mob, mob/user as mob)
+	var/mob/living/L = user
+
+	if(M == L)
+		if(istype(M, /mob/living/carbon/human))
+			var/mob/living/carbon/human/H = M
+			var/obj/item/organ/external/affecting = H.get_organ(check_zone(L.zone_sel.selecting))
+			if(!affecting)
+				to_chat(user, "<span class='warning'>The limb is missing!</span>")
+				return
+			if(affecting.status >= ORGAN_ROBOT)
+				to_chat(user, "<span class='notice'>\The [src] won't work on a robotic limb!</span>")
+				return
+
+			if(!H.can_inject(user, FALSE, L.zone_sel.selecting, pierce_material))
+				to_chat(user, "<span class='notice'>\The [src] can't be applied through such a thick material!</span>")
+				return
+
+			to_chat(H, "<span class='notice'>\The [src] is placed on your [affecting].</span>")
+			M.drop_from_inventory(src) //icon update
+			if(reagents.total_volume)
+				reagents.trans_to_mob(M, reagents.total_volume, CHEM_TOUCH)
+			qdel(src)
+			return 1
+
+	else if(istype(M, /mob/living/carbon/human))
+		var/mob/living/carbon/human/H = M
+		var/obj/item/organ/external/affecting = H.get_organ(check_zone(L.zone_sel.selecting))
 		if(!affecting)
 			to_chat(user, "<span class='warning'>The limb is missing!</span>")
 			return
-		if(affecting.status != BODYPART_ORGANIC)
-			to_chat(user, "<span class='notice'>Medicine won't work on a robotic limb!</span>")
+		if(affecting.status >= ORGAN_ROBOT)
+			to_chat(user, "<span class='notice'>\The [src] won't work on a robotic limb!</span>")
 			return
-	..()
 
-/obj/item/reagent_containers/pill/patch/canconsume(mob/eater, mob/user)
-	if(!iscarbon(eater))
-		return 0
-	return 1 // Masks were stopping people from "eating" patches. Thanks, inheritance.
+		if(!H.can_inject(user, FALSE, L.zone_sel.selecting, pierce_material))
+			to_chat(user, "<span class='notice'>\The [src] can't be applied through such a thick material!</span>")
+			return
 
-/obj/item/reagent_containers/pill/patch/libital
-	name = "libital patch (brute)"
-	desc = "A pain reliever. Does minor liver damage. Diluted with Granibitaluri."
-	list_reagents = list(/datum/reagent/medicine/C2/libital = 2, /datum/reagent/medicine/granibitaluri = 8) //10 iterations
-	icon_state = "bandaid_brute"
+		user.visible_message("<span class='warning'>[user] attempts to place \the [src] onto [H]`s [affecting].</span>")
 
-/obj/item/reagent_containers/pill/patch/aiuri
-	name = "aiuri patch (burn)"
-	desc = "Helps with burn injuries. Does minor eye damage. Diluted with Granibitaluri."
-	list_reagents = list(/datum/reagent/medicine/C2/aiuri = 1, /datum/reagent/medicine/granibitaluri = 9)
-	icon_state = "bandaid_burn"
+		user.setClickCooldown(user.get_attack_speed(src))
+		if(!do_mob(user, M))
+			return
 
-/obj/item/reagent_containers/pill/patch/instabitaluri
-	name = "instabitaluri patch"
-	desc = "Helps with brute and burn injuries."
-	list_reagents = list(/datum/reagent/medicine/C2/instabitaluri = 20)
-	icon_state = "bandaid_both"
+		user.drop_from_inventory(src) //icon update
+		user.visible_message("<span class='warning'>[user] applies \the [src] to [H].</span>")
+
+		var/contained = reagentlist()
+		add_attack_logs(user,M,"Applied a patch containing [contained]")
+
+		to_chat(H, "<span class='notice'>\The [src] is placed on your [affecting].</span>")
+		M.drop_from_inventory(src) //icon update
+
+		if(reagents.total_volume)
+			reagents.trans_to_mob(M, reagents.total_volume, CHEM_TOUCH)
+		qdel(src)
+
+		return 1
+
+	return 0

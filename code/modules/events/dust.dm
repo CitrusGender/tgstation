@@ -1,31 +1,22 @@
-/datum/round_event_control/space_dust
-	name = "Minor Space Dust"
-	typepath = /datum/round_event/space_dust
-	weight = 200
-	max_occurrences = 1000
-	earliest_start = 0 MINUTES
-	alert_observers = FALSE
+/datum/event/dust
+	startWhen	= 10
+	endWhen		= 30
 
-/datum/round_event/space_dust
-	startWhen		= 1
-	endWhen			= 2
-	fakeable = FALSE
+/datum/event/dust/announce()
+	command_announcement.Announce("Debris resulting from activity on another nearby asteroid is approaching \the [station_name()]", "Dust Alert")
 
-/datum/round_event/space_dust/start()
-	spawn_meteors(1, GLOB.meteorsC)
+/datum/event/dust/start()
+	dust_swarm(get_severity())
 
-/datum/round_event_control/sandstorm
-	name = "Sandstorm"
-	typepath = /datum/round_event/sandstorm
-	weight = 0
-	max_occurrences = 0
-	earliest_start = 0 MINUTES
+/datum/event/dust/end()
+	command_announcement.Announce("\The [station_name()] is no longer in danger of impact from space debris.", "Dust Notice")
 
-/datum/round_event/sandstorm
-	startWhen = 1
-	endWhen = 150 // ~5 min
-	announceWhen = 0
-	fakeable = FALSE
-
-/datum/round_event/sandstorm/tick()
-	spawn_meteors(10, GLOB.meteorsC)
+/datum/event/dust/proc/get_severity()
+	switch(severity)
+		if(EVENT_LEVEL_MUNDANE)
+			return "weak"
+		if(EVENT_LEVEL_MODERATE)
+			return prob(80) ? "norm" : "strong"
+		if(EVENT_LEVEL_MAJOR)
+			return "super"
+	return "weak"

@@ -1,9 +1,10 @@
 //temporary visual effects
 /obj/effect/temp_visual
+	icon = 'icons/effects/effects.dmi'
 	icon_state = "nothing"
 	anchored = TRUE
 	layer = ABOVE_MOB_LAYER
-	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	mouse_opacity = 0
 	var/duration = 10 //in deciseconds
 	var/randomdir = TRUE
 	var/timerid
@@ -11,8 +12,7 @@
 /obj/effect/temp_visual/Initialize()
 	. = ..()
 	if(randomdir)
-		setDir(pick(GLOB.cardinals))
-
+		dir = pick(list(NORTH, SOUTH, EAST, WEST))
 	timerid = QDEL_IN(src, duration)
 
 /obj/effect/temp_visual/Destroy()
@@ -31,9 +31,8 @@
 /obj/effect/temp_visual/dir_setting
 	randomdir = FALSE
 
-/obj/effect/temp_visual/dir_setting/Initialize(mapload, set_dir)
+/obj/effect/temp_visual/dir_setting/Initialize(loc, set_dir)
 	if(set_dir)
-		setDir(set_dir)
+		dir = set_dir
 	. = ..()
-
 

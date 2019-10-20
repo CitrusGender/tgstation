@@ -1,116 +1,70 @@
 /obj/structure/closet/secure_closet/freezer
-	icon_state = "freezer"
-	var/jones = FALSE
 
-/obj/structure/closet/secure_closet/freezer/Destroy()
-	recursive_organ_check(src)
-	..()
-
-/obj/structure/closet/secure_closet/freezer/Initialize()
-	. = ..()
-	recursive_organ_check(src)
-
-/obj/structure/closet/secure_closet/freezer/open(mob/living/user)
-	if(opened || !can_open(user))	//dupe check just so we don't let the organs decay when someone fails to open the locker
-		return FALSE
-	recursive_organ_check(src)
-	return ..()
-
-/obj/structure/closet/secure_closet/freezer/close(mob/living/user)
-	if(..())	//if we actually closed the locker
-		recursive_organ_check(src)
-
-/obj/structure/closet/secure_closet/freezer/ex_act()
-	if(!jones)
-		jones = TRUE
+/obj/structure/closet/secure_closet/freezer/update_icon()
+	if(broken)
+		icon_state = icon_broken
 	else
-		..()
+		if(!opened)
+			if(locked)
+				icon_state = icon_locked
+			else
+				icon_state = icon_closed
+		else
+			icon_state = icon_opened
 
 /obj/structure/closet/secure_closet/freezer/kitchen
 	name = "kitchen cabinet"
-	req_access = list(ACCESS_KITCHEN)
+	req_access = list(access_kitchen)
 
-/obj/structure/closet/secure_closet/freezer/kitchen/PopulateContents()
-	..()
-	for(var/i = 0, i < 3, i++)
-		new /obj/item/reagent_containers/food/condiment/flour(src)
-	new /obj/item/reagent_containers/food/condiment/rice(src)
-	new /obj/item/reagent_containers/food/condiment/sugar(src)
-
-/obj/structure/closet/secure_closet/freezer/kitchen/maintenance
-	name = "maintenance refrigerator"
-	desc = "This refrigerator looks quite dusty, is there anything edible still inside?"
-	req_access = list()
-
-/obj/structure/closet/secure_closet/freezer/kitchen/maintenance/PopulateContents()
-	..()
-	for(var/i = 0, i < 5, i++)
-		new /obj/item/reagent_containers/food/condiment/milk(src)
-	for(var/i = 0, i < 5, i++)
-		new /obj/item/reagent_containers/food/condiment/soymilk(src)
-	for(var/i = 0, i < 2, i++)
-		new /obj/item/storage/fancy/egg_box(src)
+	starts_with = list(
+		/obj/item/weapon/reagent_containers/food/condiment/flour = 7,
+		/obj/item/weapon/reagent_containers/food/condiment/sugar = 2)
 
 /obj/structure/closet/secure_closet/freezer/kitchen/mining
 	req_access = list()
 
+
 /obj/structure/closet/secure_closet/freezer/meat
 	name = "meat fridge"
-	req_access = list(ACCESS_KITCHEN)
+	icon_state = "fridge1"
+	icon_closed = "fridge"
+	icon_locked = "fridge1"
+	icon_opened = "fridgeopen"
+	icon_broken = "fridgebroken"
+	icon_off = "fridge1"
 
-/obj/structure/closet/secure_closet/freezer/meat/PopulateContents()
-	..()
-	for(var/i = 0, i < 4, i++)
-		new /obj/item/reagent_containers/food/snacks/meat/slab/monkey(src)
+	starts_with = list(
+		/obj/item/weapon/reagent_containers/food/snacks/meat/monkey = 10)
 
-/obj/structure/closet/secure_closet/freezer/meat/open
-	req_access = null
-	locked = FALSE
-
-/obj/structure/closet/secure_closet/freezer/gulag_fridge
-	name = "refrigerator"
-
-/obj/structure/closet/secure_closet/freezer/gulag_fridge/PopulateContents()
-	..()
-	for(var/i in 1 to 3)
-		new /obj/item/reagent_containers/food/drinks/beer/light(src)
 
 /obj/structure/closet/secure_closet/freezer/fridge
 	name = "refrigerator"
-	req_access = list(ACCESS_KITCHEN)
+	icon_state = "fridge1"
+	icon_closed = "fridge"
+	icon_locked = "fridge1"
+	icon_opened = "fridgeopen"
+	icon_broken = "fridgebroken"
+	icon_off = "fridge1"
 
-/obj/structure/closet/secure_closet/freezer/fridge/PopulateContents()
-	..()
-	for(var/i = 0, i < 5, i++)
-		new /obj/item/reagent_containers/food/condiment/milk(src)
-	for(var/i = 0, i < 5, i++)
-		new /obj/item/reagent_containers/food/condiment/soymilk(src)
-	for(var/i = 0, i < 2, i++)
-		new /obj/item/storage/fancy/egg_box(src)
+	starts_with = list(
+		/obj/item/weapon/reagent_containers/food/drinks/milk = 6,
+		/obj/item/weapon/reagent_containers/food/drinks/soymilk = 4,
+		/obj/item/weapon/storage/fancy/egg_box = 4,
+		/obj/item/weapon/reagent_containers/hypospray/autoinjector/biginjector/glucose = 2)
 
-/obj/structure/closet/secure_closet/freezer/fridge/open
-	req_access = null
-	locked = FALSE
 
 /obj/structure/closet/secure_closet/freezer/money
 	name = "freezer"
-	desc = "This contains cold hard cash."
-	req_access = list(ACCESS_VAULT)
+	icon_state = "fridge1"
+	icon_closed = "fridge"
+	icon_locked = "fridge1"
+	icon_opened = "fridgeopen"
+	icon_broken = "fridgebroken"
+	icon_off = "fridge1"
+	req_access = list(access_heads_vault)
 
-/obj/structure/closet/secure_closet/freezer/money/PopulateContents()
-	..()
-	for(var/i = 0, i < 3, i++)
-		new /obj/item/stack/spacecash/c1000(src)
-	for(var/i = 0, i < 5, i++)
-		new /obj/item/stack/spacecash/c500(src)
-	for(var/i = 0, i < 6, i++)
-		new /obj/item/stack/spacecash/c200(src)
 
-/obj/structure/closet/secure_closet/freezer/cream_pie
-	name = "cream pie closet"
-	desc = "Contains pies filled with cream and/or custard, you sickos."
-	req_access = list(ACCESS_THEATRE)
-
-/obj/structure/closet/secure_closet/freezer/cream_pie/PopulateContents()
-	..()
-	new /obj/item/reagent_containers/food/snacks/pie/cream(src)
+	starts_with = list(
+		/obj/item/weapon/spacecash/c1000 = 3,
+		/obj/item/weapon/spacecash/c500 = 4,
+		/obj/item/weapon/spacecash/c200 = 5)

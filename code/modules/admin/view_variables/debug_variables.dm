@@ -1,16 +1,16 @@
 #define VV_HTML_ENCODE(thing) ( sanitize ? html_encode(thing) : thing )
-/proc/debug_variable(name, value, level, datum/D, sanitize = TRUE)			//if D is a list, name will be index, and value will be assoc value.
+/proc/debug_variable(name, value, level, datum/DA = null, sanitize = TRUE)
 	var/header
-	if(D)
-		if(islist(D))
+	if(DA)
+		if (islist(DA))
 			var/index = name
 			if (value)
-				name = D[name] //name is really the index until this line
+				name = DA[name] //name is really the index until this line
 			else
-				value = D[name]
-			header = "<li style='backgroundColor:white'>([VV_HREF_TARGET_1V(D, VV_HK_LIST_EDIT, "E", index)]) ([VV_HREF_TARGET_1V(D, VV_HK_LIST_CHANGE, "C", index)]) ([VV_HREF_TARGET_1V(D, VV_HK_LIST_REMOVE, "-", index)]) "
+				value = DA[name]
+			header = "<li style='backgroundColor:white'>(<a href='?_src_=vars;listedit=\ref[DA];index=[index]'>E</a>) (<a href='?_src_=vars;listchange=\ref[DA];index=[index]'>C</a>) (<a href='?_src_=vars;listremove=\ref[DA];index=[index]'>-</a>) "
 		else
-			header = "<li style='backgroundColor:white'>([VV_HREF_TARGET_1V(D, VV_HK_BASIC_EDIT, "E", name)]) ([VV_HREF_TARGET_1V(D, VV_HK_BASIC_CHANGE, "C", name)]) ([VV_HREF_TARGET_1V(D, VV_HK_BASIC_MASSEDIT, "M", name)]) "
+			header = "<li style='backgroundColor:white'>(<a href='?_src_=vars;datumedit=\ref[DA];varnameedit=[name]'>E</a>) (<a href='?_src_=vars;datumchange=\ref[DA];varnamechange=[name]'>C</a>) (<a href='?_src_=vars;datummass=\ref[DA];varnamemass=[name]'>M</a>) "
 	else
 		header = "<li>"
 
@@ -23,9 +23,9 @@
 
 	else if (isicon(value))
 		#ifdef VARSICON
-		var/icon/I = icon(value)
+		var/icon/I = new/icon(value)
 		var/rnd = rand(1,10000)
-		var/rname = "tmp[REF(I)][rnd].png"
+		var/rname = "tmp\ref[I][rnd].png"
 		usr << browse_rsc(I, rname)
 		item = "[VV_HTML_ENCODE(name)] = (<span class='value'>[value]</span>) <img class=icon src=\"[rname]\">"
 		#else
@@ -36,11 +36,11 @@
 		item = "[VV_HTML_ENCODE(name)] = <span class='value'>'[value]'</span>"
 
 	else if (istype(value, /datum))
-		var/datum/DV = value
-		if ("[DV]" != "[DV.type]") //if the thing as a name var, lets use it.
-			item = "<a href='?_src_=vars;[HrefToken()];Vars=[REF(value)]'>[VV_HTML_ENCODE(name)] [REF(value)]</a> = [DV] [DV.type]"
+		var/datum/D = value
+		if ("[D]" != "[D.type]") //if the thing as a name var, lets use it.
+			item = "<a href='?_src_=vars;Vars=\ref[value]'>[VV_HTML_ENCODE(name)] \ref[value]</a> = [D] [D.type]"
 		else
-			item = "<a href='?_src_=vars;[HrefToken()];Vars=[REF(value)]'>[VV_HTML_ENCODE(name)] [REF(value)]</a> = [DV.type]"
+			item = "<a href='?_src_=vars;Vars=\ref[value]'>[VV_HTML_ENCODE(name)] \ref[value]</a> = [D.type]"
 
 	else if (islist(value))
 		var/list/L = value
@@ -58,9 +58,9 @@
 
 				items += debug_variable(key, val, level + 1, sanitize = sanitize)
 
-			item = "<a href='?_src_=vars;[HrefToken()];Vars=[REF(value)]'>[VV_HTML_ENCODE(name)] = /list ([L.len])</a><ul>[items.Join()]</ul>"
+			item = "<a href='?_src_=vars;Vars=\ref[value]'>[VV_HTML_ENCODE(name)] = /list ([L.len])</a><ul>[items.Join()]</ul>"
 		else
-			item = "<a href='?_src_=vars;[HrefToken()];Vars=[REF(value)]'>[VV_HTML_ENCODE(name)] = /list ([L.len])</a>"
+			item = "<a href='?_src_=vars;Vars=\ref[value]'>[VV_HTML_ENCODE(name)] = /list ([L.len])</a>"
 
 	else if (name in GLOB.bitfields)
 		var/list/flags = list()

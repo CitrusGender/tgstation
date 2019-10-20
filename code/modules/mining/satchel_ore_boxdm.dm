@@ -1,93 +1,103 @@
 
 /**********************Ore box**************************/
-
+//Why the hell is this file called satchel_ore_boxdm.dm? -CK
 /obj/structure/ore_box
 	icon = 'icons/obj/mining.dmi'
-	icon_state = "orebox"
+	icon_state = "orebox0"
 	name = "ore box"
-	desc = "A heavy wooden box, which can be filled with a lot of ores."
-	density = TRUE
-	pressure_resistance = 5*ONE_ATMOSPHERE
+	desc = "A heavy box used for storing ore."
+	density = 1
+	var/last_update = 0
+	var/list/stored_ore = list()
 
-/obj/structure/ore_box/attackby(obj/item/W, mob/user, params)
-	if (istype(W, /obj/item/stack/ore))
-		user.transferItemToLoc(W, src)
-	else if(SEND_SIGNAL(W, COMSIG_CONTAINS_STORAGE))
-		SEND_SIGNAL(W, COMSIG_TRY_STORAGE_TAKE_TYPE, /obj/item/stack/ore, src)
-		to_chat(user, "<span class='notice'>You empty the ore in [W] into \the [src].</span>")
-	else
-		return ..()
+/obj/structure/ore_box/attackby(obj/item/weapon/W as obj, mob/user as mob)
+	if (istype(W, /obj/item/weapon/ore))
+		user.remove_from_mob(W)
+		src.contents += W
 
-/obj/structure/ore_box/ComponentInitialize()
-	. = ..()
-	AddComponent(/datum/component/rad_insulation, 0.01) //please datum mats no more cancer
+	else if (istype(W, /obj/item/weapon/storage))
+		var/obj/item/weapon/storage/S = W
+		if(!S.contents.len)
+			return
+		S.hide_from(usr)
+		for(var/obj/item/weapon/ore/O in S.contents)
+			S.remove_from_storage(O, src) //This will move the item to this item's contents
+		to_chat(user,"<span class='notice'>You empty the satchel into the box.</span>")
 
-/obj/structure/ore_box/crowbar_act(mob/living/user, obj/item/I)
-	if(I.use_tool(src, user, 50, volume=50))
-		user.visible_message("<span class='notice'>[user] pries \the [src] apart.</span>",
-			"<span class='notice'>You pry apart \the [src].</span>",
-			"<span class='hear'>You hear splitting wood.</span>")
-		deconstruct(TRUE, user)
-	return TRUE
+	update_ore_count()
 
-/obj/structure/ore_box/examine(mob/living/user)
-	if(Adjacent(user) && istype(user))
-		show_contents(user)
-	. = ..()
-
-/obj/structure/ore_box/attack_hand(mob/user)
-	. = ..()
-	if(.)
-		return
-	if(Adjacent(user))
-		show_contents(user)
-
-/obj/structure/ore_box/attack_robot(mob/user)
-	if(Adjacent(user))
-		show_contents(user)
-
-/obj/structure/ore_box/proc/show_contents(mob/user)
-	var/dat = text("<b>The contents of the ore box reveal...</b><br>")
-	var/list/assembled = list()
-	for(var/obj/item/stack/ore/O in src)
-		assembled[O.type] += O.amount
-	for(var/type in assembled)
-		var/obj/item/stack/ore/O = type
-		dat += "[initial(O.name)] - [assembled[type]]<br>"
-	dat += text("<br><br><A href='?src=[REF(src)];removeall=1'>Empty box</A>")
-	user << browse(dat, "window=orebox")
-
-/obj/structure/ore_box/proc/dump_box_contents()
-	var/drop = drop_location()
-	for(var/obj/item/stack/ore/O in src)
-		if(QDELETED(O))
-			continue
-		if(QDELETED(src))
-			break
-		O.forceMove(drop)
-		if(TICK_CHECK)
-			stoplag()
-			drop = drop_location()
-
-/obj/structure/ore_box/Topic(href, href_list)
-	if(..())
-		return
-	if(!Adjacent(usr))
-		return
-
-	usr.set_machine(src)
-	add_fingerprint(usr)
-	if(href_list["removeall"])
-		dump_box_contents()
-		to_chat(usr, "<span class='notice'>You open the release hatch on the box..</span>")
-	updateUsrDialog()
-
-/obj/structure/ore_box/deconstruct(disassembled = TRUE, mob/user)
-	var/obj/item/stack/sheet/mineral/wood/WD = new (loc, 4)
-	if(user)
-		WD.add_fingerprint(user)
-	dump_box_contents()
-	qdel(src)
-
-/obj/structure/ore_box/onTransitZ()
 	return
+
+/obj/structure/ore_box/proc/update_ore_count()
+
+	stored_ore = list()
+
+	for(var/obj/item/weapon/ore/O in contents)
+
+		if(stored_ore[O.name])
+			stored_ore[O.name]++
+		else
+			stored_ore[O.name] = 1
+
+/obj/structure/ore_box/examine(mob/user)
+	user << "That's an [src]."
+	user << desc
+
+	// Borgs can now check contents too.
+	if((!istype(user, /mob/living/carbon/human)) && (!istype(user, /mob/living/silicon/robot)))
+		return
+
+	if(!Adjacent(user)) //Can only check the contents of ore boxes if you can physically reach them.
+		return
+
+	add_fingerprint(user)
+
+	if(!contents.len)
+		user << "It is empty."
+		return
+
+	if(world.time > last_update + 10)
+		update_ore_count()
+		last_update = world.time
+
+	user << "It holds:"
+	for(var/ore in stored_ore)
+		user << "- [stored_ore[ore]] [ore]"
+	return
+
+/obj/structure/ore_box/verb/empty_box()
+	set name = "Empty Ore Box"
+	set category = "Object"
+	set src in view(1)
+
+	if(!istype(usr, /mob/living/carbon/human) && !istype(usr, /mob/living/silicon/robot)) //Only living, intelligent creatures with gripping aparatti can empty ore boxes.
+		usr << "<font color='red'>You are physically incapable of emptying the ore box.</font>"
+		return
+
+	if( usr.stat || usr.restrained() )
+		return
+
+	if(!Adjacent(usr)) //You can only empty the box if you can physically reach it
+		usr << "You cannot reach the ore box."
+		return
+
+	add_fingerprint(usr)
+
+	if(contents.len < 1)
+		usr << "<font color='red'>The ore box is empty.</font>"
+		return
+
+	for (var/obj/item/weapon/ore/O in contents)
+		contents -= O
+		O.loc = src.loc
+	usr << "<font color='blue'>You empty the ore box.</font>"
+
+	return
+
+/obj/structure/ore_box/ex_act(severity)
+	if(severity == 1.0 || (severity < 3.0 && prob(50)))
+		for (var/obj/item/weapon/ore/O in contents)
+			O.loc = src.loc
+			O.ex_act(severity++)
+		qdel(src)
+		return

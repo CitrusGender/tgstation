@@ -1,120 +1,71 @@
 /mob/living
 	see_invisible = SEE_INVISIBLE_LIVING
-	sight = 0
-	see_in_dark = 2
-	hud_possible = list(HEALTH_HUD,STATUS_HUD,ANTAG_HUD,NANITE_HUD,DIAG_NANITE_FULL_HUD)
-	pressure_resistance = 10
-
-	var/resize = 1 //Badminnery resize
-	var/lastattacker = null
-	var/lastattackerckey = null
 
 	//Health and life related vars
-	var/maxHealth = 100 //Maximum health that should be possible.
+	var/maxHealth = 100 //Maximum health that should be possible.  Avoid adjusting this if you can, and instead use modifiers datums.
 	var/health = 100 	//A mob's health
 
+	var/mob_class = null	// A mob's "class", e.g. human, mechanical, animal, etc. Used for certain projectile effects. See __defines/mob.dm for available classes.
+
+	var/hud_updateflag = 0
+
 	//Damage related vars, NOTE: THESE SHOULD ONLY BE MODIFIED BY PROCS
-	var/bruteloss = 0	//Brutal damage caused by brute force (punching, being clubbed by a toolbox ect... this also accounts for pressure damage)
-	var/oxyloss = 0		//Oxygen depravation damage (no air in lungs)
-	var/toxloss = 0		//Toxic damage caused by being poisoned or radiated
-	var/fireloss = 0	//Burn damage caused by being way too hot, too cold or burnt.
+	var/bruteloss = 0.0	//Brutal damage caused by brute force (punching, being clubbed by a toolbox ect... this also accounts for pressure damage)
+	var/oxyloss = 0.0	//Oxygen depravation damage (no air in lungs)
+	var/toxloss = 0.0	//Toxic damage caused by being poisoned or radiated
+	var/fireloss = 0.0	//Burn damage caused by being way too hot, too cold or burnt.
 	var/cloneloss = 0	//Damage caused by being cloned or ejected from the cloner early. slimes also deal cloneloss damage to victims
-	var/staminaloss = 0		//Stamina damage, or exhaustion. You recover it slowly naturally, and are knocked down if it gets too high. Holodeck and hallucinations deal this.
-	var/crit_threshold = HEALTH_THRESHOLD_CRIT // when the mob goes from "normal" to crit
-
-	var/mobility_flags = MOBILITY_FLAGS_DEFAULT
-
-	var/resting = FALSE
-
-	var/lying = 0			//number of degrees. DO NOT USE THIS IN CHECKS. CHECK FOR MOBILITY FLAGS INSTEAD!!
-	var/lying_prev = 0		//last value of lying on update_mobility
-
-	var/confused = 0	//Makes the mob move in random directions.
+	var/brainloss = 0	//'Retardation' damage caused by someone hitting you in the head with a bible or being infected with brainrot.
+	var/halloss = 0		//Hallucination damage. 'Fake' damage obtained through hallucinating or the holodeck. Sleeping should cause it to wear off.
 
 	var/hallucination = 0 //Directly affects how long a mob will hallucinate for
+	var/list/atom/hallucinations = list() //A list of hallucinated people that try to attack the mob. See /obj/effect/fake_attacker in hallucinations.dm
 
 	var/last_special = 0 //Used by the resist verb, likely used to prevent players from bypassing next_move by logging in/out.
-	var/timeofdeath = 0
+	var/base_attack_cooldown = DEFAULT_ATTACK_COOLDOWN
 
-	//Allows mobs to move through dense areas without restriction. For instance, in space or out of holder objects.
-	var/incorporeal_move = FALSE //FALSE is off, INCORPOREAL_MOVE_BASIC is normal, INCORPOREAL_MOVE_SHADOW is for ninjas
-								 //and INCORPOREAL_MOVE_JAUNT is blocked by holy water/salt
+	var/t_phoron = null
+	var/t_oxygen = null
+	var/t_sl_gas = null
+	var/t_n2 = null
 
-	var/list/roundstart_quirks = list()
+	var/now_pushing = null
+	var/mob_bump_flag = 0
+	var/mob_swap_flags = 0
+	var/mob_push_flags = 0
+	var/mob_always_swap = 0
 
-	var/list/surgeries = list()	//a list of surgery datums. generally empty, they're added when the player wants them.
-
-	var/now_pushing = null //used by living/Bump() and living/PushAM() to prevent potential infinite loop.
-
-	var/cameraFollow = null
+	var/mob/living/cameraFollow = null
+	var/list/datum/action/actions = list()
 
 	var/tod = null // Time of death
-
+	var/update_slimes = 1
+	var/silent = null 		// Can't talk. Value goes down every life proc.
 	var/on_fire = 0 //The "Are we on fire?" var
-	var/fire_stacks = 0 //Tracks how many stacks of fire we have on, max is usually 20
+	var/fire_stacks
 
-	var/bloodcrawl = 0 //0 No blood crawling, BLOODCRAWL for bloodcrawling, BLOODCRAWL_EAT for crawling+mob devour
-	var/holder = null //The holder for blood crawling
-	var/ventcrawler = 0 //0 No vent crawling, 1 vent crawling in the nude, 2 vent crawling always
-	var/limb_destroyer = 0 //1 Sets AI behavior that allows mobs to target and dismember limbs with their basic attack.
+	var/failed_last_breath = 0 //This is used to determine if the mob failed a breath. If they did fail a brath, they will attempt to breathe each tick, otherwise just once per 4 ticks.
+	var/lastpuke = 0
 
-	var/mob_size = MOB_SIZE_HUMAN
-	var/mob_biotypes = MOB_ORGANIC
-	var/metabolism_efficiency = 1 //more or less efficiency to metabolize helpful/harmful reagents and regulate body temperature..
-	var/has_limbs = 0 //does the mob have distinct limbs?(arms,legs, chest,head)
+	var/evasion = 0 // Makes attacks harder to land. Negative numbers increase hit chance.
+	var/force_max_speed = 0 // If 1, the mob runs extremely fast and cannot be slowed.
 
-	var/list/pipes_shown = list()
-	var/last_played_vent
+	var/image/dsoverlay = null //Overlay used for darksight eye adjustments
 
-	var/smoke_delay = 0 //used to prevent spam with smoke reagent reaction on mob.
+	var/glow_toggle = 0					// If they're glowing!
+	var/glow_range = 2
+	var/glow_intensity = null
+	var/glow_color = "#FFFFFF"			// The color they're glowing!
 
-	var/bubble_icon = "default" //what icon the mob uses for speechbubbles
+	var/see_invisible_default = SEE_INVISIBLE_LIVING
 
-	var/last_bumped = 0
-	var/unique_name = 0 //if a mob's name should be appended with an id when created e.g. Mob (666)
+	var/nest				//Not specific, because a Nest may be the prop nest, or blob factory in this case.
 
-	var/list/butcher_results = null //these will be yielded from butchering with a probability chance equal to the butcher item's effectiveness
-	var/list/guaranteed_butcher_results = null //these will always be yielded from butchering
-	var/butcher_difficulty = 0 //effectiveness prob. is modified negatively by this amount; positive numbers make it more difficult, negative ones make it easier
+	var/list/hud_list		//Holder for health hud, status hud, wanted hud, etc (not like inventory slots)
+	var/has_huds = FALSE	//Whether or not we should bother initializing the above list
 
-	var/hellbound = 0 //People who've signed infernal contracts are unrevivable.
+	var/makes_dirt = TRUE	//FALSE if the mob shouldn't be making dirt on the ground when it walks
 
-	var/list/weather_immunities = list()
+	var/looking_elsewhere = FALSE //If the mob's view has been relocated to somewhere else, like via a camera or with binocs
 
-	var/stun_absorption = null //converted to a list of stun absorption sources this mob has when one is added
-
-	var/blood_volume = 0 //how much blood the mob has
-	var/obj/effect/proc_holder/ranged_ability //Any ranged ability the mob has, as a click override
-
-	var/see_override = 0 //0 for no override, sets see_invisible = see_override in silicon & carbon life process via update_sight()
-
-	var/list/status_effects //a list of all status effects the mob has
-	var/druggy = 0
-
-	//Speech
-	var/stuttering = 0
-	var/slurring = 0
-	var/cultslurring = 0
-	var/derpspeech = 0
-
-	var/list/implants = null
-
-	var/datum/riding/riding_datum
-
-	var/datum/language/selected_default_language
-
-	var/last_words	//used for database logging
-
-	var/list/obj/effect/proc_holder/abilities = list()
-
-	var/can_be_held = FALSE	//whether this can be picked up and held.
-
-	var/radiation = 0 //If the mob is irradiated.
-	var/ventcrawl_layer = PIPING_LAYER_DEFAULT
-	var/losebreath = 0
-
-	//List of active diseases
-	var/list/diseases = list() // list of all diseases in a mob
-	var/list/disease_resistances = list()
-
-	var/slowed_by_drag = TRUE //Whether the mob is slowed down when dragging another prone mob
+	var/image/selected_image = null // Used for buildmode AI control stuff.

@@ -1,187 +1,185 @@
+//I still dont think this should be a closet but whatever
 /obj/structure/fireaxecabinet
 	name = "fire axe cabinet"
-	desc = "There is a small label that reads \"For Emergency use only\" along with details for safe use of the axe. As if."
-	icon = 'icons/obj/wallmounts.dmi'
-	icon_state = "fireaxe"
-	anchored = TRUE
-	density = FALSE
-	armor = list("melee" = 50, "bullet" = 20, "laser" = 0, "energy" = 100, "bomb" = 10, "bio" = 100, "rad" = 100, "fire" = 90, "acid" = 50)
-	max_integrity = 150
-	integrity_failure = 0.33
-	var/locked = TRUE
-	var/open = FALSE
-	var/obj/item/twohanded/fireaxe/fireaxe
+	desc = "There is small label that reads \"For Emergency use only\" along with details for safe use of the axe. As if."
+	var/obj/item/weapon/material/twohanded/fireaxe/fireaxe
+	icon = 'icons/obj/closet.dmi'	//Not bothering to move icons out for now. But its dumb still.
+	icon_state = "fireaxe1000"
+	anchored = 1
+	density = 0
+	var/open = 0
+	var/hitstaken = 0
+	var/locked = 1
+	var/smashed = 0
 
 /obj/structure/fireaxecabinet/Initialize()
-	. = ..()
-	fireaxe = new
-	update_icon()
+	..()
+	fireaxe = new /obj/item/weapon/material/twohanded/fireaxe()
 
-/obj/structure/fireaxecabinet/Destroy()
-	if(fireaxe)
-		QDEL_NULL(fireaxe)
-	return ..()
+/obj/structure/fireaxecabinet/attackby(var/obj/item/O as obj, var/mob/user as mob)  //Marker -Agouri
+	//..() //That's very useful, Erro
 
-/obj/structure/fireaxecabinet/attackby(obj/item/I, mob/user, params)
-	if(iscyborg(user) || I.tool_behaviour == TOOL_MULTITOOL)
-		toggle_lock(user)
-	else if(I.tool_behaviour == TOOL_WELDER && user.a_intent == INTENT_HELP && !broken)
-		if(obj_integrity < max_integrity)
-			if(!I.tool_start_check(user, amount=2))
-				return
+	// This could stand to be put further in, made better, etc. but fuck you. Fuck whoever
+	// wrote this code. Fuck everything about this object. I hope you step on a Lego.
+	user.setClickCooldown(10)
+	// Seriously why the fuck is this even a closet aghasjdhasd I hate you
 
-			to_chat(user, "<span class='notice'>You begin repairing [src].</span>")
-			if(I.use_tool(src, user, 40, volume=50, amount=2))
-				obj_integrity = max_integrity
+	//var/hasaxe = 0       //gonna come in handy later~ // FUCK YOUR TILDES.
+	//if(fireaxe)
+	//	hasaxe = 1
+
+	if (isrobot(user) || locked)
+		if(istype(O, /obj/item/device/multitool))
+			to_chat(user, "<span class='warning'>Resetting circuitry...</span>")
+			playsound(user, 'sound/machines/lockreset.ogg', 50, 1)
+			if(do_after(user, 20 * O.toolspeed))
+				locked = 0
+				to_chat(user, "<span class = 'caution'> You disable the locking modules.</span>")
 				update_icon()
-				to_chat(user, "<span class='notice'>You repair [src].</span>")
-		else
-			to_chat(user, "<span class='warning'>[src] is already in good condition!</span>")
-		return
-	else if(istype(I, /obj/item/stack/sheet/glass) && broken)
-		var/obj/item/stack/sheet/glass/G = I
-		if(G.get_amount() < 2)
-			to_chat(user, "<span class='warning'>You need two glass sheets to fix [src]!</span>")
 			return
-		to_chat(user, "<span class='notice'>You start fixing [src]...</span>")
-		if(do_after(user, 20, target = src) && G.use(2))
-			broken = 0
-			obj_integrity = max_integrity
-			update_icon()
-	else if(open || broken)
-		if(istype(I, /obj/item/twohanded/fireaxe) && !fireaxe)
-			var/obj/item/twohanded/fireaxe/F = I
-			if(F.wielded)
-				to_chat(user, "<span class='warning'>Unwield the [F.name] first.</span>")
+		else if(istype(O, /obj/item/weapon))
+			var/obj/item/weapon/W = O
+			if(smashed || open)
+				if(open)
+					toggle_close_open()
 				return
-			if(!user.transferItemToLoc(F, src))
-				return
-			fireaxe = F
-			to_chat(user, "<span class='caution'>You place the [F.name] back in the [name].</span>")
-			update_icon()
-			return
-		else if(!broken)
-			toggle_open()
-	else
-		return ..()
-
-/obj/structure/fireaxecabinet/play_attack_sound(damage_amount, damage_type = BRUTE, damage_flag = 0)
-	switch(damage_type)
-		if(BRUTE)
-			if(broken)
-				playsound(loc, 'sound/effects/hit_on_shattered_glass.ogg', 90, TRUE)
 			else
-				playsound(loc, 'sound/effects/glasshit.ogg', 90, TRUE)
-		if(BURN)
-			playsound(src.loc, 'sound/items/welder.ogg', 100, TRUE)
+				playsound(user, 'sound/effects/Glasshit.ogg', 100, 1) //We don't want this playing every time
+			if(W.force < 15)
+				to_chat(user, "<span class='notice'>The cabinet's protective glass glances off the hit.</span>")
+			else
+				hitstaken++
+				if(hitstaken == 4)
+					playsound(user, 'sound/effects/Glassbr3.ogg', 100, 1) //Break cabinet, receive goodies. Cabinet's fucked for life after that.
+					smashed = 1
+					locked = 0
+					open= 1
+			update_icon()
+		return
+	if (istype(O, /obj/item/weapon/material/twohanded/fireaxe) && open)
+		if(!fireaxe)
+			if(O:wielded)
+				O:wielded = 0
+				O.update_icon()
+			fireaxe = O
+			user.remove_from_mob(O)
+			contents += O
+			to_chat(user, "<span class='notice'>You place the fire axe back in the [name].</span>")
+			update_icon()
+		else
+			if(smashed)
+				return
+			else
+				toggle_close_open()
+	else
+		if(smashed)
+			return
+		if(istype(O, /obj/item/device/multitool))
+			if(open)
+				open = 0
+				update_icon()
+				flick("[icon_state]closing", src)
+				return
+			else
+				to_chat(user, "<span class='warning'>Resetting circuitry...</span>")
+				playsound(user, 'sound/machines/lockenable.ogg', 50, 1)
+				if(do_after(user,20 * O.toolspeed))
+					locked = 1
+					to_chat(user, "<span class = 'caution'> You re-enable the locking modules.</span>")
+				return
+		else
+			toggle_close_open()
 
-/obj/structure/fireaxecabinet/take_damage(damage_amount, damage_type = BRUTE, damage_flag = 0, sound_effect = 1, attack_dir)
+
+/obj/structure/fireaxecabinet/attack_hand(mob/user as mob)
+	//var/hasaxe = 0	//Fuck this. Fuck everything about this. Who wrote this. Why.
+	//if(fireaxe)
+	//	hasaxe = 1
+
+	if(locked)
+		to_chat(user, "<span class='warning'>The cabinet won't budge!</span>")
+		return
+
 	if(open)
-		return
-	. = ..()
-	if(.)
-		update_icon()
-
-/obj/structure/fireaxecabinet/obj_break(damage_flag)
-	if(!broken && !(flags_1 & NODECONSTRUCT_1))
-		update_icon()
-		broken = TRUE
-		playsound(src, 'sound/effects/glassbr3.ogg', 100, TRUE)
-		new /obj/item/shard(loc)
-		new /obj/item/shard(loc)
-
-/obj/structure/fireaxecabinet/deconstruct(disassembled = TRUE)
-	if(!(flags_1 & NODECONSTRUCT_1))
-		if(fireaxe && loc)
-			fireaxe.forceMove(loc)
-			fireaxe = null
-		new /obj/item/stack/sheet/metal(loc, 2)
-	qdel(src)
-
-/obj/structure/fireaxecabinet/blob_act(obj/structure/blob/B)
-	if(fireaxe)
-		fireaxe.forceMove(loc)
-		fireaxe = null
-	qdel(src)
-
-/obj/structure/fireaxecabinet/attack_hand(mob/user)
-	. = ..()
-	if(.)
-		return
-	if(open || broken)
 		if(fireaxe)
 			user.put_in_hands(fireaxe)
 			fireaxe = null
-			to_chat(user, "<span class='caution'>You take the fire axe from the [name].</span>")
-			src.add_fingerprint(user)
+			to_chat (user, "<span class='notice'>You take the fire axe from the [name].</span>")
+			add_fingerprint(user)
 			update_icon()
-			return
-	if(locked)
-		to_chat(user, "<span class='warning'>The [name] won't budge!</span>")
-		return
-	else
-		open = !open
-		update_icon()
-		return
-
-/obj/structure/fireaxecabinet/attack_paw(mob/living/user)
-	return attack_hand(user)
-
-/obj/structure/fireaxecabinet/attack_ai(mob/user)
-	toggle_lock(user)
-	return
-
-/obj/structure/fireaxecabinet/attack_tk(mob/user)
-	if(locked)
-		to_chat(user, "<span class='warning'>The [name] won't budge!</span>")
-		return
-	else
-		open = !open
-		update_icon()
-		return
-
-/obj/structure/fireaxecabinet/update_icon()
-	cut_overlays()
-	if(fireaxe)
-		add_overlay("axe")
-	if(!open)
-		var/hp_percent = obj_integrity/max_integrity * 100
-		if(broken)
-			add_overlay("glass4")
 		else
-			switch(hp_percent)
-				if(-INFINITY to 40)
-					add_overlay("glass3")
-				if(40 to 60)
-					add_overlay("glass2")
-				if(60 to 80)
-					add_overlay("glass1")
-				if(80 to INFINITY)
-					add_overlay("glass")
-		if(locked)
-			add_overlay("locked")
-		else
-			add_overlay("unlocked")
+			if(smashed)
+				return
+			else
+				toggle_close_open()
+
 	else
-		add_overlay("glass_raised")
+		toggle_close_open()
 
-/obj/structure/fireaxecabinet/proc/toggle_lock(mob/user)
-	to_chat(user, "<span class='caution'>Resetting circuitry...</span>")
-	playsound(src, 'sound/machines/locktoggle.ogg', 50, TRUE)
-	if(do_after(user, 20, target = src))
-		to_chat(user, "<span class='caution'>You [locked ? "disable" : "re-enable"] the locking modules.</span>")
-		locked = !locked
+/obj/structure/fireaxecabinet/attack_tk(mob/user as mob)
+	if(open && fireaxe)
+		fireaxe.forceMove(loc)
+		to_chat(user, "<span class='notice'>You telekinetically remove the fire axe.</span>")
+		fireaxe = null
 		update_icon()
+		return
+	attack_hand(user)
 
-/obj/structure/fireaxecabinet/verb/toggle_open()
+/obj/structure/fireaxecabinet/proc/toggle_close_open()
+	open = !open
+	if(open)
+		update_icon()
+		flick("[icon_state]opening", src)
+	else
+		update_icon()
+		flick("[icon_state]closing", src)
+
+/obj/structure/fireaxecabinet/verb/toggle_openness() //nice name, huh? HUH?! -Erro //YEAH -Agouri
 	set name = "Open/Close"
 	set category = "Object"
-	set src in oview(1)
 
-	if(locked)
-		to_chat(usr, "<span class='warning'>The [name] won't budge!</span>")
+	if (isrobot(usr) || locked || smashed)
+		if(locked)
+			to_chat(usr, "<span class='warning'>The cabinet won't budge!</span>")
+		else if(smashed)
+			to_chat(usr, "<span class='notice'>The protective glass is broken!</span>")
+		return
+
+	toggle_close_open()
+	update_icon()
+
+/obj/structure/fireaxecabinet/verb/remove_fire_axe()
+	set name = "Remove Fire Axe"
+	set category = "Object"
+
+	if (isrobot(usr))
+		return
+
+	if (open)
+		if(fireaxe)
+			usr.put_in_hands(fireaxe)
+			fireaxe = null
+			to_chat(usr, "<span class='notice'>You take the Fire axe from the [name].</span>")
+		else
+			to_chat(usr, "<span class='notice'>The [name] is empty.</span>")
+	else
+		to_chat(usr, "<span class='notice'>The [name] is closed.</span>")
+	update_icon()
+
+/obj/structure/fireaxecabinet/attack_ai(mob/user as mob)
+	if(smashed)
+		to_chat(user, "<span class='warning'>The security of the cabinet is compromised.</span>")
 		return
 	else
-		open = !open
-		update_icon()
+		locked = !locked
+		if(locked)
+			to_chat(user, "<span class='warning'>Cabinet locked.</span>")
+		else
+			to_chat(user, "<span class='notice'>Cabinet unlocked.</span>")
 		return
+
+/obj/structure/fireaxecabinet/update_icon() //Template: fireaxe[has fireaxe][is opened][hits taken][is smashed]. If you want the opening or closing animations, add "opening" or "closing" right after the numbers
+	var/hasaxe = 0
+	if(fireaxe)
+		hasaxe = 1
+	icon_state = text("fireaxe[][][][]",hasaxe,open,hitstaken,smashed)

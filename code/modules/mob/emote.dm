@@ -1,54 +1,91 @@
-//The code execution of the emote datum is located at code/datums/emotes.dm
-/mob/proc/emote(act, m_type = null, message = null, intentional = FALSE)
-	act = lowertext(act)
-	var/param = message
-	var/custom_param = findchar(act, " ")
-	if(custom_param)
-		param = copytext(act, custom_param + 1, length(act) + 1)
-		act = copytext(act, 1, custom_param)
-
-
-	var/list/key_emotes = GLOB.emote_list[act]
-
-	if(!length(key_emotes))
-		if(intentional)
-			to_chat(src, "<span class='notice'>'[act]' emote does not exist. Say *help for a list.</span>")
+// All mobs should have custom emote, really..
+//m_type == 1 --> visual.
+//m_type == 2 --> audible
+/mob/proc/custom_emote(var/m_type=1,var/message = null,var/range=world.view)
+	if(stat || !use_me && usr == src)
+		src << "You are unable to emote."
 		return
-	for(var/datum/emote/P in key_emotes)
-		if(P.run_emote(src, param, m_type, intentional))
+
+	var/muzzled = is_muzzled()
+	if(m_type == 2 && muzzled) return
+
+	var/input
+	if(!message)
+		input = sanitize_or_reflect(input(src,"Choose an emote to display.") as text|null, src) //VOREStation Edit - Reflect too long messages, within reason
+	else
+		input = message
+	if(input)
+		log_emote(message,src) //Log before we add junk
+		message = "<B>[src]</B> [input]"
+	else
+		return
+
+
+	if (message)
+		message = say_emphasis(message)
+
+ // Hearing gasp and such every five seconds is not good emotes were not global for a reason.
+ // Maybe some people are okay with that.
+
+		var/turf/T = get_turf(src)
+		if(!T) return
+		var/list/in_range = get_mobs_and_objs_in_view_fast(T,range,2,remote_ghosts = client ? TRUE : FALSE)
+		var/list/m_viewers = in_range["mobs"]
+		var/list/o_viewers = in_range["objs"]
+
+		for(var/mob in m_viewers)
+			var/mob/M = mob
+			spawn(0) // It's possible that it could be deleted in the meantime, or that it runtimes.
+				if(M)
+					//VOREStation edit
+					if(istype(M, /mob/observer/dead/))
+						var/mob/observer/dead/D = M
+						if(ckey || (src in view(D)))
+							M.show_message(message, m_type)
+					else
+						M.show_message(message, m_type)
+					//End VOREStation edit
+
+		for(var/obj in o_viewers)
+			var/obj/O = obj
+			spawn(0)
+				if(O)
+					O.see_emote(src, message, m_type)
+
+// Shortcuts for above proc
+/mob/proc/visible_emote(var/act_desc)
+	custom_emote(1, act_desc)
+
+/mob/proc/audible_emote(var/act_desc)
+	custom_emote(2, act_desc)
+
+/mob/proc/emote_dead(var/message)
+
+	if(client.prefs.muted & MUTE_DEADCHAT)
+		src << "<span class='danger'>You cannot send deadchat emotes (muted).</span>"
+		return
+
+	if(!is_preference_enabled(/datum/client_preference/show_dsay))
+		src << "<span class='danger'>You have deadchat muted.</span>"
+		return
+
+	if(!src.client.holder)
+		if(!config.dsay_allowed)
+			src << "<span class='danger'>Deadchat is globally muted.</span>"
 			return
-	if(intentional)
-		to_chat(src, "<span class='notice'>Unusable emote '[act]'. Say *help for a list.</span>")
 
-/datum/emote/flip
-	key = "flip"
-	key_third_person = "flips"
-	restraint_check = TRUE
-	mob_type_allowed_typecache = list(/mob/living, /mob/dead/observer)
-	mob_type_ignore_stat_typecache = list(/mob/dead/observer)
 
-/datum/emote/flip/run_emote(mob/user, params , type_override, intentional)
-	. = ..()
-	if(.)
-		user.SpinAnimation(7,1)
+	var/input
+	if(!message)
+		input = sanitize_or_reflect(input(src, "Choose an emote to display.") as text|null, src) //VOREStation Edit - Reflect too long messages, within reason
+	else
+		input = message
 
-/datum/emote/spin
-	key = "spin"
-	key_third_person = "spins"
-	restraint_check = TRUE
-	mob_type_allowed_typecache = list(/mob/living, /mob/dead/observer)
-	mob_type_ignore_stat_typecache = list(/mob/dead/observer)
+	input = say_emphasis(input)
 
-/datum/emote/spin/run_emote(mob/user, params ,  type_override, intentional)
-	. = ..()
-	if(.)
-		user.spin(20, 1)
-
-		if(iscyborg(user) && user.has_buckled_mobs())
-			var/mob/living/silicon/robot/R = user
-			var/datum/component/riding/riding_datum = R.GetComponent(/datum/component/riding)
-			if(riding_datum)
-				for(var/mob/M in R.buckled_mobs)
-					riding_datum.force_dismount(M)
-			else
-				R.unbuckle_all_mobs()
+	if(input)
+		log_ghostemote(input, src)
+		if(!invisibility) //If the ghost is made visible by admins or cult. And to see if the ghost has toggled its own visibility, as well. -Mech
+			visible_message("<span class='deadsay'><B>[src]</B> [input]</span>")
+		else
+			say_dead_direct(input, src)

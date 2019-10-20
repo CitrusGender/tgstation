@@ -1,91 +1,253 @@
+//Also contains /obj/structure/closet/body_bag because I doubt anyone would think to look for bodybags in /object/structures
 
 /obj/item/bodybag
 	name = "body bag"
 	desc = "A folded bag designed for the storage and transportation of cadavers."
 	icon = 'icons/obj/bodybag.dmi'
 	icon_state = "bodybag_folded"
-	w_class = WEIGHT_CLASS_SMALL
-	var/unfoldedbag_path = /obj/structure/closet/body_bag
+	w_class = ITEMSIZE_SMALL
 
-/obj/item/bodybag/attack_self(mob/user)
-	deploy_bodybag(user, user.loc)
-
-/obj/item/bodybag/afterattack(atom/target, mob/user, proximity)
-	. = ..()
-	if(proximity)
-		if(isopenturf(target))
-			deploy_bodybag(user, target)
-
-/obj/item/bodybag/proc/deploy_bodybag(mob/user, atom/location)
-	var/obj/structure/closet/body_bag/R = new unfoldedbag_path(location)
-	R.open(user)
-	R.add_fingerprint(user)
-	R.foldedbag_instance = src
-	moveToNullspace()
-
-/obj/item/bodybag/suicide_act(mob/user)
-	if(isopenturf(user.loc))
-		user.visible_message("<span class='suicide'>[user] is crawling into [src]! It looks like [user.p_theyre()] trying to commit suicide!</span>")
-		var/obj/structure/closet/body_bag/R = new unfoldedbag_path(user.loc)
+	attack_self(mob/user)
+		var/obj/structure/closet/body_bag/R = new /obj/structure/closet/body_bag(user.loc)
 		R.add_fingerprint(user)
 		qdel(src)
-		user.forceMove(R)
-		playsound(src, 'sound/items/zip.ogg', 15, TRUE, -3)
-		return (OXYLOSS)
+
+
+/obj/item/weapon/storage/box/bodybags
+	name = "body bags"
+	desc = "This box contains body bags."
+	icon_state = "bodybags"
+	New()
+		..()
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+		new /obj/item/bodybag(src)
+
+
+/obj/structure/closet/body_bag
+	name = "body bag"
+	desc = "A plastic bag designed for the storage and transportation of cadavers."
+	icon = 'icons/obj/bodybag.dmi'
+	icon_state = "bodybag_closed"
+	icon_closed = "bodybag_closed"
+	icon_opened = "bodybag_open"
+	open_sound = 'sound/items/zip.ogg'
+	close_sound = 'sound/items/zip.ogg'
+	var/item_path = /obj/item/bodybag
+	density = 0
+	storage_capacity = (MOB_MEDIUM * 2) - 1
+	var/contains_body = 0
+
+/obj/structure/closet/body_bag/attackby(var/obj/item/W as obj, mob/user as mob)
+	if (istype(W, /obj/item/weapon/pen))
+		var/t = input(user, "What would you like the label to be?", text("[]", src.name), null)  as text
+		if (user.get_active_hand() != W)
+			return
+		if (!in_range(src, user) && src.loc != user)
+			return
+		t = sanitizeSafe(t, MAX_NAME_LEN)
+		if (t)
+			src.name = "body bag - "
+			src.name += t
+			src.overlays += image(src.icon, "bodybag_label")
+		else
+			src.name = "body bag"
+	//..() //Doesn't need to run the parent. Since when can fucking bodybags be welded shut? -Agouri
+		return
+	else if(W.is_wirecutter())
+		to_chat(user, "You cut the tag off the bodybag")
+		src.name = "body bag"
+		src.overlays.Cut()
+		return
+
+/obj/structure/closet/body_bag/store_mobs(var/stored_units)
+	contains_body = ..()
+	return contains_body
+
+/obj/structure/closet/body_bag/close()
+	if(..())
+		density = 0
+		return 1
+	return 0
+
+/obj/structure/closet/body_bag/MouseDrop(over_object, src_location, over_location)
+	..()
+	if((over_object == usr && (in_range(src, usr) || usr.contents.Find(src))))
+		if(!ishuman(usr))	return 0
+		if(opened)	return 0
+		if(contents.len)	return 0
+		visible_message("[usr] folds up the [src.name]")
+		var/folded = new item_path(get_turf(src))
+		spawn(0)
+			qdel(src)
+		return folded
+
+/obj/structure/closet/body_bag/relaymove(mob/user,direction)
+	if(src.loc != get_turf(src))
+		src.loc.relaymove(user,direction)
+	else
+		..()
+
+/obj/structure/closet/body_bag/proc/get_occupants()
+	var/list/occupants = list()
+	for(var/mob/living/carbon/human/H in contents)
+		occupants += H
+	return occupants
+
+/obj/structure/closet/body_bag/proc/update(var/broadcast=0)
+	if(istype(loc, /obj/structure/morgue))
+		var/obj/structure/morgue/M = loc
+		M.update(broadcast)
+
+/obj/structure/closet/body_bag/update_icon()
+	if(opened)
+		icon_state = icon_opened
+	else
+		if(contains_body > 0)
+			icon_state = "bodybag_closed1"
+		else
+			icon_state = icon_closed
+
+
+/obj/item/bodybag/cryobag
+	name = "stasis bag"
+	desc = "A non-reusable plastic bag designed to slow down bodily functions such as circulation and breathing, \
+	especially useful if short on time or in a hostile enviroment."
+	icon = 'icons/obj/cryobag.dmi'
+	icon_state = "bodybag_folded"
+	item_state = "bodybag_cryo_folded"
+	origin_tech = list(TECH_BIO = 4)
+	var/obj/item/weapon/reagent_containers/syringe/syringe
+
+/obj/item/bodybag/cryobag/attack_self(mob/user)
+	var/obj/structure/closet/body_bag/cryobag/R = new /obj/structure/closet/body_bag/cryobag(user.loc)
+	R.add_fingerprint(user)
+	if(syringe)
+		R.syringe = syringe
+		syringe = null
+	qdel(src)
+
+/obj/structure/closet/body_bag/cryobag
+	name = "stasis bag"
+	desc = "A non-reusable plastic bag designed to slow down bodily functions such as circulation and breathing, \
+	especially useful if short on time or in a hostile enviroment."
+	icon = 'icons/obj/cryobag.dmi'
+	item_path = /obj/item/bodybag/cryobag
+	store_misc = 0
+	store_items = 0
+	var/used = 0
+	var/obj/item/weapon/tank/tank = null
+	var/tank_type = /obj/item/weapon/tank/stasis/oxygen
+	var/stasis_level = 3 //Every 'this' life ticks are applied to the mob (when life_ticks%stasis_level == 1)
+	var/obj/item/weapon/reagent_containers/syringe/syringe
+
+/obj/structure/closet/body_bag/cryobag/Initialize()
+	tank = new tank_type(null) //It's in nullspace to prevent ejection when the bag is opened.
 	..()
 
-// Bluespace bodybag
-
-/obj/item/bodybag/bluespace
-	name = "bluespace body bag"
-	desc = "A folded bluespace body bag designed for the storage and transportation of cadavers."
-	icon = 'icons/obj/bodybag.dmi'
-	icon_state = "bluebodybag_folded"
-	unfoldedbag_path = /obj/structure/closet/body_bag/bluespace
-	w_class = WEIGHT_CLASS_SMALL
-	item_flags = NO_MAT_REDEMPTION
-
-/obj/item/bodybag/bluespace/Initialize()
-	. = ..()
-	RegisterSignal(src, COMSIG_ATOM_CANREACH, .proc/CanReachReact)
-
-/obj/item/bodybag/bluespace/examine(mob/user)
-	. = ..()
-	if(contents.len)
-		var/s = contents.len == 1 ? "" : "s"
-		. += "<span class='notice'>You can make out the shape[s] of [contents.len] object[s] through the fabric.</span>"
-
-/obj/item/bodybag/bluespace/Destroy()
-	for(var/atom/movable/A in contents)
-		A.forceMove(get_turf(src))
-		if(isliving(A))
-			to_chat(A, "<span class='notice'>You suddenly feel the space around you torn apart! You're free!</span>")
+/obj/structure/closet/body_bag/cryobag/Destroy()
+	QDEL_NULL(syringe)
+	QDEL_NULL(tank)
 	return ..()
 
-/obj/item/bodybag/bluespace/proc/CanReachReact(atom/movable/source, list/next)
-	return COMPONENT_BLOCK_REACH
+/obj/structure/closet/body_bag/cryobag/open()
+	. = ..()
+	if(used)
+		var/obj/item/O = new/obj/item(src.loc)
+		O.name = "used [name]"
+		O.icon = src.icon
+		O.icon_state = "bodybag_used"
+		O.desc = "Pretty useless now..."
+		qdel(src)
 
-/obj/item/bodybag/bluespace/deploy_bodybag(mob/user, atom/location)
-	var/obj/structure/closet/body_bag/R = new unfoldedbag_path(location)
-	for(var/atom/movable/A in contents)
-		A.forceMove(R)
-		if(isliving(A))
-			to_chat(A, "<span class='notice'>You suddenly feel air around you! You're free!</span>")
-	R.open(user)
-	R.add_fingerprint(user)
-	R.foldedbag_instance = src
-	moveToNullspace()
+/obj/structure/closet/body_bag/cryobag/MouseDrop(over_object, src_location, over_location)
+	. = ..()
+	if(. && syringe)
+		var/obj/item/bodybag/cryobag/folded = .
+		folded.syringe = syringe
+		syringe = null
 
-/obj/item/bodybag/bluespace/container_resist(mob/living/user)
-	if(user.incapacitated())
-		to_chat(user, "<span class='warning'>You can't get out while you're restrained like this!</span>")
+/obj/structure/closet/body_bag/cryobag/Entered(atom/movable/AM)
+	if(ishuman(AM))
+		var/mob/living/carbon/human/H = AM
+		H.Stasis(stasis_level)
+		src.used = 1
+		inject_occupant(H)
+
+	if(istype(AM, /obj/item/organ))
+		var/obj/item/organ/O = AM
+		O.preserved = 1
+		for(var/obj/item/organ/organ in O)
+			organ.preserved = 1
+	..()
+
+/obj/structure/closet/body_bag/cryobag/Exited(atom/movable/AM)
+	if(ishuman(AM))
+		var/mob/living/carbon/human/H = AM
+		H.Stasis(0)
+
+	if(istype(AM, /obj/item/organ))
+		var/obj/item/organ/O = AM
+		O.preserved = 0
+		for(var/obj/item/organ/organ in O)
+			organ.preserved = 0
+	..()
+
+/obj/structure/closet/body_bag/cryobag/return_air() //Used to make stasis bags protect from vacuum.
+	if(tank)
+		return tank.air_contents
+	..()
+
+/obj/structure/closet/body_bag/cryobag/proc/inject_occupant(var/mob/living/carbon/human/H)
+	if(!syringe)
 		return
-	user.changeNext_move(CLICK_CD_BREAKOUT)
-	user.last_special = world.time + CLICK_CD_BREAKOUT
-	to_chat(user, "<span class='notice'>You claw at the fabric of [src], trying to tear it open...</span>")
-	to_chat(loc, "<span class='warning'>Someone starts trying to break free of [src]!</span>")
-	if(!do_after(user, 200, target = src))
-		to_chat(loc, "<span class='warning'>The pressure subsides. It seems that they've stopped resisting...</span>")
-		return
-	loc.visible_message("<span class='warning'>[user] suddenly appears in front of [loc]!</span>", "<span class='userdanger'>[user] breaks free of [src]!</span>")
-	qdel(src)
+
+	if(H.reagents)
+		syringe.reagents.trans_to_mob(H, 30, CHEM_BLOOD)
+
+/obj/structure/closet/body_bag/cryobag/examine(mob/user)
+	..()
+	if(Adjacent(user)) //The bag's rather thick and opaque from a distance.
+		to_chat(user, "<span class='info'>You peer into \the [src].</span>")
+		if(syringe)
+			to_chat(user, "<span class='info'>It has a syringe added to it.</span>")
+		for(var/mob/living/L in contents)
+			L.examine(user)
+
+/obj/structure/closet/body_bag/cryobag/attackby(obj/item/W, mob/user)
+	if(opened)
+		..()
+	else //Allows the bag to respond to a health analyzer by analyzing the mob inside without needing to open it.
+		if(istype(W,/obj/item/device/healthanalyzer))
+			var/obj/item/device/healthanalyzer/analyzer = W
+			for(var/mob/living/L in contents)
+				analyzer.attack(L,user)
+
+		else if(istype(W,/obj/item/weapon/reagent_containers/syringe))
+			if(syringe)
+				to_chat(user,"<span class='warning'>\The [src] already has an injector! Remove it first.</span>")
+			else
+				var/obj/item/weapon/reagent_containers/syringe/syringe = W
+				to_chat(user,"<span class='info'>You insert \the [syringe] into \the [src], and it locks into place.</span>")
+				user.unEquip(syringe)
+				src.syringe = syringe
+				syringe.loc = null
+				for(var/mob/living/carbon/human/H in contents)
+					inject_occupant(H)
+					break
+
+		else if(W.is_screwdriver())
+			if(syringe)
+				if(used)
+					to_chat(user,"<span class='warning'>The injector cannot be removed now that the stasis bag has been used!</span>")
+				else
+					syringe.forceMove(src.loc)
+					to_chat(user,"<span class='info'>You pry \the [syringe] out of \the [src].</span>")
+					syringe = null
+
+		else
+			..()

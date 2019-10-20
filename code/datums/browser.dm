@@ -5,7 +5,7 @@
 	var/width = 0
 	var/height = 0
 	var/atom/ref = null
-	var/window_options = "can_close=1;can_minimize=1;can_maximize=0;can_resize=1;titlebar=1;" // window option is set using window_id
+	var/window_options = "focus=0;can_close=1;can_minimize=1;can_maximize=0;can_resize=1;titlebar=1;" // window option is set using window_id
 	var/stylesheets[0]
 	var/scripts[0]
 	var/title_image
@@ -13,9 +13,10 @@
 	var/body_elements
 	var/head_content = ""
 	var/content = ""
+	var/title_buttons = ""
 
 
-/datum/browser/New(nuser, nwindow_id, ntitle = 0, nwidth = 0, nheight = 0, atom/nref = null)
+/datum/browser/New(nuser, nwindow_id, ntitle = 0, nwidth = 0, nheight = 0, var/atom/nref = null)
 
 	user = nuser
 	window_id = nwindow_id
@@ -27,10 +28,19 @@
 		height = nheight
 	if (nref)
 		ref = nref
+	// If a client exists, but they have disabled fancy windowing, disable it!
+	if(user && user.client && !user.client.is_preference_enabled(/datum/client_preference/browser_style))
+		return
 	add_stylesheet("common", 'html/browser/common.css') // this CSS sheet is common to all UIs
+
+/datum/browser/proc/set_title(ntitle)
+	title = format_text(ntitle)
 
 /datum/browser/proc/add_head_content(nhead_content)
 	head_content = nhead_content
+
+/datum/browser/proc/set_title_buttons(ntitle_buttons)
+	title_buttons = ntitle_buttons
 
 /datum/browser/proc/set_window_options(nwindow_options)
 	window_options = nwindow_options
@@ -39,20 +49,10 @@
 	//title_image = ntitle_image
 
 /datum/browser/proc/add_stylesheet(name, file)
-	if (istype(name, /datum/asset/spritesheet))
-		var/datum/asset/spritesheet/sheet = name
-		stylesheets["spritesheet_[sheet.name].css"] = "data/spritesheets/[sheet.name]"
-	else
-		var/asset_name = "[name].css"
-
-		stylesheets[asset_name] = file
-
-		if (!SSassets.cache[asset_name])
-			register_asset(asset_name, file)
+	stylesheets[name] = file
 
 /datum/browser/proc/add_script(name, file)
-	scripts["[ckey(name)].js"] = file
-	register_asset("[ckey(name)].js", file)
+	scripts[name] = file
 
 /datum/browser/proc/set_content(ncontent)
 	content = ncontent
@@ -61,30 +61,35 @@
 	content += ncontent
 
 /datum/browser/proc/get_header()
-	var/file
-	for (file in stylesheets)
-		head_content += "<link rel='stylesheet' type='text/css' href='[file]'>"
+	var/key
+	var/filename
+	for (key in stylesheets)
+		filename = "[ckey(key)].css"
+		user << browse_rsc(stylesheets[key], filename)
+		head_content += "<link rel='stylesheet' type='text/css' href='[filename]'>"
 
-	for (file in scripts)
-		head_content += "<script type='text/javascript' src='[file]'></script>"
+	for (key in scripts)
+		filename = "[ckey(key)].js"
+		user << browse_rsc(scripts[key], filename)
+		head_content += "<script type='text/javascript' src='[filename]'></script>"
 
 	var/title_attributes = "class='uiTitle'"
 	if (title_image)
 		title_attributes = "class='uiTitle icon' style='background-image: url([title_image]);'"
 
-	return {"<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+	return {"<!DOCTYPE html>
 <html>
-	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset=ISO-8859-1">
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		[head_content]
 	</head>
 	<body scroll=auto>
 		<div class='uiWrapper'>
-			[title ? "<div class='uiTitleWrapper'><div [title_attributes]><tt>[title]</tt></div></div>" : ""]
+			[title ? "<div class='uiTitleWrapper'><div [title_attributes]><tt>[title]</tt></div><div class='uiTitleButtons'>[title_buttons]</div></div>" : ""]
 			<div class='uiContent'>
 	"}
-//" This is here because else the rest of the file looks like a string in notepad++.
+
 /datum/browser/proc/get_footer()
 	return {"
 			</div>
@@ -99,7 +104,7 @@
 	[get_footer()]
 	"}
 
-/datum/browser/proc/open(use_onclose = TRUE)
+/datum/browser/proc/open(var/use_onclose = 1)
 	if(isnull(window_id))	//null check because this can potentially nuke goonchat
 		WARNING("Browser [title] tried to open with a null ID")
 		to_chat(user, "<span class='userdanger'>The [title] browser you tried to open failed a sanity check! Please report this on github!</span>")
@@ -107,20 +112,77 @@
 	var/window_size = ""
 	if (width && height)
 		window_size = "size=[width]x[height];"
-	if (stylesheets.len)
-		send_asset_list(user, stylesheets, verify=FALSE)
-	if (scripts.len)
-		send_asset_list(user, scripts, verify=FALSE)
 	user << browse(get_content(), "window=[window_id];[window_size][window_options]")
 	if (use_onclose)
-		setup_onclose()
+		onclose(user, window_id, ref)
 
-/datum/browser/proc/setup_onclose()
-	set waitfor = 0 //winexists sleeps, so we don't need to.
-	for (var/i in 1 to 10)
-		if (user && winexists(user, window_id))
-			onclose(user, window_id, ref)
-			break
+// This will allow you to show an icon in the browse window
+// This is added to mob so that it can be used without a reference to the browser object
+// There is probably a better place for this...
+/mob/proc/browse_rsc_icon(icon, icon_state, dir = -1)
+	/*
+	var/icon/I
+	if (dir >= 0)
+		I = new /icon(icon, icon_state, dir)
+	else
+		I = new /icon(icon, icon_state)
+		dir = "default"
+
+	var/filename = "[ckey("[icon]_[icon_state]_[dir]")].png"
+	src << browse_rsc(I, filename)
+	return filename
+	*/
+
+
+// Registers the on-close verb for a browse window (client/verb/.windowclose)
+// this will be called when the close-button of a window is pressed.
+//
+// This is usually only needed for devices that regularly update the browse window,
+// e.g. canisters, timers, etc.
+//
+// windowid should be the specified window name
+// e.g. code is	: user << browse(text, "window=fred")
+// then use 	: onclose(user, "fred")
+//
+// Optionally, specify the "ref" parameter as the controlled atom (usually src)
+// to pass a "close=1" parameter to the atom's Topic() proc for special handling.
+// Otherwise, the user mob's machine var will be reset directly.
+//
+/proc/onclose(mob/user, windowid, var/atom/ref=null)
+	if(!user || !user.client) return
+	var/param = "null"
+	if(ref)
+		param = "\ref[ref]"
+
+	winset(user, windowid, "on-close=\".windowclose [param]\"")
+
+	//world << "OnClose [user]: [windowid] : ["on-close=\".windowclose [param]\""]"
+
+// the on-close client verb
+// called when a browser popup window is closed after registering with proc/onclose()
+// if a valid atom reference is supplied, call the atom's Topic() with "close=1"
+// otherwise, just reset the client mob's machine var.
+//
+
+/client/verb/windowclose(var/atomref as text)
+	set hidden = 1						// hide this verb from the user's panel
+	set name = ".windowclose"			// no autocomplete on cmd line
+
+	//world << "windowclose: [atomref]"
+	if(atomref!="null")				// if passed a real atomref
+		var/hsrc = locate(atomref)	// find the reffed atom
+		if(hsrc)
+			//world << "[src] Topic [href] [hsrc]"
+			usr = src.mob
+			src.Topic("close=1", list("close"="1"), hsrc)	// this will direct to the atom's
+			return										// Topic() proc via client.Topic()
+
+	// no atomref specified (or not found)
+	// so just reset the user mob's machine var
+	if(src && src.mob)
+		//world << "[src] was [src.mob.machine], setting to null"
+		src.mob.unset_machine()
+	return
 
 /datum/browser/proc/close()
 	if(!isnull(window_id))//null check because this can potentially nuke goonchat
@@ -134,13 +196,13 @@
 
 	var/output =  {"<center><b>[Message]</b></center><br />
 		<div style="text-align:center">
-		<a style="font-size:large;float:[( Button2 ? "left" : "right" )]" href="?src=[REF(src)];button=1">[Button1]</a>"}
+		<a style="font-size:large;float:[( Button2 ? "left" : "right" )]" href="?src=\ref[src];button=1">[Button1]</a>"}
 
 	if (Button2)
-		output += {"<a style="font-size:large;[( Button3 ? "" : "float:right" )]" href="?src=[REF(src)];button=2">[Button2]</a>"}
+		output += {"<a style="font-size:large;[( Button3 ? "" : "float:right" )]" href="?src=\ref[src];button=2">[Button2]</a>"}
 
 	if (Button3)
-		output += {"<a style="font-size:large;float:right" href="?src=[REF(src)];button=3">[Button3]</a>"}
+		output += {"<a style="font-size:large;float:right" href="?src=\ref[src];button=3">[Button3]</a>"}
 
 	output += {"</div>"}
 
@@ -190,7 +252,7 @@
 	var/selectedbutton = 0
 	var/stealfocus
 
-/datum/browser/modal/New(nuser, nwindow_id, ntitle = 0, nwidth = 0, nheight = 0, atom/nref = null, StealFocus = 1, Timeout = 6000)
+/datum/browser/modal/New(nuser, nwindow_id, ntitle = 0, nwidth = 0, nheight = 0, var/atom/nref = null, StealFocus = 1, Timeout = 6000)
 	..()
 	stealfocus = StealFocus
 	if (!StealFocus)
@@ -202,7 +264,7 @@
 	.=..()
 	opentime = 0
 
-/datum/browser/modal/open(use_onclose)
+/datum/browser/modal/open()
 	set waitfor = 0
 	opentime = world.time
 
@@ -235,7 +297,7 @@
 	if (!User)
 		return
 
-	var/output =  {"<form><input type="hidden" name="src" value="[REF(src)]"><ul class="sparse">"}
+	var/output =  {"<form><input type="hidden" name="src" value="\ref[src]"><ul class="sparse">"}
 	if (inputtype == "checkbox" || inputtype == "radio")
 		for (var/i in values)
 			var/div_slider = slidecolor
@@ -282,7 +344,7 @@
 	opentime = 0
 	close()
 
-/proc/presentpicker(mob/User,Message, Title, Button1="Ok", Button2, Button3, StealFocus = 1,Timeout = 6000,list/values, inputtype = "checkbox", width, height, slidecolor)
+/proc/presentpicker(var/mob/User,Message, Title, Button1="Ok", Button2, Button3, StealFocus = 1,Timeout = 6000,list/values, inputtype = "checkbox", width, height, slidecolor)
 	if (!istype(User))
 		if (istype(User, /client/))
 			var/client/C = User
@@ -295,7 +357,7 @@
 	if (A.selectedbutton)
 		return list("button" = A.selectedbutton, "values" = A.valueslist)
 
-/proc/input_bitfield(mob/User, title, bitfield, current_value, nwidth = 350, nheight = 350, nslidecolor, allowed_edit_list = null)
+/proc/input_bitfield(var/mob/User, title, bitfield, current_value, nwidth = 350, nheight = 350, nslidecolor, allowed_edit_list = null)
 	if (!User || !(bitfield in GLOB.bitfields))
 		return
 	var/list/pickerlist = list()
@@ -316,158 +378,3 @@
 			. |= GLOB.bitfields[bitfield][flag]
 	else
 		return
-
-/datum/browser/modal/preflikepicker
-	var/settings = list()
-	var/icon/preview_icon = null
-	var/datum/callback/preview_update
-
-/datum/browser/modal/preflikepicker/New(User,Message,Title,Button1="Ok",Button2,Button3,StealFocus = 1, Timeout = FALSE,list/settings,inputtype="checkbox", width = 600, height, slidecolor)
-	if (!User)
-		return
-	src.settings = settings
-
-	..(User, ckey("[User]-[Message]-[Title]-[world.time]-[rand(1,10000)]"), Title, width, height, src, StealFocus, Timeout)
-	set_content(ShowChoices(User))
-
-/datum/browser/modal/preflikepicker/proc/ShowChoices(mob/user)
-	if (settings["preview_callback"])
-		var/datum/callback/callback = settings["preview_callback"]
-		preview_icon = callback.Invoke(settings)
-		if (preview_icon)
-			user << browse_rsc(preview_icon, "previewicon.png")
-	var/dat = ""
-
-	for (var/name in settings["mainsettings"])
-		var/setting = settings["mainsettings"][name]
-		if (setting["type"] == "datum")
-			if (setting["subtypesonly"])
-				dat += "<b>[setting["desc"]]:</b> <a href='?src=[REF(src)];setting=[name];task=input;subtypesonly=1;type=datum;path=[setting["path"]]'>[setting["value"]]</a><BR>"
-			else
-				dat += "<b>[setting["desc"]]:</b> <a href='?src=[REF(src)];setting=[name];task=input;type=datum;path=[setting["path"]]'>[setting["value"]]</a><BR>"
-		else
-			dat += "<b>[setting["desc"]]:</b> <a href='?src=[REF(src)];setting=[name];task=input;type=[setting["type"]]'>[setting["value"]]</a><BR>"
-
-	if (preview_icon)
-		dat += "<td valign='center'>"
-
-		dat += "<div class='statusDisplay'><center><img src=previewicon.png width=[preview_icon.Width()] height=[preview_icon.Height()]></center></div>"
-
-		dat += "</td>"
-
-	dat += "</tr></table>"
-
-	dat += "<hr><center><a href='?src=[REF(src)];button=1'>Ok</a> "
-
-	dat += "</center>"
-
-	return dat
-
-/datum/browser/modal/preflikepicker/Topic(href,href_list)
-	if (href_list["close"] || !user || !user.client)
-		opentime = 0
-		return
-	if (href_list["task"] == "input")
-		var/setting = href_list["setting"]
-		switch (href_list["type"])
-			if ("datum")
-				var/oldval = settings["mainsettings"][setting]["value"]
-				if (href_list["subtypesonly"])
-					settings["mainsettings"][setting]["value"] = pick_closest_path(null, make_types_fancy(subtypesof(text2path(href_list["path"]))))
-				else
-					settings["mainsettings"][setting]["value"] = pick_closest_path(null, make_types_fancy(typesof(text2path(href_list["path"]))))
-				if (isnull(settings["mainsettings"][setting]["value"]))
-					settings["mainsettings"][setting]["value"] = oldval
-			if ("string")
-				settings["mainsettings"][setting]["value"] = stripped_input(user, "Enter new value for [settings["mainsettings"][setting]["desc"]]", "Enter new value for [settings["mainsettings"][setting]["desc"]]", settings["mainsettings"][setting]["value"])
-			if ("number")
-				settings["mainsettings"][setting]["value"] = input(user, "Enter new value for [settings["mainsettings"][setting]["desc"]]", "Enter new value for [settings["mainsettings"][setting]["desc"]]") as num
-			if ("color")
-				settings["mainsettings"][setting]["value"] = input(user, "Enter new value for [settings["mainsettings"][setting]["desc"]]", "Enter new value for [settings["mainsettings"][setting]["desc"]]", settings["mainsettings"][setting]["value"]) as color
-			if ("boolean")
-				settings["mainsettings"][setting]["value"] = input(user, "[settings["mainsettings"][setting]["desc"]]?") in list("Yes","No")
-			if ("ckey")
-				settings["mainsettings"][setting]["value"] = input(user, "[settings["mainsettings"][setting]["desc"]]?") in list("none") + GLOB.directory
-		if (settings["mainsettings"][setting]["callback"])
-			var/datum/callback/callback = settings["mainsettings"][setting]["callback"]
-			settings = callback.Invoke(settings)
-	if (href_list["button"])
-		var/button = text2num(href_list["button"])
-		if (button <= 3 && button >= 1)
-			selectedbutton = button
-	if (selectedbutton != 1)
-		set_content(ShowChoices(user))
-		open()
-		return
-	for (var/item in href_list)
-		switch(item)
-			if ("close", "button", "src")
-				continue
-	opentime = 0
-	close()
-
-/proc/presentpreflikepicker(mob/User,Message, Title, Button1="Ok", Button2, Button3, StealFocus = 1,Timeout = 6000,list/settings, width, height, slidecolor)
-	if (!istype(User))
-		if (istype(User, /client/))
-			var/client/C = User
-			User = C.mob
-		else
-			return
-	var/datum/browser/modal/preflikepicker/A = new(User, Message, Title, Button1, Button2, Button3, StealFocus,Timeout, settings, width, height, slidecolor)
-	A.open()
-	A.wait()
-	if (A.selectedbutton)
-		return list("button" = A.selectedbutton, "settings" = A.settings)
-
-// This will allow you to show an icon in the browse window
-// This is added to mob so that it can be used without a reference to the browser object
-// There is probably a better place for this...
-/mob/proc/browse_rsc_icon(icon, icon_state, dir = -1)
-
-
-// Registers the on-close verb for a browse window (client/verb/.windowclose)
-// this will be called when the close-button of a window is pressed.
-//
-// This is usually only needed for devices that regularly update the browse window,
-// e.g. canisters, timers, etc.
-//
-// windowid should be the specified window name
-// e.g. code is	: user << browse(text, "window=fred")
-// then use 	: onclose(user, "fred")
-//
-// Optionally, specify the "ref" parameter as the controlled atom (usually src)
-// to pass a "close=1" parameter to the atom's Topic() proc for special handling.
-// Otherwise, the user mob's machine var will be reset directly.
-//
-/proc/onclose(mob/user, windowid, atom/ref=null)
-	if(!user.client)
-		return
-	var/param = "null"
-	if(ref)
-		param = "[REF(ref)]"
-
-	winset(user, windowid, "on-close=\".windowclose [param]\"")
-
-
-
-// the on-close client verb
-// called when a browser popup window is closed after registering with proc/onclose()
-// if a valid atom reference is supplied, call the atom's Topic() with "close=1"
-// otherwise, just reset the client mob's machine var.
-//
-/client/verb/windowclose(atomref as text)
-	set hidden = 1						// hide this verb from the user's panel
-	set name = ".windowclose"			// no autocomplete on cmd line
-
-	if(atomref!="null")				// if passed a real atomref
-		var/hsrc = locate(atomref)	// find the reffed atom
-		var/href = "close=1"
-		if(hsrc)
-			usr = src.mob
-			src.Topic(href, params2list(href), hsrc)	// this will direct to the atom's
-			return										// Topic() proc via client.Topic()
-
-	// no atomref specified (or not found)
-	// so just reset the user mob's machine var
-	if(src && src.mob)
-		src.mob.unset_machine()

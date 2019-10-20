@@ -1,143 +1,114 @@
-/obj/structure/frame/computer
-	name = "computer frame"
-	icon_state = "0"
-	state = 0
+//This file was auto-corrected by findeclaration.exe on 25.5.2012 20:42:31
 
-/obj/structure/frame/computer/attackby(obj/item/P, mob/user, params)
-	add_fingerprint(user)
+/obj/structure/computerframe
+	density = 1
+	anchored = 0
+	name = "computer frame"
+	icon = 'icons/obj/stock_parts.dmi'
+	icon_state = "0"
+	var/state = 0
+	var/obj/item/weapon/circuitboard/circuit = null
+//	weight = 1.0E8
+
+/obj/structure/computerframe/attackby(obj/item/P as obj, mob/user as mob)
 	switch(state)
 		if(0)
-			if(P.tool_behaviour == TOOL_WRENCH)
-				to_chat(user, "<span class='notice'>You start wrenching the frame into place...</span>")
-				if(P.use_tool(src, user, 20, volume=50))
+			if(P.is_wrench())
+				playsound(src.loc, P.usesound, 50, 1)
+				if(do_after(user, 20 * P.toolspeed))
 					to_chat(user, "<span class='notice'>You wrench the frame into place.</span>")
-					setAnchored(TRUE)
-					state = 1
-				return
-			if(P.tool_behaviour == TOOL_WELDER)
-				if(!P.tool_start_check(user, amount=0))
+					src.anchored = 1
+					src.state = 1
+			if(istype(P, /obj/item/weapon/weldingtool))
+				var/obj/item/weapon/weldingtool/WT = P
+				if(!WT.remove_fuel(0, user))
+					to_chat(user, "The welding tool must be on to complete this task.")
 					return
-
-				to_chat(user, "<span class='notice'>You start deconstructing the frame...</span>")
-				if(P.use_tool(src, user, 20, volume=50))
+				playsound(src.loc, WT.usesound, 50, 1)
+				if(do_after(user, 20 * WT.toolspeed))
+					if(!src || !WT.isOn()) return
 					to_chat(user, "<span class='notice'>You deconstruct the frame.</span>")
-					var/obj/item/stack/sheet/metal/M = new (drop_location(), 5)
-					M.add_fingerprint(user)
+					new /obj/item/stack/material/steel( src.loc, 5 )
 					qdel(src)
-				return
 		if(1)
-			if(P.tool_behaviour == TOOL_WRENCH)
-				to_chat(user, "<span class='notice'>You start to unfasten the frame...</span>")
-				if(P.use_tool(src, user, 20, volume=50))
+			if(P.is_wrench())
+				playsound(src.loc, P.usesound, 50, 1)
+				if(do_after(user, 20 * P.toolspeed))
 					to_chat(user, "<span class='notice'>You unfasten the frame.</span>")
-					setAnchored(FALSE)
-					state = 0
-				return
-			if(istype(P, /obj/item/circuitboard/computer) && !circuit)
-				if(!user.transferItemToLoc(P, src))
-					return
-				playsound(src, 'sound/items/deconstruct.ogg', 50, TRUE)
-				to_chat(user, "<span class='notice'>You place [P] inside the frame.</span>")
-				icon_state = "1"
-				circuit = P
-				circuit.add_fingerprint(user)
-				return
-
-			else if(istype(P, /obj/item/circuitboard) && !circuit)
-				to_chat(user, "<span class='warning'>This frame does not accept circuit boards of this type!</span>")
-				return
-			if(P.tool_behaviour == TOOL_SCREWDRIVER && circuit)
-				P.play_tool_sound(src)
-				to_chat(user, "<span class='notice'>You screw [circuit] into place.</span>")
-				state = 2
-				icon_state = "2"
-				return
-			if(P.tool_behaviour == TOOL_CROWBAR && circuit)
-				P.play_tool_sound(src)
-				to_chat(user, "<span class='notice'>You remove [circuit].</span>")
-				state = 1
-				icon_state = "0"
-				circuit.forceMove(drop_location())
-				circuit.add_fingerprint(user)
-				circuit = null
-				return
+					src.anchored = 0
+					src.state = 0
+			if(istype(P, /obj/item/weapon/circuitboard) && !circuit)
+				var/obj/item/weapon/circuitboard/B = P
+				if(B.board_type == "computer")
+					playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
+					to_chat(user, "<span class='notice'>You place the circuit board inside the frame.</span>")
+					src.icon_state = "1"
+					src.circuit = P
+					user.drop_item()
+					P.loc = src
+				else
+					to_chat(user, "<span class='warning'>This frame does not accept circuit boards of this type!</span>")
+			if(P.is_screwdriver() && circuit)
+				playsound(src.loc, P.usesound, 50, 1)
+				to_chat(user, "<span class='notice'>You screw the circuit board into place.</span>")
+				src.state = 2
+				src.icon_state = "2"
+			if(P.is_crowbar()) && circuit)
+				playsound(src.loc, P.usesound, 50, 1)
+				to_chat(user, "<span class='notice'>You remove the circuit board.</span>")
+				src.state = 1
+				src.icon_state = "0"
+				circuit.loc = src.loc
+				src.circuit = null
 		if(2)
-			if(P.tool_behaviour == TOOL_SCREWDRIVER && circuit)
-				P.play_tool_sound(src)
+			if(P.is_screwdriver() && circuit)
+				playsound(src.loc, P.usesound, 50, 1)
 				to_chat(user, "<span class='notice'>You unfasten the circuit board.</span>")
-				state = 1
-				icon_state = "1"
-				return
+				src.state = 1
+				src.icon_state = "1"
 			if(istype(P, /obj/item/stack/cable_coil))
-				if(!P.tool_start_check(user, amount=5))
+				var/obj/item/stack/cable_coil/C = P
+				if (C.get_amount() < 5)
+					to_chat(user, "<span class='warning'>You need five coils of wire to add them to the frame.</span>")
 					return
-				to_chat(user, "<span class='notice'>You start adding cables to the frame...</span>")
-				if(P.use_tool(src, user, 20, volume=50, amount=5))
-					if(state != 2)
-						return
-					to_chat(user, "<span class='notice'>You add cables to the frame.</span>")
-					state = 3
-					icon_state = "3"
-				return
+				to_chat(user, "<span class='notice'>You start to add cables to the frame.</span>")
+				playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
+				if(do_after(user, 20) && state == 2)
+					if (C.use(5))
+						to_chat(user, "<span class='notice'>You add cables to the frame.</span>")
+						state = 3
+						icon_state = "3"
 		if(3)
-			if(P.tool_behaviour == TOOL_WIRECUTTER)
-				P.play_tool_sound(src)
+			if(P.is_wirecutter())
+				playsound(src.loc, P.usesound, 50, 1)
 				to_chat(user, "<span class='notice'>You remove the cables.</span>")
-				state = 2
-				icon_state = "2"
-				var/obj/item/stack/cable_coil/A = new (drop_location(), 5)
-				A.add_fingerprint(user)
-				return
+				src.state = 2
+				src.icon_state = "2"
+				var/obj/item/stack/cable_coil/A = new /obj/item/stack/cable_coil( src.loc )
+				A.amount = 5
 
-			if(istype(P, /obj/item/stack/sheet/glass))
-				if(!P.tool_start_check(user, amount=2))
+			if(istype(P, /obj/item/stack/material) && P.get_material_name() == "glass")
+				var/obj/item/stack/G = P
+				if (G.get_amount() < 2)
+					to_chat(user, "<span class='warning'>You need two sheets of glass to put in the glass panel.</span>")
 					return
-				playsound(src, 'sound/items/deconstruct.ogg', 50, TRUE)
-				to_chat(user, "<span class='notice'>You start to put in the glass panel...</span>")
-				if(P.use_tool(src, user, 20, amount=2))
-					if(state != 3)
-						return
-					to_chat(user, "<span class='notice'>You put in the glass panel.</span>")
-					state = 4
-					src.icon_state = "4"
-				return
+				playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
+				to_chat(user, "<span class='notice'>You start to put in the glass panel.</span>")
+				if(do_after(user, 20) && state == 3)
+					if (G.use(2))
+						to_chat(user, "<span class='notice'>You put in the glass panel.</span>")
+						src.state = 4
+						src.icon_state = "4"
 		if(4)
-			if(P.tool_behaviour == TOOL_CROWBAR)
-				P.play_tool_sound(src)
+			if(P.is_crowbar())
+				playsound(src.loc, P.usesound, 50, 1)
 				to_chat(user, "<span class='notice'>You remove the glass panel.</span>")
-				state = 3
-				icon_state = "3"
-				var/obj/item/stack/sheet/glass/G = new(drop_location(), 2)
-				G.add_fingerprint(user)
-				return
-			if(P.tool_behaviour == TOOL_SCREWDRIVER)
-				P.play_tool_sound(src)
+				src.state = 3
+				src.icon_state = "3"
+				new /obj/item/stack/material/glass( src.loc, 2 )
+			if(P.is_screwdriver())
+				playsound(src.loc, P.usesound, 50, 1)
 				to_chat(user, "<span class='notice'>You connect the monitor.</span>")
-				var/obj/B = new circuit.build_path (loc, circuit)
-				B.setDir(dir)
-				transfer_fingerprints_to(B)
+				var/B = new src.circuit.build_path ( src.loc )
+				src.circuit.construct(B)
 				qdel(src)
-				return
-	if(user.a_intent == INTENT_HARM)
-		return ..()
-
-
-/obj/structure/frame/computer/deconstruct(disassembled = TRUE)
-	if(!(flags_1 & NODECONSTRUCT_1))
-		if(state == 4)
-			new /obj/item/shard(drop_location())
-			new /obj/item/shard(drop_location())
-		if(state >= 3)
-			new /obj/item/stack/cable_coil(drop_location(), 5)
-	..()
-
-/obj/structure/frame/computer/AltClick(mob/user)
-	..()
-	if(!isliving(user) || !user.canUseTopic(src, BE_CLOSE, ismonkey(user)))
-		return
-
-	if(anchored)
-		to_chat(usr, "<span class='warning'>You must unwrench [src] before rotating it!</span>")
-		return
-
-	setDir(turn(dir, -90))

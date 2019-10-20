@@ -1,606 +1,593 @@
-#define CART_SECURITY			(1<<0)
-#define CART_ENGINE				(1<<1)
-#define CART_ATMOS				(1<<2)
-#define CART_MEDICAL			(1<<3)
-#define CART_MANIFEST			(1<<4)
-#define CART_CLOWN				(1<<5)
-#define CART_MIME				(1<<6)
-#define CART_JANITOR			(1<<7)
-#define CART_REAGENT_SCANNER	(1<<8)
-#define CART_NEWSCASTER			(1<<9)
-#define CART_REMOTE_DOOR		(1<<10)
-#define CART_STATUS_DISPLAY		(1<<11)
-#define CART_QUARTERMASTER		(1<<12)
-#define CART_HYDROPONICS		(1<<13)
-#define CART_DRONEPHONE			(1<<14)
+var/list/command_cartridges = list(
+	/obj/item/weapon/cartridge/captain,
+	/obj/item/weapon/cartridge/hop,
+	/obj/item/weapon/cartridge/hos,
+	/obj/item/weapon/cartridge/ce,
+	/obj/item/weapon/cartridge/rd,
+	/obj/item/weapon/cartridge/cmo,
+	/obj/item/weapon/cartridge/head,
+	/obj/item/weapon/cartridge/lawyer // Internal Affaris,
+	)
 
+var/list/security_cartridges = list(
+	/obj/item/weapon/cartridge/security,
+	/obj/item/weapon/cartridge/detective,
+	/obj/item/weapon/cartridge/hos
+	)
 
-/obj/item/cartridge
+var/list/engineering_cartridges = list(
+	/obj/item/weapon/cartridge/engineering,
+	/obj/item/weapon/cartridge/atmos,
+	/obj/item/weapon/cartridge/ce
+	)
+
+var/list/medical_cartridges = list(
+	/obj/item/weapon/cartridge/medical,
+	/obj/item/weapon/cartridge/chemistry,
+	/obj/item/weapon/cartridge/cmo
+	)
+
+var/list/research_cartridges = list(
+	/obj/item/weapon/cartridge/signal/science,
+	/obj/item/weapon/cartridge/rd
+	)
+
+var/list/cargo_cartridges = list(
+	/obj/item/weapon/cartridge/quartermaster, // This also covers cargo-techs, apparently,
+	/obj/item/weapon/cartridge/miner,
+	/obj/item/weapon/cartridge/hop
+	)
+
+var/list/civilian_cartridges = list(
+	/obj/item/weapon/cartridge/janitor,
+	/obj/item/weapon/cartridge/service,
+	/obj/item/weapon/cartridge/hop
+	)
+
+/obj/item/weapon/cartridge
 	name = "generic cartridge"
 	desc = "A data cartridge for portable microcomputers."
 	icon = 'icons/obj/pda.dmi'
 	icon_state = "cart"
 	item_state = "electronic"
-	lefthand_file = 'icons/mob/inhands/misc/devices_lefthand.dmi'
-	righthand_file = 'icons/mob/inhands/misc/devices_righthand.dmi'
-	w_class = WEIGHT_CLASS_TINY
+	w_class = ITEMSIZE_TINY
 
-	var/obj/item/integrated_signaler/radio = null
-
-	var/access = 0 //Bit flags for cartridge access
-
+	var/obj/item/radio/integrated/radio = null
+	var/access_security = 0
+	var/access_engine = 0
+	var/access_atmos = 0
+	var/access_medical = 0
+	var/access_clown = 0
+	var/access_mime = 0
+	var/access_janitor = 0
+//	var/access_flora = 0
+	var/access_reagent_scanner = 0
+	var/access_remote_door = 0 // Control some blast doors remotely!!
 	var/remote_door_id = ""
-
-	var/bot_access_flags = 0 //Bit flags. Selection: SEC_BOT | MULE_BOT | FLOOR_BOT | CLEAN_BOT | MED_BOT | FIRE_BOT
-	var/spam_enabled = 0 //Enables "Send to All" Option
-
-	var/obj/item/pda/host_pda = null
+	var/access_status_display = 0
+	var/access_quartermaster = 0
+	var/access_detonate_pda = 0
+	var/access_hydroponics = 0
+	var/charges = 0
+	var/mode = null
 	var/menu
 	var/datum/data/record/active1 = null //General
 	var/datum/data/record/active2 = null //Medical
 	var/datum/data/record/active3 = null //Security
-	var/obj/machinery/computer/monitor/powmonitor = null // Power Monitor
-	var/list/powermonitors = list()
+	var/selected_sensor = null // Power Sensor
 	var/message1	// used for status_displays
 	var/message2
 	var/list/stored_data = list()
-	var/current_channel
 
-	var/mob/living/simple_animal/bot/active_bot
-	var/list/botlist = list()
+/obj/item/weapon/cartridge/Destroy()
+	QDEL_NULL(radio)
+	return ..()
 
-/obj/item/cartridge/Initialize()
-	. = ..()
-	var/obj/item/pda/pda = loc
-	if(istype(pda))
-		host_pda = pda
-
-/obj/item/cartridge/engineering
+/obj/item/weapon/cartridge/engineering
 	name = "\improper Power-ON cartridge"
 	icon_state = "cart-e"
-	access = CART_ENGINE | CART_DRONEPHONE
-	bot_access_flags = FLOOR_BOT
+	access_engine = 1
 
-/obj/item/cartridge/atmos
+/obj/item/weapon/cartridge/atmos
 	name = "\improper BreatheDeep cartridge"
 	icon_state = "cart-a"
-	access = CART_ATMOS | CART_DRONEPHONE
-	bot_access_flags = FLOOR_BOT | FIRE_BOT
+	access_atmos = 1
 
-/obj/item/cartridge/medical
+/obj/item/weapon/cartridge/medical
 	name = "\improper Med-U cartridge"
 	icon_state = "cart-m"
-	access = CART_MEDICAL
-	bot_access_flags = MED_BOT
+	access_medical = 1
 
-/obj/item/cartridge/chemistry
+/obj/item/weapon/cartridge/chemistry
 	name = "\improper ChemWhiz cartridge"
 	icon_state = "cart-chem"
-	access = CART_REAGENT_SCANNER
-	bot_access_flags = MED_BOT
+	access_reagent_scanner = 1
+	access_medical = 1
 
-/obj/item/cartridge/security
+/obj/item/weapon/cartridge/security
 	name = "\improper R.O.B.U.S.T. cartridge"
 	icon_state = "cart-s"
-	access = CART_SECURITY
-	bot_access_flags = SEC_BOT
+	access_security = 1
 
-/obj/item/cartridge/detective
+/obj/item/weapon/cartridge/security/Initialize()
+	radio = new /obj/item/radio/integrated/beepsky(src)
+	. = ..()
+
+/obj/item/weapon/cartridge/detective
 	name = "\improper D.E.T.E.C.T. cartridge"
 	icon_state = "cart-s"
-	access = CART_SECURITY | CART_MEDICAL | CART_MANIFEST
-	bot_access_flags = SEC_BOT
+	access_security = 1
+	access_medical = 1
 
-/obj/item/cartridge/janitor
+
+/obj/item/weapon/cartridge/janitor
 	name = "\improper CustodiPRO cartridge"
 	desc = "The ultimate in clean-room design."
 	icon_state = "cart-j"
-	access = CART_JANITOR | CART_DRONEPHONE
-	bot_access_flags = CLEAN_BOT
+	access_janitor = 1
 
-/obj/item/cartridge/lawyer
+/obj/item/weapon/cartridge/lawyer
 	name = "\improper P.R.O.V.E. cartridge"
 	icon_state = "cart-s"
-	access = CART_SECURITY
-	spam_enabled = 1
+	access_security = 1
 
-/obj/item/cartridge/curator
-	name = "\improper Lib-Tweet cartridge"
-	icon_state = "cart-s"
-	access = CART_NEWSCASTER
+/obj/item/weapon/cartridge/clown
+	name = "\improper Honkworks 5.0 cartridge"
+	icon_state = "cart-clown"
+	access_clown = 1
+	charges = 5
 
-/obj/item/cartridge/roboticist
-	name = "\improper B.O.O.P. Remote Control cartridge"
-	desc = "Packed with heavy duty quad-bot interlink!"
-	bot_access_flags = FLOOR_BOT | CLEAN_BOT | MED_BOT | FIRE_BOT
-	access = CART_DRONEPHONE
+/obj/item/weapon/cartridge/mime
+	name = "\improper Gestur-O 1000 cartridge"
+	icon_state = "cart-mi"
+	access_mime = 1
+	charges = 5
+/*
+/obj/item/weapon/cartridge/botanist
+	name = "Green Thumb v4.20"
+	icon_state = "cart-b"
+	access_flora = 1
+*/
 
-/obj/item/cartridge/signal
+/obj/item/weapon/cartridge/service
+	name = "\improper Serv-U Pro cartridge"
+	desc = "A data cartridge designed to serve YOU!"
+
+/obj/item/weapon/cartridge/signal
 	name = "generic signaler cartridge"
 	desc = "A data cartridge with an integrated radio signaler module."
+	var/qdeled = 0
 
-/obj/item/cartridge/signal/toxins
+/obj/item/weapon/cartridge/signal/science
 	name = "\improper Signal Ace 2 cartridge"
 	desc = "Complete with integrated radio signaler!"
 	icon_state = "cart-tox"
-	access = CART_REAGENT_SCANNER | CART_ATMOS
+	access_reagent_scanner = 1
+	access_atmos = 1
 
-/obj/item/cartridge/signal/Initialize()
-	. = ..()
-	radio = new(src)
+/obj/item/weapon/cartridge/signal/Initialize()
+    radio = new /obj/item/radio/integrated/signal(src)
+    . = ..()
 
-
-
-/obj/item/cartridge/quartermaster
-	name = "space parts & space vendors cartridge"
+/obj/item/weapon/cartridge/quartermaster
+	name = "\improper Space Parts & Space Vendors cartridge"
 	desc = "Perfect for the Quartermaster on the go!"
 	icon_state = "cart-q"
-	access = CART_QUARTERMASTER
-	bot_access_flags = MULE_BOT
+	access_quartermaster = 1
 
-/obj/item/cartridge/head
+/obj/item/weapon/cartridge/miner
+	name = "\improper Drill-Jockey 4.5 cartridge"
+	desc = "It's covered in some sort of sand."
+	icon_state = "cart-q"
+
+/obj/item/weapon/cartridge/head
 	name = "\improper Easy-Record DELUXE cartridge"
 	icon_state = "cart-h"
-	access = CART_MANIFEST | CART_STATUS_DISPLAY
+	access_status_display = 1
 
-/obj/item/cartridge/hop
+/obj/item/weapon/cartridge/hop
 	name = "\improper HumanResources9001 cartridge"
 	icon_state = "cart-h"
-	access = CART_MANIFEST | CART_STATUS_DISPLAY | CART_JANITOR | CART_SECURITY | CART_NEWSCASTER | CART_QUARTERMASTER | CART_DRONEPHONE
-	bot_access_flags = MULE_BOT | CLEAN_BOT
+	access_status_display = 1
+	access_quartermaster = 1
+	access_janitor = 1
+	access_security = 1
 
-/obj/item/cartridge/hos
+/obj/item/weapon/cartridge/hos
 	name = "\improper R.O.B.U.S.T. DELUXE cartridge"
 	icon_state = "cart-hos"
-	access = CART_MANIFEST | CART_STATUS_DISPLAY | CART_SECURITY
-	bot_access_flags = SEC_BOT
+	access_status_display = 1
+	access_security = 1
 
+/obj/item/weapon/cartridge/hos/Initialize()
+	radio = new /obj/item/radio/integrated/beepsky(src)
+	. = ..()
 
-/obj/item/cartridge/ce
+/obj/item/weapon/cartridge/ce
 	name = "\improper Power-On DELUXE cartridge"
 	icon_state = "cart-ce"
-	access = CART_MANIFEST | CART_STATUS_DISPLAY | CART_ENGINE | CART_ATMOS | CART_DRONEPHONE
-	bot_access_flags = FLOOR_BOT | FIRE_BOT
+	access_status_display = 1
+	access_engine = 1
+	access_atmos = 1
 
-/obj/item/cartridge/cmo
+/obj/item/weapon/cartridge/cmo
 	name = "\improper Med-U DELUXE cartridge"
 	icon_state = "cart-cmo"
-	access = CART_MANIFEST | CART_STATUS_DISPLAY | CART_REAGENT_SCANNER | CART_MEDICAL
-	bot_access_flags = MED_BOT
+	access_status_display = 1
+	access_reagent_scanner = 1
+	access_medical = 1
 
-/obj/item/cartridge/rd
+/obj/item/weapon/cartridge/rd
 	name = "\improper Signal Ace DELUXE cartridge"
 	icon_state = "cart-rd"
-	access = CART_MANIFEST | CART_STATUS_DISPLAY | CART_REAGENT_SCANNER | CART_ATMOS | CART_DRONEPHONE
-	bot_access_flags = FLOOR_BOT | CLEAN_BOT | MED_BOT | FIRE_BOT
+	access_status_display = 1
+	access_reagent_scanner = 1
+	access_atmos = 1
 
-/obj/item/cartridge/rd/Initialize()
+/obj/item/weapon/cartridge/rd/Initialize()
+	radio = new /obj/item/radio/integrated/signal(src)
 	. = ..()
-	radio = new(src)
 
-/obj/item/cartridge/captain
+/obj/item/weapon/cartridge/captain
 	name = "\improper Value-PAK cartridge"
-	desc = "Now with 350% more value!" //Give the Captain...EVERYTHING! (Except Mime, Clown, and Syndie)
+	desc = "Now with 200% more value!"
 	icon_state = "cart-c"
-	access = ~(CART_CLOWN | CART_MIME | CART_REMOTE_DOOR)
-	bot_access_flags = SEC_BOT | MULE_BOT | FLOOR_BOT | CLEAN_BOT | MED_BOT | FIRE_BOT
-	spam_enabled = 1
+	access_quartermaster = 1
+	access_janitor = 1
+	access_engine = 1
+	access_security = 1
+	access_medical = 1
+	access_reagent_scanner = 1
+	access_status_display = 1
+	access_atmos = 1
 
-/obj/item/cartridge/captain/Initialize()
-	. = ..()
-	radio = new(src)
+/obj/item/weapon/cartridge/syndicate
+	name = "\improper Detomatix cartridge"
+	icon_state = "cart"
+	access_remote_door = 1
+	access_detonate_pda = 1
+	remote_door_id = "smindicate" //Make sure this matches the syndicate shuttle's shield/door id!!	//don't ask about the name, testing.
+	charges = 4
 
-/obj/item/cartridge/proc/post_status(command, data1, data2)
+/obj/item/weapon/cartridge/proc/post_status(var/command, var/data1, var/data2)
 
-	var/datum/radio_frequency/frequency = SSradio.return_frequency(FREQ_STATUS_DISPLAYS)
+	var/datum/radio_frequency/frequency = radio_controller.return_frequency(1435)
+	if(!frequency) return
 
-	if(!frequency)
-		return
+	var/datum/signal/status_signal = new
+	status_signal.source = src
+	status_signal.transmission_method = 1
+	status_signal.data["command"] = command
 
-	var/datum/signal/status_signal = new(list("command" = command))
 	switch(command)
 		if("message")
 			status_signal.data["msg1"] = data1
 			status_signal.data["msg2"] = data2
+			if(loc)
+				var/obj/item/PDA = loc
+				var/mob/user = PDA.fingerprintslast
+				log_admin("STATUS: [user] set status screen with [PDA]. Message: [data1] [data2]")
+				message_admins("STATUS: [user] set status screen with [PDA]. Message: [data1] [data2]")
+
 		if("alert")
 			status_signal.data["picture_state"] = data1
 
 	frequency.post_signal(src, status_signal)
 
-/obj/item/cartridge/proc/generate_menu(mob/user)
-	if(!host_pda)
-		return
-	switch(host_pda.mode)
-		if(40) //signaller
-			menu = "<h4>[PDAIMG(signaler)] Remote Signaling System</h4>"
 
-			menu += {"
-<a href='byond://?src=[REF(src)];choice=Send Signal'>Send Signal</A><BR>
-Frequency:
-<a href='byond://?src=[REF(src)];choice=Signal Frequency;sfreq=-10'>-</a>
-<a href='byond://?src=[REF(src)];choice=Signal Frequency;sfreq=-2'>-</a>
-[format_frequency(radio.frequency)]
-<a href='byond://?src=[REF(src)];choice=Signal Frequency;sfreq=2'>+</a>
-<a href='byond://?src=[REF(src)];choice=Signal Frequency;sfreq=10'>+</a><br>
-<br>
-Code:
-<a href='byond://?src=[REF(src)];choice=Signal Code;scode=-5'>-</a>
-<a href='byond://?src=[REF(src)];choice=Signal Code;scode=-1'>-</a>
-[radio.code]
-<a href='byond://?src=[REF(src)];choice=Signal Code;scode=1'>+</a>
-<a href='byond://?src=[REF(src)];choice=Signal Code;scode=5'>+</a><br>"}
-		if (41) //crew manifest
-
-			menu = "<h4>[PDAIMG(notes)] Crew Manifest</h4>"
-			menu += "Entries cannot be modified from this terminal.<br><br>"
-			if(GLOB.data_core.general)
-				for (var/datum/data/record/t in sortRecord(GLOB.data_core.general))
-					menu += "[t.fields["name"]] - [t.fields["rank"]]<br>"
-			menu += "<br>"
+/*
+	This generates the nano values of the cart menus.
+	Because we close the UI when we insert a new cart
+	we don't have to worry about null values on items
+	the user can't access.  Well, unless they are href hacking.
+	But in that case their UI will just lock up.
+*/
 
 
-		if (42) //status displays
-			menu = "<h4>[PDAIMG(status)] Station Status Display Interlink</h4>"
+/obj/item/weapon/cartridge/proc/create_NanoUI_values(mob/user as mob)
+	var/values[0]
 
-			menu += "\[ <A HREF='?src=[REF(src)];choice=Status;statdisp=blank'>Clear</A> \]<BR>"
-			menu += "\[ <A HREF='?src=[REF(src)];choice=Status;statdisp=shuttle'>Shuttle ETA</A> \]<BR>"
-			menu += "\[ <A HREF='?src=[REF(src)];choice=Status;statdisp=message'>Message</A> \]"
-			menu += "<ul><li> Line 1: <A HREF='?src=[REF(src)];choice=Status;statdisp=setmsg1'>[ message1 ? message1 : "(none)"]</A>"
-			menu += "<li> Line 2: <A HREF='?src=[REF(src)];choice=Status;statdisp=setmsg2'>[ message2 ? message2 : "(none)"]</A></ul><br>"
-			menu += "\[ Alert: <A HREF='?src=[REF(src)];choice=Status;statdisp=alert;alert=default'>None</A> |"
-			menu += " <A HREF='?src=[REF(src)];choice=Status;statdisp=alert;alert=redalert'>Red Alert</A> |"
-			menu += " <A HREF='?src=[REF(src)];choice=Status;statdisp=alert;alert=lockdown'>Lockdown</A> |"
-			menu += " <A HREF='?src=[REF(src)];choice=Status;statdisp=alert;alert=biohazard'>Biohazard</A> \]<BR>"
+	/*		Signaler (Mode: 40)				*/
 
-		if (43)
-			menu = "<h4>[PDAIMG(power)] Power Monitors - Please select one</h4><BR>"
-			powmonitor = null
-			powermonitors = list()
-			var/powercount = 0
+
+	if(istype(radio,/obj/item/radio/integrated/signal) && (mode==40))
+		var/obj/item/radio/integrated/signal/R = radio
+		values["signal_freq"] = format_frequency(R.frequency)
+		values["signal_code"] = R.code
+
+
+	/*		Station Display (Mode: 42)			*/
+
+	if(mode==42)
+		values["message1"] = message1 ? message1 : "(none)"
+		values["message2"] = message2 ? message2 : "(none)"
 
 
 
-			var/turf/pda_turf = get_turf(src)
-			for(var/obj/machinery/computer/monitor/pMon in GLOB.machines)
-				if(pMon.stat & (NOPOWER | BROKEN)) //check to make sure the computer is functional
+	/*		Power Monitor (Mode: 43 / 433)			*/
+
+	if(mode==43 || mode==433)
+		var/list/sensors = list()
+		var/obj/machinery/power/sensor/MS = null
+
+		for(var/obj/machinery/power/sensor/S in machines)
+			sensors.Add(list(list("name_tag" = S.name_tag)))
+			if(S.name_tag == selected_sensor)
+				MS = S
+		values["power_sensors"] = sensors
+		if(selected_sensor && MS)
+			values["sensor_reading"] = MS.return_reading_data()
+
+
+	/*		General Records (Mode: 44 / 441 / 45 / 451)	*/
+	if(mode == 44 || mode == 441 || mode == 45 || mode ==451)
+		if(istype(active1, /datum/data/record) && (active1 in data_core.general))
+			values["general"] = active1.fields
+			values["general_exists"] = 1
+
+		else
+			values["general_exists"] = 0
+
+
+
+	/*		Medical Records (Mode: 44 / 441)	*/
+
+	if(mode == 44 || mode == 441)
+		var/medData[0]
+		for(var/datum/data/record/R in sortRecord(data_core.general))
+			medData[++medData.len] = list(Name = R.fields["name"],"ref" = "\ref[R]")
+		values["medical_records"] = medData
+
+		if(istype(active2, /datum/data/record) && (active2 in data_core.medical))
+			values["medical"] = active2.fields
+			values["medical_exists"] = 1
+		else
+			values["medical_exists"] = 0
+
+	/*		Security Records (Mode:45 / 451)	*/
+
+	if(mode == 45 || mode == 451)
+		var/secData[0]
+		for (var/datum/data/record/R in sortRecord(data_core.general))
+			secData[++secData.len] = list(Name = R.fields["name"], "ref" = "\ref[R]")
+		values["security_records"] = secData
+
+		if(istype(active3, /datum/data/record) && (active3 in data_core.security))
+			values["security"] = active3.fields
+			values["security_exists"] = 1
+		else
+			values["security_exists"] = 0
+
+	/*		Security Bot Control (Mode: 46)		*/
+
+	if(mode==46)
+		var/botsData[0]
+		var/beepskyData[0]
+		if(istype(radio,/obj/item/radio/integrated/beepsky))
+			var/obj/item/radio/integrated/beepsky/SC = radio
+			beepskyData["active"] = SC.active
+			if(SC.active && !isnull(SC.botstatus))
+				var/area/loca = SC.botstatus["loca"]
+				var/loca_name = sanitize(loca.name)
+				beepskyData["botstatus"] = list("loca" = loca_name, "mode" = SC.botstatus["mode"])
+			else
+				beepskyData["botstatus"] = list("loca" = null, "mode" = -1)
+			var/botsCount=0
+			if(SC.botlist && SC.botlist.len)
+				for(var/mob/living/bot/B in SC.botlist)
+					botsCount++
+					if(B.loc)
+						botsData[++botsData.len] = list("Name" = sanitize(B.name), "Location" = sanitize(B.loc.loc.name), "ref" = "\ref[B]")
+
+			if(!botsData.len)
+				botsData[++botsData.len] = list("Name" = "No bots found", "Location" = "Invalid", "ref"= null)
+
+			beepskyData["bots"] = botsData
+			beepskyData["count"] = botsCount
+
+		else
+			beepskyData["active"] = 0
+			botsData[++botsData.len] = list("Name" = "No bots found", "Location" = "Invalid", "ref"= null)
+			beepskyData["botstatus"] = list("loca" = null, "mode" = null)
+			beepskyData["bots"] = botsData
+			beepskyData["count"] = 0
+
+		values["beepsky"] = beepskyData
+
+
+	/*		MULEBOT Control	(Mode: 48)		*/
+
+	if(mode==48)
+		var/mulebotsData[0]
+		var/count = 0
+
+		for(var/mob/living/bot/mulebot/M in living_mob_list)
+			if(!M.on)
+				continue
+			++count
+			var/muleData[0]
+			muleData["name"] = M.suffix
+			muleData["location"] = get_area(M)
+			muleData["paused"] = M.paused
+			muleData["home"] = M.homeName
+			muleData["target"] = M.targetName
+			muleData["ref"] = "\ref[M]"
+			muleData["load"] = M.load ? M.load.name : "Nothing"
+
+			mulebotsData[++mulebotsData.len] = muleData.Copy()
+
+		values["mulebotcount"] = count
+		values["mulebots"] = mulebotsData
+
+
+
+	/*	Supply Shuttle Requests Menu (Mode: 47)		*/
+
+	if(mode==47)
+		var/supplyData[0]
+		var/datum/shuttle/ferry/supply/shuttle = supply_controller.shuttle
+		if (shuttle)
+			supplyData["shuttle_moving"] = shuttle.has_arrive_time()
+			supplyData["shuttle_eta"] = shuttle.eta_minutes()
+			supplyData["shuttle_loc"] = shuttle.at_station() ? "Station" : "Dock"
+		var/supplyOrderCount = 0
+		var/supplyOrderData[0]
+		for(var/S in supply_controller.shoppinglist)
+			var/datum/supply_order/SO = S
+
+			supplyOrderData[++supplyOrderData.len] = list("Number" = SO.ordernum, "Name" = html_encode(SO.object.name), "ApprovedBy" = SO.ordered_by, "Comment" = html_encode(SO.comment))
+		if(!supplyOrderData.len)
+			supplyOrderData[++supplyOrderData.len] = list("Number" = null, "Name" = null, "OrderedBy"=null)
+
+		supplyData["approved"] = supplyOrderData
+		supplyData["approved_count"] = supplyOrderCount
+
+		var/requestCount = 0
+		var/requestData[0]
+		for(var/S in supply_controller.order_history)
+			var/datum/supply_order/SO = S
+			if(SO.status != SUP_ORDER_REQUESTED)
+				continue
+
+			requestCount++
+			requestData[++requestData.len] = list("Number" = SO.ordernum, "Name" = html_encode(SO.object.name), "OrderedBy" = SO.ordered_by, "Comment" = html_encode(SO.comment))
+		if(!requestData.len)
+			requestData[++requestData.len] = list("Number" = null, "Name" = null, "orderedBy" = null, "Comment" = null)
+
+		supplyData["requests"] = requestData
+		supplyData["requests_count"] = requestCount
+
+
+		values["supply"] = supplyData
+
+
+
+	/* 	Janitor Supplies Locator  (Mode: 49)      */
+	if(mode==49)
+		var/JaniData[0]
+		var/turf/cl = get_turf(src)
+
+		if(cl)
+			JaniData["user_loc"] = list("x" = cl.x, "y" = cl.y)
+		else
+			JaniData["user_loc"] = list("x" = 0, "y" = 0)
+		var/MopData[0]
+		for(var/obj/item/weapon/mop/M in all_mops)
+			var/turf/ml = get_turf(M)
+			if(ml)
+				if(ml.z != cl.z)
 					continue
-				if(pda_turf.z != pMon.z) //and that we're on the same zlevel as the computer (lore: limited signal strength)
+				var/direction = get_dir(src, M)
+				MopData[++MopData.len] = list ("x" = ml.x, "y" = ml.y, "dir" = uppertext(dir2text(direction)), "status" = M.reagents.total_volume ? "Wet" : "Dry")
+
+		if(!MopData.len)
+			MopData[++MopData.len] = list("x" = 0, "y" = 0, dir=null, status = null)
+
+
+		var/BucketData[0]
+		for(var/obj/structure/mopbucket/B in all_mopbuckets)
+			var/turf/bl = get_turf(B)
+			if(bl)
+				if(bl.z != cl.z)
 					continue
-				if(pMon.is_secret_monitor) //make sure it isn't a secret one (ie located on a ruin), allowing people to metagame that the location exists
+				var/direction = get_dir(src,B)
+				BucketData[++BucketData.len] = list ("x" = bl.x, "y" = bl.y, "dir" = uppertext(dir2text(direction)), "status" = B.reagents.total_volume/100)
+
+		if(!BucketData.len)
+			BucketData[++BucketData.len] = list("x" = 0, "y" = 0, dir=null, status = null)
+
+		var/CbotData[0]
+		for(var/mob/living/bot/cleanbot/B in mob_list)
+			var/turf/bl = get_turf(B)
+			if(bl)
+				if(bl.z != cl.z)
 					continue
-				powercount++
-				powermonitors += pMon
+				var/direction = get_dir(src,B)
+				CbotData[++CbotData.len] = list("x" = bl.x, "y" = bl.y, "dir" = uppertext(dir2text(direction)), "status" = B.on ? "Online" : "Offline")
 
 
-			if(!powercount)
-				menu += "<span class='danger'>No connection<BR></span>"
-			else
+		if(!CbotData.len)
+			CbotData[++CbotData.len] = list("x" = 0, "y" = 0, dir=null, status = null)
+		var/CartData[0]
+		for(var/obj/structure/janitorialcart/B in all_janitorial_carts)
+			var/turf/bl = get_turf(B)
+			if(bl)
+				if(bl.z != cl.z)
+					continue
+				var/direction = get_dir(src,B)
+				CartData[++CartData.len] = list("x" = bl.x, "y" = bl.y, "dir" = uppertext(dir2text(direction)), "status" = B.reagents.total_volume/100)
+		if(!CartData.len)
+			CartData[++CartData.len] = list("x" = 0, "y" = 0, dir=null, status = null)
 
-				menu += "<FONT SIZE=-1>"
-				var/count = 0
-				for(var/obj/machinery/computer/monitor/pMon in powermonitors)
-					count++
-					menu += "<a href='byond://?src=[REF(src)];choice=Power Select;target=[count]'>[pMon] - [get_area_name(pMon, TRUE)] </a><BR>"
 
-				menu += "</FONT>"
 
-		if (433)
-			menu = "<h4>[PDAIMG(power)] Power Monitor </h4><BR>"
-			if(!powmonitor || !powmonitor.get_powernet())
-				menu += "<span class='danger'>No connection<BR></span>"
-			else
-				var/list/L = list()
-				var/datum/powernet/connected_powernet = powmonitor.get_powernet()
-				for(var/obj/machinery/power/terminal/term in connected_powernet.nodes)
-					if(istype(term.master, /obj/machinery/power/apc))
-						var/obj/machinery/power/apc/A = term.master
-						L += A
 
-				menu += "<PRE>Location: [get_area_name(powmonitor, TRUE)]<BR>Total power: [DisplayPower(connected_powernet.viewavail)]<BR>Total load:  [DisplayPower(connected_powernet.viewload)]<BR>"
+		JaniData["mops"] = MopData
+		JaniData["buckets"] = BucketData
+		JaniData["cleanbots"] = CbotData
+		JaniData["carts"] = CartData
+		values["janitor"] = JaniData
 
-				menu += "<FONT SIZE=-1>"
+	return values
 
-				if(L.len > 0)
-					menu += "Area                           Eqp./Lgt./Env.  Load   Cell<HR>"
 
-					var/list/S = list(" Off","AOff","  On", " AOn")
-					var/list/chg = list("N","C","F")
 
-					for(var/obj/machinery/power/apc/A in L)
-						menu += copytext(add_tspace(A.area.name, 30), 1, 30)
-						menu += " [S[A.equipment+1]] [S[A.lighting+1]] [S[A.environ+1]] [add_lspace(DisplayPower(A.lastused_total), 6)]  [A.cell ? "[add_lspace(round(A.cell.percent()), 3)]% [chg[A.charging+1]]" : "  N/C"]<BR>"
 
-				menu += "</FONT></PRE>"
 
-		if (44) //medical records //This thing only displays a single screen so it's hard to really get the sub-menu stuff working.
-			menu = "<h4>[PDAIMG(medical)] Medical Record List</h4>"
-			if(GLOB.data_core.general)
-				for(var/datum/data/record/R in sortRecord(GLOB.data_core.general))
-					menu += "<a href='byond://?src=[REF(src)];choice=Medical Records;target=[R.fields["id"]]'>[R.fields["id"]]: [R.fields["name"]]<br>"
-			menu += "<br>"
-		if(441)
-			menu = "<h4>[PDAIMG(medical)] Medical Record</h4>"
-
-			if(active1 in GLOB.data_core.general)
-				menu += "Name: [active1.fields["name"]] ID: [active1.fields["id"]]<br>"
-				menu += "Gender: [active1.fields["gender"]]<br>"
-				menu += "Age: [active1.fields["age"]]<br>"
-				menu += "Rank: [active1.fields["rank"]]<br>"
-				menu += "Fingerprint: [active1.fields["fingerprint"]]<br>"
-				menu += "Physical Status: [active1.fields["p_stat"]]<br>"
-				menu += "Mental Status: [active1.fields["m_stat"]]<br>"
-			else
-				menu += "<b>Record Lost!</b><br>"
-
-			menu += "<br>"
-
-			menu += "<h4>[PDAIMG(medical)] Medical Data</h4>"
-			if(active2 in GLOB.data_core.medical)
-				menu += "Blood Type: [active2.fields["blood_type"]]<br><br>"
-
-				menu += "Minor Disabilities: [active2.fields["mi_dis"]]<br>"
-				menu += "Details: [active2.fields["mi_dis_d"]]<br><br>"
-
-				menu += "Major Disabilities: [active2.fields["ma_dis"]]<br>"
-				menu += "Details: [active2.fields["ma_dis_d"]]<br><br>"
-
-				menu += "Allergies: [active2.fields["alg"]]<br>"
-				menu += "Details: [active2.fields["alg_d"]]<br><br>"
-
-				menu += "Current Diseases: [active2.fields["cdi"]]<br>"
-				menu += "Details: [active2.fields["cdi_d"]]<br><br>"
-
-				menu += "Important Notes: [active2.fields["notes"]]<br>"
-			else
-				menu += "<b>Record Lost!</b><br>"
-
-			menu += "<br>"
-		if (45) //security records
-			menu = "<h4>[PDAIMG(cuffs)] Security Record List</h4>"
-			if(GLOB.data_core.general)
-				for (var/datum/data/record/R in sortRecord(GLOB.data_core.general))
-					menu += "<a href='byond://?src=[REF(src)];choice=Security Records;target=[R.fields["id"]]'>[R.fields["id"]]: [R.fields["name"]]<br>"
-
-			menu += "<br>"
-		if(451)
-			menu = "<h4>[PDAIMG(cuffs)] Security Record</h4>"
-
-			if(active1 in GLOB.data_core.general)
-				menu += "Name: [active1.fields["name"]] ID: [active1.fields["id"]]<br>"
-				menu += "Gender: [active1.fields["gender"]]<br>"
-				menu += "Age: [active1.fields["age"]]<br>"
-				menu += "Rank: [active1.fields["rank"]]<br>"
-				menu += "Fingerprint: [active1.fields["fingerprint"]]<br>"
-				menu += "Physical Status: [active1.fields["p_stat"]]<br>"
-				menu += "Mental Status: [active1.fields["m_stat"]]<br>"
-			else
-				menu += "<b>Record Lost!</b><br>"
-
-			menu += "<br>"
-
-			menu += "<h4>[PDAIMG(cuffs)] Security Data</h4>"
-			if(active3 in GLOB.data_core.security)
-				menu += "Criminal Status: [active3.fields["criminal"]]<br>"
-
-				menu += text("<BR>\nMinor Crimes:")
-
-				menu +={"<table style="text-align:center;" border="1" cellspacing="0" width="100%">
-<tr>
-<th>Crime</th>
-<th>Details</th>
-<th>Author</th>
-<th>Time Added</th>
-</tr>"}
-				for(var/datum/data/crime/c in active3.fields["mi_crim"])
-					menu += "<tr><td>[c.crimeName]</td>"
-					menu += "<td>[c.crimeDetails]</td>"
-					menu += "<td>[c.author]</td>"
-					menu += "<td>[c.time]</td>"
-					menu += "</tr>"
-				menu += "</table>"
-
-				menu += text("<BR>\nMajor Crimes:")
-
-				menu +={"<table style="text-align:center;" border="1" cellspacing="0" width="100%">
-<tr>
-<th>Crime</th>
-<th>Details</th>
-<th>Author</th>
-<th>Time Added</th>
-</tr>"}
-				for(var/datum/data/crime/c in active3.fields["ma_crim"])
-					menu += "<tr><td>[c.crimeName]</td>"
-					menu += "<td>[c.crimeDetails]</td>"
-					menu += "<td>[c.author]</td>"
-					menu += "<td>[c.time]</td>"
-					menu += "</tr>"
-				menu += "</table>"
-
-				menu += "<BR>\nImportant Notes:<br>"
-				menu += "[active3.fields["notes"]]"
-			else
-				menu += "<b>Record Lost!</b><br>"
-
-			menu += "<br>"
-
-		if (47) //quartermaster order records
-			menu = "<h4>[PDAIMG(crate)] Supply Record Interlink</h4>"
-
-			menu += "<BR><B>Supply shuttle</B><BR>"
-			menu += "Location: "
-			switch(SSshuttle.supply.mode)
-				if(SHUTTLE_CALL)
-					menu += "Moving to "
-					if(!is_station_level(SSshuttle.supply.z))
-						menu += "station"
-					else
-						menu += "CentCom"
-					menu += " ([SSshuttle.supply.timeLeft(600)] Mins)"
-				else
-					menu += "At "
-					if(!is_station_level(SSshuttle.supply.z))
-						menu += "CentCom"
-					else
-						menu += "station"
-			menu += "<BR>Current approved orders: <BR><ol>"
-			for(var/S in SSshuttle.shoppinglist)
-				var/datum/supply_order/SO = S
-				menu += "<li>#[SO.id] - [SO.pack.name] approved by [SO.orderer] [SO.reason ? "([SO.reason])":""]</li>"
-			menu += "</ol>"
-
-			menu += "Current requests: <BR><ol>"
-			for(var/S in SSshuttle.requestlist)
-				var/datum/supply_order/SO = S
-				menu += "<li>#[SO.id] - [SO.pack.name] requested by [SO.orderer]</li>"
-			menu += "</ol><font size=\"-3\">Upgrade NOW to Space Parts & Space Vendors PLUS for full remote order control and inventory management."
-
-		if (48) // quartermaster ore logs
-			menu = list("<h4>[PDAIMG(crate)] Ore Silo Logs</h4>")
-			if (GLOB.ore_silo_default)
-				var/list/logs = GLOB.silo_access_logs[REF(GLOB.ore_silo_default)]
-				var/len = LAZYLEN(logs)
-				var/i = 0
-				for(var/M in logs)
-					if (++i > 30)
-						menu += "(... older logs not shown ...)"
-						break
-					var/datum/ore_silo_log/entry = M
-					menu += "[len - i]. [entry.formatted]<br><br>"
-				if(i == 0)
-					menu += "Nothing!"
-			else
-				menu += "<b>No ore silo detected!</b>"
-			menu = jointext(menu, "")
-
-		if (49) //janitorial locator
-			menu = "<h4>[PDAIMG(bucket)] Persistent Custodial Object Locator</h4>"
-
-			var/turf/cl = get_turf(src)
-			if (cl)
-				menu += "Current Orbital Location: <b>\[[cl.x],[cl.y]\]</b>"
-
-				menu += "<h4>Located Mops:</h4>"
-
-				var/ldat
-				for (var/obj/item/mop/M in world)
-					var/turf/ml = get_turf(M)
-
-					if(ml)
-						if (ml.z != cl.z)
-							continue
-						var/direction = get_dir(src, M)
-						ldat += "Mop - <b>\[[ml.x],[ml.y] ([uppertext(dir2text(direction))])\]</b> - [M.reagents.total_volume ? "Wet" : "Dry"]<br>"
-
-				if (!ldat)
-					menu += "None"
-				else
-					menu += "[ldat]"
-
-				menu += "<h4>Located Janitorial Cart:</h4>"
-
-				ldat = null
-				for (var/obj/structure/janitorialcart/B in world)
-					var/turf/bl = get_turf(B)
-
-					if(bl)
-						if (bl.z != cl.z)
-							continue
-						var/direction = get_dir(src, B)
-						ldat += "Cart - <b>\[[bl.x],[bl.y] ([uppertext(dir2text(direction))])\]</b> - Water level: [B.reagents.total_volume]/100<br>"
-
-				if (!ldat)
-					menu += "None"
-				else
-					menu += "[ldat]"
-
-				menu += "<h4>Located Cleanbots:</h4>"
-
-				ldat = null
-				for (var/mob/living/simple_animal/bot/cleanbot/B in GLOB.alive_mob_list)
-					var/turf/bl = get_turf(B)
-
-					if(bl)
-						if (bl.z != cl.z)
-							continue
-						var/direction = get_dir(src, B)
-						ldat += "Cleanbot - <b>\[[bl.x],[bl.y] ([uppertext(dir2text(direction))])\]</b> - [B.on ? "Online" : "Offline"]<br>"
-
-				if (!ldat)
-					menu += "None"
-				else
-					menu += "[ldat]"
-
-			else
-				menu += "ERROR: Unable to determine current location."
-			menu += "<br><br><A href='byond://?src=[REF(src)];choice=49'>Refresh GPS Locator</a>"
-
-		if (53) // Newscaster
-			menu = "<h4>[PDAIMG(notes)] Newscaster Access</h4>"
-			menu += "<br> Current Newsfeed: <A href='byond://?src=[REF(src)];choice=Newscaster Switch Channel'>[current_channel ? current_channel : "None"]</a> <br>"
-			var/datum/newscaster/feed_channel/current
-			for(var/datum/newscaster/feed_channel/chan in GLOB.news_network.network_channels)
-				if (chan.channel_name == current_channel)
-					current = chan
-			if(!current)
-				menu += "<h5> ERROR : NO CHANNEL FOUND </h5>"
-				return menu
-			var/i = 1
-			for(var/datum/newscaster/feed_message/msg in current.messages)
-				menu +="-[msg.returnBody(-1)] <BR><FONT SIZE=1>\[Story by <FONT COLOR='maroon'>[msg.returnAuthor(-1)]</FONT>\]</FONT><BR>"
-				menu +="<b><font size=1>[msg.comments.len] comment[msg.comments.len > 1 ? "s" : ""]</font></b><br>"
-				if(msg.img)
-					user << browse_rsc(msg.img, "tmp_photo[i].png")
-					menu +="<img src='tmp_photo[i].png' width = '180'><BR>"
-				i++
-				for(var/datum/newscaster/feed_comment/comment in msg.comments)
-					menu +="<font size=1><small>[comment.body]</font><br><font size=1><small><small><small>[comment.author] [comment.time_stamp]</small></small></small></small></font><br>"
-			menu += "<br> <A href='byond://?src=[REF(src)];choice=Newscaster Message'>Post Message</a>"
-
-		if (54) // Beepsky, Medibot, Floorbot, and Cleanbot access
-			menu = "<h4>[PDAIMG(medbot)] Bots Interlink</h4>"
-			bot_control()
-		if (99) //Newscaster message permission error
-			menu = "<h5> ERROR : NOT AUTHORIZED [host_pda.id ? "" : "- ID SLOT EMPTY"] </h5>"
-
-	return menu
-
-/obj/item/cartridge/Topic(href, href_list)
+/obj/item/weapon/cartridge/Topic(href, href_list)
 	..()
 
-	if(!usr.canUseTopic(src, !issilicon(usr)))
+	if (!usr.canmove || usr.stat || usr.restrained() || !in_range(loc, usr))
 		usr.unset_machine()
 		usr << browse(null, "window=pda")
 		return
 
+
+
+
 	switch(href_list["choice"])
 		if("Medical Records")
-			active1 = find_record("id", href_list["target"], GLOB.data_core.general)
-			if(active1)
-				active2 = find_record("id", href_list["target"], GLOB.data_core.medical)
-			host_pda.mode = 441
-			if(!active2)
-				active1 = null
+			var/datum/data/record/R = locate(href_list["target"])
+			var/datum/data/record/M = locate(href_list["target"])
+			loc:mode = 441
+			mode = 441
+			if (R in data_core.general)
+				for (var/datum/data/record/E in data_core.medical)
+					if ((E.fields["name"] == R.fields["name"] || E.fields["id"] == R.fields["id"]))
+						M = E
+						break
+				active1 = R
+				active2 = M
 
 		if("Security Records")
-			active1 = find_record("id", href_list["target"], GLOB.data_core.general)
-			if(active1)
-				active3 = find_record("id", href_list["target"], GLOB.data_core.security)
-			host_pda.mode = 451
-			if(!active3)
-				active1 = null
+			var/datum/data/record/R = locate(href_list["target"])
+			var/datum/data/record/S = locate(href_list["target"])
+			loc:mode = 451
+			mode = 451
+			if (R in data_core.general)
+				for (var/datum/data/record/E in data_core.security)
+					if ((E.fields["name"] == R.fields["name"] || E.fields["id"] == R.fields["id"]))
+						S = E
+						break
+				active1 = R
+				active3 = S
 
 		if("Send Signal")
-			INVOKE_ASYNC(radio, /obj/item/integrated_signaler.proc/send_activation)
+			if(is_jammed(src))
+				return
+			spawn( 0 )
+				radio:send_signal("ACTIVATE")
+				return
 
 		if("Signal Frequency")
-			var/new_frequency = sanitize_frequency(radio.frequency + text2num(href_list["sfreq"]))
-			radio.set_frequency(new_frequency)
+			var/new_frequency = sanitize_frequency(radio:frequency + text2num(href_list["sfreq"]))
+			radio:set_frequency(new_frequency)
 
 		if("Signal Code")
-			radio.code += text2num(href_list["scode"])
-			radio.code = round(radio.code)
-			radio.code = min(100, radio.code)
-			radio.code = max(1, radio.code)
+			radio:code += text2num(href_list["scode"])
+			radio:code = round(radio:code)
+			radio:code = min(100, radio:code)
+			radio:code = max(1, radio:code)
 
 		if("Status")
 			switch(href_list["statdisp"])
@@ -609,131 +596,26 @@ Code:
 				if("alert")
 					post_status("alert", href_list["alert"])
 				if("setmsg1")
-					message1 = reject_bad_text(input("Line 1", "Enter Message Text", message1) as text|null, 40)
+					message1 = reject_bad_text(sanitize(input("Line 1", "Enter Message Text", message1) as text|null, 40), 40)
 					updateSelfDialog()
 				if("setmsg2")
-					message2 = reject_bad_text(input("Line 2", "Enter Message Text", message2) as text|null, 40)
+					message2 = reject_bad_text(sanitize(input("Line 2", "Enter Message Text", message2) as text|null, 40), 40)
 					updateSelfDialog()
 				else
 					post_status(href_list["statdisp"])
+
 		if("Power Select")
-			var/pnum = text2num(href_list["target"])
-			powmonitor = powermonitors[pnum]
-			host_pda.mode = 433
+			selected_sensor = href_list["target"]
+			loc:mode = 433
+			mode = 433
+		if("Power Clear")
+			selected_sensor = null
+			loc:mode = 43
+			mode = 43
 
-		if("Supply Orders")
-			host_pda.mode =47
+		if("MULEbot")
+			var/mob/living/bot/mulebot/M = locate(href_list["ref"])
+			if(istype(M))
+				M.obeyCommand(href_list["command"])
 
-		if("Newscaster Access")
-			host_pda.mode = 53
-
-		if("Newscaster Message")
-			var/host_pda_owner_name = host_pda.id ? "[host_pda.id.registered_name] ([host_pda.id.assignment])" : "Unknown"
-			var/message = host_pda.msg_input()
-			var/datum/newscaster/feed_channel/current
-			for(var/datum/newscaster/feed_channel/chan in GLOB.news_network.network_channels)
-				if (chan.channel_name == current_channel)
-					current = chan
-			if(current.locked && current.author != host_pda_owner_name)
-				host_pda.mode = 99
-				host_pda.Topic(null,list("choice"="Refresh"))
-				return
-			GLOB.news_network.SubmitArticle(message,host_pda.owner,current_channel)
-			host_pda.Topic(null,list("choice"=num2text(host_pda.mode)))
-			return
-
-		if("Newscaster Switch Channel")
-			current_channel = host_pda.msg_input()
-			host_pda.Topic(null,list("choice"=num2text(host_pda.mode)))
-			return
-
-	//Bot control section! Viciously ripped from radios for being laggy and terrible.
-	if(href_list["op"])
-		switch(href_list["op"])
-
-			if("control")
-				active_bot = locate(href_list["bot"]) in GLOB.bots_list
-
-			if("botlist")
-				active_bot = null
-			if("summon") //Args are in the correct order, they are stated here just as an easy reminder.
-				active_bot.bot_control("summon", usr, host_pda.GetAccess())
-			else //Forward all other bot commands to the bot itself!
-				active_bot.bot_control(href_list["op"], usr)
-
-	if(href_list["mule"]) //MULEbots are special snowflakes, and need different args due to how they work.
-		var/mob/living/simple_animal/bot/mulebot/mule = active_bot
-		if (istype(mule))
-			mule.bot_control(href_list["mule"], usr, pda=TRUE)
-
-	if(!host_pda)
-		return
-	host_pda.attack_self(usr)
-
-
-/obj/item/cartridge/proc/bot_control()
-	if(active_bot)
-		menu += "<B>[active_bot]</B><BR> Status: (<A href='byond://?src=[REF(src)];op=control;bot=[REF(active_bot)]'>[PDAIMG(refresh)]<i>refresh</i></A>)<BR>"
-		menu += "Model: [active_bot.model]<BR>"
-		menu += "Location: [get_area(active_bot)]<BR>"
-		menu += "Mode: [active_bot.get_mode()]"
-		if(active_bot.allow_pai)
-			menu += "<BR>pAI: "
-			if(active_bot.paicard && active_bot.paicard.pai)
-				menu += "[active_bot.paicard.pai.name]"
-				if(active_bot.bot_core.allowed(usr))
-					menu += " (<A href='byond://?src=[REF(src)];op=ejectpai'><i>eject</i></A>)"
-			else
-				menu += "<i>none</i>"
-
-		//MULEs!
-		if(active_bot.bot_type == MULE_BOT)
-			var/mob/living/simple_animal/bot/mulebot/MULE = active_bot
-			var/atom/Load = MULE.load
-			menu += "<BR>Current Load: [ !Load ? "<i>none</i>" : "[Load.name] (<A href='byond://?src=[REF(src)];mule=unload'><i>unload</i></A>)" ]<BR>"
-			menu += "Destination: [MULE.destination ? MULE.destination : "<i>None</i>"] (<A href='byond://?src=[REF(src)];mule=destination'><i>set</i></A>)<BR>"
-			menu += "Set ID: [MULE.suffix] <A href='byond://?src=[REF(src)];mule=setid'><i> Modify</i></A><BR>"
-			menu += "Power: [MULE.cell ? MULE.cell.percent() : 0]%<BR>"
-			menu += "Home: [!MULE.home_destination ? "<i>none</i>" : MULE.home_destination ]<BR>"
-			menu += "Delivery Reporting: <A href='byond://?src=[REF(src)];mule=report'>[MULE.report_delivery ? "(<B>On</B>)": "(<B>Off</B>)"]</A><BR>"
-			menu += "Auto Return Home: <A href='byond://?src=[REF(src)];mule=autoret'>[MULE.auto_return ? "(<B>On</B>)": "(<B>Off</B>)"]</A><BR>"
-			menu += "Auto Pickup Crate: <A href='byond://?src=[REF(src)];mule=autopick'>[MULE.auto_pickup ? "(<B>On</B>)": "(<B>Off</B>)"]</A><BR><BR>" //Hue.
-
-			menu += "\[<A href='byond://?src=[REF(src)];mule=stop'>Stop</A>\] "
-			menu += "\[<A href='byond://?src=[REF(src)];mule=go'>Proceed</A>\] "
-			menu += "\[<A href='byond://?src=[REF(src)];mule=home'>Return Home</A>\]<BR>"
-
-		else
-			menu += "<BR>\[<A href='byond://?src=[REF(src)];op=patroloff'>Stop Patrol</A>\] "	//patrolon
-			menu += "\[<A href='byond://?src=[REF(src)];op=patrolon'>Start Patrol</A>\] "	//patroloff
-			menu += "\[<A href='byond://?src=[REF(src)];op=summon'>Summon Bot</A>\]<BR>"		//summon
-			menu += "Keep an ID inserted to upload access codes upon summoning."
-
-		menu += "<HR><A href='byond://?src=[REF(src)];op=botlist'>[PDAIMG(back)]Return to bot list</A>"
-	else
-		menu += "<BR><A href='byond://?src=[REF(src)];op=botlist'>[PDAIMG(refresh)]Scan for active bots</A><BR><BR>"
-		var/turf/current_turf = get_turf(src)
-		var/zlevel = current_turf.z
-		var/botcount = 0
-		for(var/B in GLOB.bots_list) //Git da botz
-			var/mob/living/simple_animal/bot/Bot = B
-			if(!Bot.on || Bot.z != zlevel || Bot.remote_disabled || !(bot_access_flags & Bot.bot_type)) //Only non-emagged bots on the same Z-level are detected!
-				continue //Also, the PDA must have access to the bot type.
-			menu += "<A href='byond://?src=[REF(src)];op=control;bot=[REF(Bot)]'><b>[Bot.name]</b> ([Bot.get_mode()])<BR>"
-			botcount++
-		if(!botcount) //No bots at all? Lame.
-			menu += "No bots found.<BR>"
-			return
-
-	return menu
-
-//If the cartridge adds a special line to the top of the messaging app
-/obj/item/cartridge/proc/message_header()
-	return ""
-
-//If the cartridge adds something to each potetial messaging target
-/obj/item/cartridge/proc/message_special(obj/item/pda/target)
-	return ""
-
-//This is called for special abilities of cartridges
-/obj/item/cartridge/proc/special(mob/living/user, list/params)
+	return 1

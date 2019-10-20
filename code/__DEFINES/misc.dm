@@ -1,257 +1,268 @@
-// Byond direction defines, because I want to put them somewhere.
-// #define NORTH 1
-// #define SOUTH 2
-// #define EAST 4
-// #define WEST 8
+#define DEBUG
+// Turf-only flags.
+#define NOJAUNT 1 // This is used in literally one place, turf.dm, to block ethereal jaunt.
 
-#define TEXT_NORTH			"[NORTH]"
-#define TEXT_SOUTH			"[SOUTH]"
-#define TEXT_EAST			"[EAST]"
-#define TEXT_WEST			"[WEST]"
+#define TRANSITIONEDGE 7 // Distance from edge to move to another z-level.
 
+// Invisibility constants. These should only be used for TRUE invisibility, AKA nothing living players touch
+#define INVISIBILITY_LIGHTING             20
+#define INVISIBILITY_LEVEL_ONE            35
+#define INVISIBILITY_LEVEL_TWO            45
+#define INVISIBILITY_OBSERVER             60
+#define INVISIBILITY_EYE		          61
 
-//Human Overlays Indexes/////////
-#define MUTATIONS_LAYER			28		//mutations. Tk headglows, cold resistance glow, etc
-#define BODY_BEHIND_LAYER		27		//certain mutantrace features (tail when looking south) that must appear behind the body parts
-#define BODYPARTS_LAYER			26		//Initially "AUGMENTS", this was repurposed to be a catch-all bodyparts flag
-#define BODY_ADJ_LAYER			25		//certain mutantrace features (snout, body markings) that must appear above the body parts
-#define BODY_LAYER				24		//underwear, undershirts, socks, eyes, lips(makeup)
-#define FRONT_MUTATIONS_LAYER	23		//mutations that should appear above body, body_adj and bodyparts layer (e.g. laser eyes)
-#define DAMAGE_LAYER			22		//damage indicators (cuts and burns)
-#define UNIFORM_LAYER			21
-#define ID_LAYER				20 //lmao at the idiot who put both ids and hands on the same layer
-#define HANDS_PART_LAYER		19
-#define GLOVES_LAYER			18
-#define SHOES_LAYER				17
-#define EARS_LAYER				16
-#define SUIT_LAYER				15
-#define GLASSES_LAYER			14
-#define BELT_LAYER				13		//Possible make this an overlay of somethign required to wear a belt?
-#define SUIT_STORE_LAYER		12
-#define NECK_LAYER				11
-#define BACK_LAYER				10
-#define HAIR_LAYER				9		//TODO: make part of head layer?
-#define FACEMASK_LAYER			8
-#define HEAD_LAYER				7
-#define HANDCUFF_LAYER			6
-#define LEGCUFF_LAYER			5
-#define HANDS_LAYER				4
-#define BODY_FRONT_LAYER		3
-#define HALO_LAYER				2		//blood cult ascended halo, because there's currently no better solution for adding/removing
-#define FIRE_LAYER				1		//If you're on fire
-#define TOTAL_LAYERS			28		//KEEP THIS UP-TO-DATE OR SHIT WILL BREAK ;_;
+#define SEE_INVISIBLE_LIVING              25
+#define SEE_INVISIBLE_NOLIGHTING 15
+#define SEE_INVISIBLE_LEVEL_ONE           35
+#define SEE_INVISIBLE_LEVEL_TWO           45
+#define SEE_INVISIBLE_CULT		          60
+#define SEE_INVISIBLE_OBSERVER            61
 
-//Human Overlay Index Shortcuts for alternate_worn_layer, layers
-//Because I *KNOW* somebody will think layer+1 means "above"
-//IT DOESN'T OK, IT MEANS "UNDER"
-#define UNDER_SUIT_LAYER			(SUIT_LAYER+1)
-#define UNDER_HEAD_LAYER			(HEAD_LAYER+1)
+#define SEE_INVISIBLE_MINIMUM 5
+#define INVISIBILITY_MAXIMUM 100
 
-//AND -1 MEANS "ABOVE", OK?, OK!?!
-#define ABOVE_SHOES_LAYER			(SHOES_LAYER-1)
-#define ABOVE_BODY_FRONT_LAYER		(BODY_FRONT_LAYER-1)
+// Pseudo-Invis, like Ninja, Ling, Etc.
+#define EFFECTIVE_INVIS					  50		// Below this, can't be examined, may as well be invisible to the game
 
+// For the client FPS pref and anywhere else
+#define MAX_CLIENT_FPS	200
 
-//Security levels
-#define SEC_LEVEL_GREEN	0
-#define SEC_LEVEL_BLUE	1
-#define SEC_LEVEL_RED	2
-#define SEC_LEVEL_DELTA	3
+// Some arbitrary defines to be used by self-pruning global lists. (see master_controller)
+#define PROCESS_KILL 26 // Used to trigger removal from a processing list.
+#define MAX_GEAR_COST 15 // Used in chargen for accessory loadout limit.
 
-//some arbitrary defines to be used by self-pruning global lists. (see master_controller)
-#define PROCESS_KILL 26	//Used to trigger removal from a processing list
+// For secHUDs and medHUDs and variants. The number is the location of the image on the list hud_list of humans.
+#define      HEALTH_HUD 1 // A simple line rounding the mob's number health.
+#define      STATUS_HUD 2 // Alive, dead, diseased, etc.
+#define          ID_HUD 3 // The job asigned to your ID.
+#define      WANTED_HUD 4 // Wanted, released, paroled, security status.
+#define    IMPLOYAL_HUD 5 // Loyality implant.
+#define     IMPCHEM_HUD 6 // Chemical implant.
+#define    IMPTRACK_HUD 7 // Tracking implant.
+#define SPECIALROLE_HUD 8 // AntagHUD image.
+#define  STATUS_HUD_OOC 9 // STATUS_HUD without virus DB check for someone being ill.
+#define 	  LIFE_HUD 10 // STATUS_HUD that only reports dead or alive
+#define     TOTAL_HUDS 10 // Total number of HUDs. Like body layers, and other things, it comes up sometimes.
 
-// Cargo-related stuff.
-#define MANIFEST_ERROR_CHANCE		5
-#define MANIFEST_ERROR_NAME			1
-#define MANIFEST_ERROR_CONTENTS		2
-#define MANIFEST_ERROR_ITEM			4
-
-#define TRANSITIONEDGE			7 //Distance from edge to move to another z-level
-
-#define BE_CLOSE TRUE		//in the case of a silicon, to select if they need to be next to the atom
-#define NO_DEXTERY TRUE	//if other mobs (monkeys, aliens, etc) can use this
-#define NO_TK TRUE
-//used by canUseTopic()
-
-//singularity defines
-#define STAGE_ONE 1
-#define STAGE_TWO 3
-#define STAGE_THREE 5
-#define STAGE_FOUR 7
-#define STAGE_FIVE 9
-#define STAGE_SIX 11 //From supermatter shard
-
-//SSticker.current_state values
-#define GAME_STATE_STARTUP		0
-#define GAME_STATE_PREGAME		1
-#define GAME_STATE_SETTING_UP	2
-#define GAME_STATE_PLAYING		3
-#define GAME_STATE_FINISHED		4
-
-//FONTS:
-// Used by Paper and PhotoCopier (and PaperBin once a year).
-// Used by PDA's Notekeeper.
-// Used by NewsCaster and NewsPaper.
-// Used by Modular Computers
-#define PEN_FONT "Verdana"
-#define FOUNTAIN_PEN_FONT "Segoe Script"
-#define CRAYON_FONT "Comic Sans MS"
-#define PRINTER_FONT "Times New Roman"
-#define SIGNFONT "Times New Roman"
-
-#define RESIZE_DEFAULT_SIZE 1
-
-//transfer_ai() defines. Main proc in ai_core.dm
-#define AI_TRANS_TO_CARD	1 //Downloading AI to InteliCard.
-#define AI_TRANS_FROM_CARD	2 //Uploading AI from InteliCard
-#define AI_MECH_HACK		3 //Malfunctioning AI hijacking mecha
-
-//check_target_facings() return defines
-#define FACING_SAME_DIR											1
-#define FACING_EACHOTHER										2
-#define FACING_INIT_FACING_TARGET_TARGET_FACING_PERPENDICULAR	3 //Do I win the most informative but also most stupid define award?
-
-
-//Cache of bloody footprint images
-//Key:
-//"entered-[blood_state]-[dir_of_image]"
-//or: "exited-[blood_state]-[dir_of_image]"
-GLOBAL_LIST_EMPTY(bloody_footprints_cache)
-
-//Bloody shoes/footprints
-#define MAX_SHOE_BLOODINESS			100
-#define BLOODY_FOOTPRINT_BASE_ALPHA	150
-#define BLOOD_GAIN_PER_STEP			100
-#define BLOOD_LOSS_PER_STEP			5
-#define BLOOD_LOSS_IN_SPREAD		20
-#define BLOOD_AMOUNT_PER_DECAL		20
-
-//Bloody shoe blood states
-#define BLOOD_STATE_HUMAN			"blood"
-#define BLOOD_STATE_XENO			"xeno"
-#define BLOOD_STATE_OIL				"oil"
-#define BLOOD_STATE_NOT_BLOODY		"no blood whatsoever"
-
-//suit sensors: sensor_mode defines
-
-#define SENSOR_OFF 0
-#define SENSOR_LIVING 1
-#define SENSOR_VITALS 2
-#define SENSOR_COORDS 3
-
-//suit sensors: has_sensor defines
-
-#define BROKEN_SENSORS -1
-#define NO_SENSORS 0
-#define HAS_SENSORS 1
-#define LOCKED_SENSORS 2
-
-//Wet floor type flags. Stronger ones should be higher in number.
-#define TURF_DRY			(0)
-#define TURF_WET_WATER		(1<<0)
-#define TURF_WET_PERMAFROST	(1<<1)
-#define TURF_WET_ICE 		(1<<2)
-#define TURF_WET_LUBE		(1<<3)
-#define TURF_WET_SUPERLUBE	(1<<4)
-
-#define IS_WET_OPEN_TURF(O) O.GetComponent(/datum/component/wet_floor)
-
-//Maximum amount of time, (in deciseconds) a tile can be wet for.
-#define MAXIMUM_WET_TIME 5 MINUTES
-
-//unmagic-strings for types of polls
-#define POLLTYPE_OPTION		"OPTION"
-#define POLLTYPE_TEXT		"TEXT"
-#define POLLTYPE_RATING		"NUMVAL"
-#define POLLTYPE_MULTI		"MULTICHOICE"
-#define POLLTYPE_IRV		"IRV"
+//some colors
+#define COLOR_WHITE   			"#FFFFFF"
+#define COLOR_SILVER  			"#C0C0C0"
+#define COLOR_GRAY    			"#808080"
+#define COLOR_BLACK   			"#000000"
+#define COLOR_RED     			"#FF0000"
+#define COLOR_MAROON 			"#800000"
+#define COLOR_YELLOW  			"#FFFF00"
+#define COLOR_OLIVE  			"#808000"
+#define COLOR_LIME   			"#00FF00"
+#define COLOR_GREEN   			"#008000"
+#define COLOR_CYAN    			"#00FFFF"
+#define COLOR_TEAL    			"#008080"
+#define COLOR_BLUE    			"#0000FF"
+#define COLOR_NAVY    			"#000080"
+#define COLOR_PINK    			"#FF00FF"
+#define COLOR_PURPLE  			"#800080"
+#define COLOR_ORANGE  			"#FF9900"
+#define COLOR_LUMINOL 			"#66FFFF"
+#define COLOR_BEIGE 			"#CEB689"
+#define COLOR_BLUE_GRAY 		"#6A97B0"
+#define COLOR_BROWN 			"#B19664"
+#define COLOR_DARK_BROWN 		"#917448"
+#define COLOR_DARK_ORANGE 		"#B95A00"
+#define COLOR_GREEN_GRAY 		"#8DAF6A"
+#define COLOR_RED_GRAY 			"#AA5F61"
+#define COLOR_PALE_BLUE_GRAY	"#8BBBD5"
+#define COLOR_PALE_GREEN_GRAY 	"#AED18B"
+#define COLOR_PALE_RED_GRAY		"#CC9090"
+#define COLOR_PALE_PURPLE_GRAY	"#BDA2BA"
+#define COLOR_PURPLE_GRAY 		"#A2819E"
+#define COLOR_RED_LIGHT         "#FF3333"
+#define COLOR_DEEP_SKY_BLUE     "#00e1ff"
 
 
 
-//subtypesof(), typesof() without the parent path
-#define subtypesof(typepath) ( typesof(typepath) - typepath )
 
-//Gets the turf this atom inhabits
-#define get_turf(A) (get_step(A, 0))
+//	Shuttles.
 
-//Same as above except gets the area instead
-#define get_area(A) (isarea(A) ? A : get_step(A, 0)?.loc)
+// These define the time taken for the shuttle to get to the space station, and the time before it leaves again.
+#define SHUTTLE_PREPTIME                300 // 5 minutes = 300 seconds - after this time, the shuttle departs centcom and cannot be recalled.
+#define SHUTTLE_LEAVETIME               180 // 3 minutes = 180 seconds - the duration for which the shuttle will wait at the station after arriving.
+#define SHUTTLE_TRANSIT_DURATION        300 // 5 minutes = 300 seconds - how long it takes for the shuttle to get to the station.
+#define SHUTTLE_TRANSIT_DURATION_RETURN 120 // 2 minutes = 120 seconds - for some reason it takes less time to come back, go figure.
 
-//Ghost orbit types:
-#define GHOST_ORBIT_CIRCLE		"circle"
-#define GHOST_ORBIT_TRIANGLE	"triangle"
-#define GHOST_ORBIT_HEXAGON		"hexagon"
-#define GHOST_ORBIT_SQUARE		"square"
-#define GHOST_ORBIT_PENTAGON	"pentagon"
+// Shuttle moving status.
+#define SHUTTLE_IDLE      0
+#define SHUTTLE_WARMUP    1
+#define SHUTTLE_INTRANSIT 2
 
-//Ghost showing preferences:
-#define GHOST_ACCS_NONE		1
-#define GHOST_ACCS_DIR		50
-#define GHOST_ACCS_FULL		100
+// Sound defines for shuttles.
+#define HYPERSPACE_WARMUP    0
+#define HYPERSPACE_PROGRESS  1
+#define HYPERSPACE_END       2
 
-#define GHOST_ACCS_NONE_NAME		"default sprites"
-#define GHOST_ACCS_DIR_NAME			"only directional sprites"
-#define GHOST_ACCS_FULL_NAME		"full accessories"
+// Ferry shuttle processing status.
+#define IDLE_STATE   0
+#define WAIT_LAUNCH  1
+#define FORCE_LAUNCH 2
+#define WAIT_ARRIVE  3
+#define WAIT_FINISH  4
 
-#define GHOST_ACCS_DEFAULT_OPTION	GHOST_ACCS_FULL
+// Setting this much higher than 1024 could allow spammers to DOS the server easily.
+#define MAX_MESSAGE_LEN       2048 //VOREStation Edit - I'm not sure about "easily". It can be a little longer.
+#define MAX_PAPER_MESSAGE_LEN 6144
+#define MAX_BOOK_MESSAGE_LEN  24576
+#define MAX_RECORD_LENGTH	  24576
+#define MAX_LNAME_LEN         64
+#define MAX_NAME_LEN          52
+#define MAX_TEXTFILE_LENGTH 128000		// 512GQ file
 
-GLOBAL_LIST_INIT(ghost_accs_options, list(GHOST_ACCS_NONE, GHOST_ACCS_DIR, GHOST_ACCS_FULL)) //So save files can be sanitized properly.
+// Event defines.
+#define EVENT_LEVEL_MUNDANE  1
+#define EVENT_LEVEL_MODERATE 2
+#define EVENT_LEVEL_MAJOR    3
 
-#define GHOST_OTHERS_SIMPLE 			1
-#define GHOST_OTHERS_DEFAULT_SPRITE		50
-#define GHOST_OTHERS_THEIR_SETTING 		100
+//General-purpose life speed define for plants.
+#define HYDRO_SPEED_MULTIPLIER 1
 
-#define GHOST_OTHERS_SIMPLE_NAME 			"white ghost"
-#define GHOST_OTHERS_DEFAULT_SPRITE_NAME 	"default sprites"
-#define GHOST_OTHERS_THEIR_SETTING_NAME 	"their setting"
+#define DEFAULT_JOB_TYPE /datum/job/assistant
 
-#define GHOST_OTHERS_DEFAULT_OPTION			GHOST_OTHERS_THEIR_SETTING
+//Area flags, possibly more to come
+#define RAD_SHIELDED 1 //shielded from radiation, clearly
 
-#define GHOST_MAX_VIEW_RANGE_DEFAULT 10
-#define GHOST_MAX_VIEW_RANGE_MEMBER 14
+// Convoluted setup so defines can be supplied by Bay12 main server compile script.
+// Should still work fine for people jamming the icons into their repo.
+#ifndef CUSTOM_ITEM_OBJ
+#define CUSTOM_ITEM_OBJ 'icons/obj/custom_items_obj.dmi'
+#endif
+#ifndef CUSTOM_ITEM_MOB
+#define CUSTOM_ITEM_MOB 'icons/mob/custom_items_mob.dmi'
+#endif
+#ifndef CUSTOM_ITEM_SYNTH
+#define CUSTOM_ITEM_SYNTH 'icons/mob/custom_synthetic.dmi'
+#endif
+
+#define WALL_CAN_OPEN 1
+#define WALL_OPENING 2
+
+#define DEFAULT_TABLE_MATERIAL "plastic"
+#define DEFAULT_WALL_MATERIAL "steel"
+
+#define MAT_IRON			"iron"
+#define MAT_MARBLE			"marble"
+#define MAT_STEEL			"steel"
+#define MAT_PLASTIC			"plastic"
+#define MAT_GLASS			"glass"
+#define MAT_SILVER			"silver"
+#define MAT_GOLD			"gold"
+#define MAT_URANIUM			"uranium" //Did it
+#define MAT_TITANIUM		"titanium"
+#define MAT_PHORON			"phoron"
+#define MAT_DIAMOND			"diamond"
+#define MAT_SNOW			"snow"
+#define MAT_WOOD			"wood"
+#define MAT_LOG				"log"
+#define MAT_SIFWOOD			"alien wood"
+#define MAT_SIFLOG			"alien log"
+#define MAT_STEELHULL		"steel hull"
+#define MAT_PLASTEEL		"plasteel"
+#define MAT_PLASTEELHULL	"plasteel hull"
+#define MAT_DURASTEEL		"durasteel"
+#define MAT_DURASTEELHULL	"durasteel hull"
+#define MAT_TITANIUMHULL	"titanium hull"
+#define MAT_VERDANTIUM		"verdantium"
+#define MAT_MORPHIUM		"morphium"
+#define MAT_MORPHIUMHULL	"morphium hull"
+#define MAT_VALHOLLIDE		"valhollide"
+#define MAT_LEAD			"lead"
+#define MAT_SUPERMATTER		"supermatter"
+#define MAT_METALHYDROGEN	"mhydrogen"
+#define MAT_OSMIUM			"osmium"
+
+#define SHARD_SHARD "shard"
+#define SHARD_SHRAPNEL "shrapnel"
+#define SHARD_STONE_PIECE "piece"
+#define SHARD_SPLINTER "splinters"
+#define SHARD_NONE ""
+
+#define MATERIAL_UNMELTABLE 0x1
+#define MATERIAL_BRITTLE    0x2
+#define MATERIAL_PADDING    0x4
+
+#define TABLE_BRITTLE_MATERIAL_MULTIPLIER 4 // Amount table damage is multiplied by if it is made of a brittle material (e.g. glass)
+
+#define BOMBCAP_DVSTN_RADIUS (max_explosion_range/4)
+#define BOMBCAP_HEAVY_RADIUS (max_explosion_range/2)
+#define BOMBCAP_LIGHT_RADIUS max_explosion_range
+#define BOMBCAP_FLASH_RADIUS (max_explosion_range*1.5)
+									// NTNet module-configuration values. Do not change these. If you need to add another use larger number (5..6..7 etc)
+#define NTNET_SOFTWAREDOWNLOAD 1 	// Downloads of software from NTNet
+#define NTNET_PEERTOPEER 2			// P2P transfers of files between devices
+#define NTNET_COMMUNICATION 3		// Communication (messaging)
+#define NTNET_SYSTEMCONTROL 4		// Control of various systems, RCon, air alarm control, etc.
+
+// NTNet transfer speeds, used when downloading/uploading a file/program.
+#define NTNETSPEED_LOWSIGNAL 0.25	// GQ/s transfer speed when the device is wirelessly connected and on Low signal
+#define NTNETSPEED_HIGHSIGNAL 0.5	// GQ/s transfer speed when the device is wirelessly connected and on High signal
+#define NTNETSPEED_ETHERNET 1.0		// GQ/s transfer speed when the device is using wired connection
+#define NTNETSPEED_DOS_AMPLIFICATION 5	// Multiplier for Denial of Service program. Resulting load on NTNet relay is this multiplied by NTNETSPEED of the device
+
+// Program bitflags
+#define PROGRAM_ALL 15
+#define PROGRAM_CONSOLE 1
+#define PROGRAM_LAPTOP 2
+#define PROGRAM_TABLET 4
+#define PROGRAM_TELESCREEN 8
+
+#define PROGRAM_STATE_KILLED 0
+#define PROGRAM_STATE_BACKGROUND 1
+#define PROGRAM_STATE_ACTIVE 2
+
+// Caps for NTNet logging. Less than 10 would make logging useless anyway, more than 500 may make the log browser too laggy. Defaults to 100 unless user changes it.
+#define MAX_NTNET_LOGS 500
+#define MIN_NTNET_LOGS 10
 
 
-GLOBAL_LIST_INIT(ghost_others_options, list(GHOST_OTHERS_SIMPLE, GHOST_OTHERS_DEFAULT_SPRITE, GHOST_OTHERS_THEIR_SETTING)) //Same as ghost_accs_options.
+// Special return values from bullet_act(). Positive return values are already used to indicate the blocked level of the projectile.
+#define PROJECTILE_CONTINUE   -1 //if the projectile should continue flying after calling bullet_act()
+#define PROJECTILE_FORCE_MISS -2 //if the projectile should treat the attack as a miss (suppresses attack and admin logs) - only applies to mobs.
 
-//pda fonts
-#define MONO		"Monospaced"
-#define VT			"VT323"
-#define ORBITRON	"Orbitron"
-#define SHARE		"Share Tech Mono"
 
-GLOBAL_LIST_INIT(pda_styles, list(MONO, VT, ORBITRON, SHARE))
+// Vending stuff
+#define CAT_NORMAL 1
+#define CAT_HIDDEN 2
+#define CAT_COIN   4
 
-/////////////////////////////////////
-// atom.appearence_flags shortcuts //
-/////////////////////////////////////
+//Antag Faction Visbility
+#define ANTAG_HIDDEN	"Hidden"
+#define ANTAG_SHARED	"Shared"
+#define ANTAG_KNOWN		"Known"
 
-/*
+// Job groups
+#define ROLE_COMMAND			"command"
+#define ROLE_SECURITY			"security"
+#define ROLE_ENGINEERING		"engineering"
+#define ROLE_MEDICAL			"medical"
+#define ROLE_RESEARCH			"research"
+#define ROLE_CARGO				"cargo"
+#define ROLE_CIVILIAN			"civilian"
+#define ROLE_SYNTHETIC			"synthetic"
+#define ROLE_UNKNOWN			"unknown"
+#define ROLE_EVERYONE			"everyone"
 
-// Disabling certain features
-#define APPEARANCE_IGNORE_TRANSFORM			RESET_TRANSFORM
-#define APPEARANCE_IGNORE_COLOUR			RESET_COLOR
-#define	APPEARANCE_IGNORE_CLIENT_COLOUR		NO_CLIENT_COLOR
-#define APPEARANCE_IGNORE_COLOURING			(RESET_COLOR|NO_CLIENT_COLOR)
-#define APPEARANCE_IGNORE_ALPHA				RESET_ALPHA
-#define APPEARANCE_NORMAL_GLIDE				~LONG_GLIDE
+// Canonical spellings of TSCs, so typos never have to happen again due to human error.
+#define TSC_NT		"NanoTrasen"
+#define TSC_HEPH	"Hephaestus" // Because everyone misspells it
+#define TSC_VM		"Vey Med"
+#define TSC_ZH		"Zeng-Hu"
+#define TSC_WT		"Ward-Takahashi"
+#define TSC_BC		"Bishop Cybernetics"
+#define TSC_MORPH	"Morpheus"
+#define TSC_XION	"Xion" // Not really needed but consistancy I guess.
+#define TSC_GIL 	"Gilthari"
 
-// Enabling certain features
-#define APPEARANCE_CONSIDER_TRANSFORM		~RESET_TRANSFORM
-#define APPEARANCE_CONSIDER_COLOUR			~RESET_COLOUR
-#define APPEARANCE_CONSIDER_CLIENT_COLOUR	~NO_CLIENT_COLOR
-#define APPEARANCE_CONSIDER_COLOURING		(~RESET_COLOR|~NO_CLIENT_COLOR)
-#define APPEARANCE_CONSIDER_ALPHA			~RESET_ALPHA
-#define APPEARANCE_LONG_GLIDE				LONG_GLIDE
+#define MIDNIGHT_ROLLOVER		864000	//number of deciseconds in a day
 
-*/
-
-// Consider these images/atoms as part of the UI/HUD
-#define APPEARANCE_UI_IGNORE_ALPHA			(RESET_COLOR|RESET_TRANSFORM|NO_CLIENT_COLOR|RESET_ALPHA|PIXEL_SCALE)
-#define APPEARANCE_UI						(RESET_COLOR|RESET_TRANSFORM|NO_CLIENT_COLOR|PIXEL_SCALE)
-
-//Just space
-#define SPACE_ICON_STATE	"[((x + y) ^ ~(x * y) + z) % 25]"
+#define WORLD_ICON_SIZE 32 //Needed for the R-UST port
+#define PIXEL_MULTIPLIER WORLD_ICON_SIZE/32 //Needed for the R-UST port
 
 // Maploader bounds indices
 #define MAP_MINX 1
@@ -261,205 +272,90 @@ GLOBAL_LIST_INIT(pda_styles, list(MONO, VT, ORBITRON, SHARE))
 #define MAP_MAXY 5
 #define MAP_MAXZ 6
 
-// Defib stats
-#define DEFIB_TIME_LIMIT 900
-#define DEFIB_TIME_LOSS 60
+// /atom/proc/use_check flags
+#define USE_ALLOW_NONLIVING 1
+#define USE_ALLOW_NON_ADV_TOOL_USR 2
+#define USE_ALLOW_DEAD 4
+#define USE_ALLOW_INCAPACITATED 8
+#define USE_ALLOW_NON_ADJACENT 16
+#define USE_FORCE_SRC_IN_USER 32
+#define USE_DISALLOW_SILICONS 64
+
+#define USE_SUCCESS 0
+#define USE_FAIL_NON_ADJACENT 1
+#define USE_FAIL_NONLIVING 2
+#define USE_FAIL_NON_ADV_TOOL_USR 3
+#define USE_FAIL_DEAD 4
+#define USE_FAIL_INCAPACITATED 5
+#define USE_FAIL_NOT_IN_USER 6
+#define USE_FAIL_IS_SILICON 7
+
+// This creates a consistant definition for creating global lists, automatically inserting objects into it when they are created, and removing them when deleted.
+// It is very good for removing the 'in world' junk that exists in the codebase painlessly.
+// First argument is the list name/path desired, e.g. 'all_candles' would be 'var/list/all_candles = list()'.
+// Second argument is the path the list is expected to contain. Note that children will also get added to the global list.
+// If the GLOB system is ever ported, you can change this macro in one place and have less work to do than you otherwise would.
+#define GLOBAL_LIST_BOILERPLATE(LIST_NAME, PATH)\
+var/global/list/##LIST_NAME = list();\
+##PATH/Initialize(mapload, ...)\
+	{\
+	##LIST_NAME += src;\
+	return ..();\
+	}\
+##PATH/Destroy(force, ...)\
+	{\
+	##LIST_NAME -= src;\
+	return ..();\
+	}\
+
+
+//'Normal'ness						 v								 v								 v
+//Various types of colorblindness	R2R		R2G		R2B		G2R		G2G		G2B		B2R		B2G		B2B
+#define MATRIX_Monochromia 		list(0.33,	0.33,	0.33,	0.59,	0.59,	0.59,	0.11,	0.11,	0.11)
+#define MATRIX_Protanopia 		list(0.57,	0.43, 	0,		0.56, 	0.44, 	0, 		0, 		0.24,	0.76)
+#define MATRIX_Protanomaly 		list(0.82,	0.18, 	0,		0.33,	0.67, 	0, 		0, 		0.13,	0.88)
+#define MATRIX_Deuteranopia 	list(0.63,	0.38, 	0,		0.70, 	0.30, 	0, 		0, 		0.30, 	0.70)
+#define MATRIX_Deuteranomaly 	list(0.80, 	0.20, 	0,		0.26,	0.74,	0, 		0, 		0.14,	0.86)
+#define MATRIX_Tritanopia 		list(0.95, 	0.05, 	0,		0,		0.43, 	0.57,	0, 		0.48, 	0.53)
+#define MATRIX_Tritanomaly 		list(0.97,	0.03, 	0,		0,		0.73, 	0.27,	0, 		0.18,	0.82)
+#define MATRIX_Achromatopsia 	list(0.30,	0.59, 	0.11, 	0.30, 	0.59, 	0.11, 	0.30, 	0.59, 	0.11)
+#define MATRIX_Achromatomaly 	list(0.62,	0.32, 	0.06, 	0.16, 	0.78, 	0.06, 	0.16, 	0.32, 	0.52)
+#define MATRIX_Vulp_Colorblind 	list(0.50,	0.40,	0.10,	0.50,	0.40,	0.10,	0,		0.20,	0.80)
+#define MATRIX_Taj_Colorblind 	list(0.40,	0.20,	0.40,	0.40,	0.60,	0,		0.20,	0.20,	0.60)
+
+// Tool substitution defines
+#define IS_SCREWDRIVER		"screwdriver"
+#define IS_CROWBAR			"crowbar"
+#define IS_WIRECUTTER		"wirecutter"
+#define IS_WRENCH			"wrench"
+
 
 // Diagonal movement
 #define FIRST_DIAG_STEP 1
 #define SECOND_DIAG_STEP 2
 
-#define DEADCHAT_ARRIVALRATTLE "arrivalrattle"
-#define DEADCHAT_DEATHRATTLE "deathrattle"
-#define DEADCHAT_REGULAR "regular-deadchat"
+// RCD modes. Used on the RCD, and gets passed to an object's rcd_act() when an RCD is used on it, to determine what happens.
+#define RCD_FLOORWALL		"Floor / Wall"		// Builds plating on space/ground/open tiles. Builds a wall when on floors. Finishes walls when used on girders.
+#define RCD_AIRLOCK			"Airlock"			// Builds an airlock on the tile if one isn't already there.
+#define RCD_WINDOWGRILLE	"Window / Grille" 	// Builds a full tile window and grille pair on floors.
+#define RCD_DECONSTRUCT		"Deconstruction"	// Removes various things. Still consumes compressed matter.
 
-// Bluespace shelter deploy checks
-#define SHELTER_DEPLOY_ALLOWED "allowed"
-#define SHELTER_DEPLOY_BAD_TURFS "bad turfs"
-#define SHELTER_DEPLOY_BAD_AREA "bad area"
-#define SHELTER_DEPLOY_ANCHORED_OBJECTS "anchored objects"
+#define RCD_VALUE_MODE		"mode"
+#define RCD_VALUE_DELAY		"delay"
+#define RCD_VALUE_COST		"cost"
 
-//debug printing macros
-#define debug_world(msg) if (GLOB.Debug2) to_chat(world, "DEBUG: [msg]")
-#define debug_usr(msg) if (GLOB.Debug2&&usr) to_chat(usr, "DEBUG: [msg]")
-#define debug_admins(msg) if (GLOB.Debug2) to_chat(GLOB.admins, "DEBUG: [msg]")
-#define debug_world_log(msg) if (GLOB.Debug2) log_world("DEBUG: [msg]")
+#define RCD_SHEETS_PER_MATTER_UNIT	4	// Each physical material sheet is worth four matter units.
+#define RCD_MAX_CAPACITY			30 * RCD_SHEETS_PER_MATTER_UNIT
 
-#define INCREMENT_TALLY(L, stat) if(L[stat]){L[stat]++}else{L[stat] = 1}
+// Radiation 'levels'. Used for the geiger counter, for visuals and sound. They are in different files so this goes here.
+#define RAD_LEVEL_LOW 0.5 // Around the level at which radiation starts to become harmful
+#define RAD_LEVEL_MODERATE 5
+#define RAD_LEVEL_HIGH 25
+#define RAD_LEVEL_VERY_HIGH 75
 
-//TODO Move to a pref
-#define STATION_GOAL_BUDGET  1
-
-//Luma coefficients suggested for HDTVs. If you change these, make sure they add up to 1.
-#define LUMA_R 0.213
-#define LUMA_G 0.715
-#define LUMA_B 0.072
-
-//different types of atom colorations
-#define ADMIN_COLOUR_PRIORITY 		1 //only used by rare effects like greentext coloring mobs and when admins varedit color
-#define TEMPORARY_COLOUR_PRIORITY 	2 //e.g. purple effect of the revenant on a mob, black effect when mob electrocuted
-#define WASHABLE_COLOUR_PRIORITY 	3 //color splashed onto an atom (e.g. paint on turf)
-#define FIXED_COLOUR_PRIORITY 		4 //color inherent to the atom (e.g. blob color)
-#define COLOUR_PRIORITY_AMOUNT 4 //how many priority levels there are.
-
-//Endgame Results
-#define NUKE_NEAR_MISS 1
-#define NUKE_MISS_STATION 2
-#define NUKE_SYNDICATE_BASE 3
-#define STATION_DESTROYED_NUKE 4
-#define STATION_EVACUATED 5
-#define BLOB_WIN 8
-#define BLOB_NUKE 9
-#define BLOB_DESTROYED 10
-#define CULT_ESCAPE 11
-#define CULT_FAILURE 12
-#define CULT_SUMMON 13
-#define NUKE_MISS 14
-#define OPERATIVES_KILLED 15
-#define OPERATIVE_SKIRMISH 16
-#define REVS_WIN 17
-#define REVS_LOSE 18
-#define WIZARD_KILLED 19
-#define STATION_NUKED 20
-#define CLOCK_SUMMON 21
-#define CLOCK_SILICONS 22
-#define CLOCK_PROSELYTIZATION 23
-#define SHUTTLE_HIJACK 24
-
-#define FIELD_TURF 1
-#define FIELD_EDGE 2
-
-//gibtonite state defines
-#define GIBTONITE_UNSTRUCK 0
-#define GIBTONITE_ACTIVE 1
-#define GIBTONITE_STABLE 2
-#define GIBTONITE_DETONATE 3
-
-//for obj explosion block calculation
-#define EXPLOSION_BLOCK_PROC -1
-
-//for determining which type of heartbeat sound is playing
-#define BEAT_FAST 1
-#define BEAT_SLOW 2
-#define BEAT_NONE 0
+#define RADIATION_THRESHOLD_CUTOFF 0.1	// Radiation will not affect a tile when below this value.
 
 //https://secure.byond.com/docs/ref/info.html#/atom/var/mouse_opacity
 #define MOUSE_OPACITY_TRANSPARENT 0
 #define MOUSE_OPACITY_ICON 1
 #define MOUSE_OPACITY_OPAQUE 2
-
-//world/proc/shelleo
-#define SHELLEO_ERRORLEVEL 1
-#define SHELLEO_STDOUT 2
-#define SHELLEO_STDERR 3
-
-//server security mode
-#define SECURITY_SAFE 1
-#define SECURITY_ULTRASAFE 2
-#define SECURITY_TRUSTED 3
-
-//Dummy mob reserve slots
-#define DUMMY_HUMAN_SLOT_PREFERENCES "dummy_preference_preview"
-#define DUMMY_HUMAN_SLOT_ADMIN "admintools"
-#define DUMMY_HUMAN_SLOT_MANIFEST "dummy_manifest_generation"
-
-#define PR_ANNOUNCEMENTS_PER_ROUND 5 //The number of unique PR announcements allowed per round
-									//This makes sure that a single person can only spam 3 reopens and 3 closes before being ignored
-
-#define MAX_PROC_DEPTH 195 // 200 proc calls deep and shit breaks, this is a bit lower to give some safety room
-
-#define SYRINGE_DRAW 0
-#define SYRINGE_INJECT 1
-
-//gold slime core spawning
-#define NO_SPAWN 0
-#define HOSTILE_SPAWN 1
-#define FRIENDLY_SPAWN 2
-
-//slime core activation type
-#define SLIME_ACTIVATE_MINOR 1
-#define SLIME_ACTIVATE_MAJOR 2
-
-#define LUMINESCENT_DEFAULT_GLOW 2
-
-#define RIDING_OFFSET_ALL "ALL"
-
-//stack recipe placement check types
-#define STACK_CHECK_CARDINALS "cardinals" //checks if there is an object of the result type in any of the cardinal directions
-#define STACK_CHECK_ADJACENT "adjacent" //checks if there is an object of the result type within one tile
-
-//text files
-#define BRAIN_DAMAGE_FILE "traumas.json"
-#define ION_FILE "ion_laws.json"
-#define PIRATE_NAMES_FILE "pirates.json"
-#define REDPILL_FILE "redpill.json"
-#define ARCADE_FILE "arcade.json"
-
-//Fullscreen overlay resolution in tiles.
-#define FULLSCREEN_OVERLAY_RESOLUTION_X 15
-#define FULLSCREEN_OVERLAY_RESOLUTION_Y 15
-
-#define SUMMON_GUNS "guns"
-#define SUMMON_MAGIC "magic"
-
-#define TELEPORT_CHANNEL_BLUESPACE "bluespace"	//Classic bluespace teleportation, requires a sender but no receiver
-#define TELEPORT_CHANNEL_QUANTUM "quantum"		//Quantum-based teleportation, requires both sender and receiver, but is free from normal disruption
-#define TELEPORT_CHANNEL_WORMHOLE "wormhole"	//Wormhole teleportation, is not disrupted by bluespace fluctuations but tends to be very random or unsafe
-#define TELEPORT_CHANNEL_MAGIC "magic"			//Magic teleportation, does whatever it wants (unless there's antimagic)
-#define TELEPORT_CHANNEL_CULT "cult"			//Cult teleportation, does whatever it wants (unless there's holiness)
-#define TELEPORT_CHANNEL_FREE "free"			//Anything else
-
-//Run the world with this parameter to enable a single run though of the game setup and tear down process with unit tests in between
-#define TEST_RUN_PARAMETER "test-run"
-//Force the log directory to be something specific in the data/logs folder
-#define OVERRIDE_LOG_DIRECTORY_PARAMETER "log-directory"
-//Prevent the master controller from starting automatically, overrides TEST_RUN_PARAMETER
-#define NO_INIT_PARAMETER "no-init"
-//Force the config directory to be something other than "config"
-#define OVERRIDE_CONFIG_DIRECTORY_PARAMETER "config-directory"
-
-#define EGG_LAYING_MESSAGES list("lays an egg.","squats down and croons.","begins making a huge racket.","begins clucking raucously.")
-
-// Used by PDA and cartridge code to reduce repetitiveness of spritesheets
-#define PDAIMG(what) {"<span class="pda16x16 [#what]"></span>"}
-
-//Filters
-#define AMBIENT_OCCLUSION filter(type="drop_shadow", x=0, y=-2, size=4, color="#04080FAA")
-#define GAUSSIAN_BLUR(filter_size) filter(type="blur", size=filter_size)
-
-#define STANDARD_GRAVITY 1 //Anything above this is high gravity, anything below no grav
-#define GRAVITY_DAMAGE_TRESHOLD 3 //Starting with this value gravity will start to damage mobs
-
-#define CAMERA_NO_GHOSTS 0
-#define CAMERA_SEE_GHOSTS_BASIC 1
-#define CAMERA_SEE_GHOSTS_ORBIT 2
-
-#define CLIENT_FROM_VAR(I) (ismob(I) ? I:client : (istype(I, /client) ? I : (istype(I, /datum/mind) ? I:current?:client : null)))
-
-#define AREASELECT_CORNERA "corner A"
-#define AREASELECT_CORNERB "corner B"
-
-#define VARSET_FROM_LIST(L, V) if(L && L[#V]) V = L[#V]
-#define VARSET_FROM_LIST_IF(L, V, C...) if(L && L[#V] && (C)) V = L[#V]
-#define VARSET_TO_LIST(L, V) if(L) L[#V] = V
-#define VARSET_TO_LIST_IF(L, V, C...) if(L && (C)) L[#V] = V
-
-#define DICE_NOT_RIGGED 1
-#define DICE_BASICALLY_RIGGED 2
-#define DICE_TOTALLY_RIGGED 3
-
-#define VOMIT_TOXIC 1
-#define VOMIT_PURPLE 2
-
-//chem grenades defines
-#define GRENADE_EMPTY 1
-#define GRENADE_WIRED 2
-#define GRENADE_READY 3
-
-//Misc text define. Does 4 spaces. Used as a makeshift tabulator.
-#define FOURSPACES "&nbsp;&nbsp;&nbsp;&nbsp;"
-
-// art quality defines, used in datums/components/art.dm, elsewhere
-#define BAD_ART 12.5
-#define GOOD_ART 25
-#define GREAT_ART 50

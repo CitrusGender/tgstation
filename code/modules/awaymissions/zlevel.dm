@@ -1,41 +1,11 @@
-// How much "space" we give the edge of the map
-GLOBAL_LIST_INIT(potentialRandomZlevels, generateMapList(filename = "[global.config.directory]/awaymissionconfig.txt"))
-
-/proc/createRandomZlevel()
-	if(GLOB.awaydestinations.len)	//crude, but it saves another var!
+proc/createRandomZlevel()
+	if(awaydestinations.len || UNIT_TEST)	//crude, but it saves another var! //VOREStation Edit - No loading away missions during Travis testing
 		return
 
-	if(GLOB.potentialRandomZlevels && GLOB.potentialRandomZlevels.len)
-		to_chat(world, "<span class='boldannounce'>Loading away mission...</span>")
-		var/map = pick(GLOB.potentialRandomZlevels)
-		load_new_z_level(map, "Away Mission")
-		to_chat(world, "<span class='boldannounce'>Away mission loaded.</span>")
-
-/proc/reset_gateway_spawns(reset = FALSE)
-	for(var/obj/machinery/gateway/G in world)
-		if(reset)
-			G.randomspawns = GLOB.awaydestinations
-		else
-			G.randomspawns.Add(GLOB.awaydestinations)
-
-/obj/effect/landmark/awaystart
-	name = "away mission spawn"
-	desc = "Randomly picked away mission spawn points."
-
-/obj/effect/landmark/awaystart/New()
-	GLOB.awaydestinations += src
-	..()
-
-/obj/effect/landmark/awaystart/Destroy()
-	GLOB.awaydestinations -= src
-	return ..()
-
-/proc/generateMapList(filename)
-	. = list()
-	var/list/Lines = world.file2list(filename)
-
-	if(!Lines.len)
-		return
+	var/list/potentialRandomZlevels = list()
+	admin_notice("<font color='red'><B> Searching for away missions...</B></font>", R_DEBUG)
+	var/list/Lines = file2list("maps/RandomZLevels/fileList.txt")
+	if(!Lines.len)	return
 	for (var/t in Lines)
 		if (!t)
 			continue
@@ -48,14 +18,54 @@ GLOBAL_LIST_INIT(potentialRandomZlevels, generateMapList(filename = "[global.con
 
 		var/pos = findtext(t, " ")
 		var/name = null
+	//	var/value = null
 
 		if (pos)
-			name = lowertext(copytext(t, 1, pos))
-
+            // No, don't do lowertext here, that breaks paths on linux
+			name = copytext(t, 1, pos)
+		//	value = copytext(t, pos + 1)
 		else
-			name = lowertext(t)
+            // No, don't do lowertext here, that breaks paths on linux
+			name = t
 
 		if (!name)
 			continue
 
-		. += t
+		potentialRandomZlevels.Add(name)
+
+
+	if(potentialRandomZlevels.len)
+		admin_notice("<font color='red'><B>Loading away mission...</B></font>", R_DEBUG)
+
+		var/map = pick(potentialRandomZlevels)
+		world.log << "Away mission picked: [map]" //VOREStation Add for debugging
+		var/file = file(map)
+		if(isfile(file))
+			var/datum/map_template/template = new(file, "away mission")
+			template.load_new_z()
+			world.log << "away mission loaded: [map]"
+		/* VOREStation Removal - We do this in the special landmark init instead.
+		for(var/obj/effect/landmark/L in landmarks_list)
+			if (L.name != "awaystart")
+				continue
+			awaydestinations.Add(L)
+		*/ //VOREStation Removal End
+		admin_notice("<font color='red'><B>Away mission loaded.</B></font>", R_DEBUG)
+
+	else
+		admin_notice("<font color='red'><B>No away missions found.</B></font>", R_DEBUG)
+		return
+
+//VOREStation Add - This landmark type so it's not so ghetto.
+/obj/effect/landmark/gateway_scatter
+	name = "uncalibrated gateway destination"
+/obj/effect/landmark/gateway_scatter/Initialize()
+	. = ..()
+	awaydestinations += src
+
+/obj/effect/landmark/event_scatter
+	name = "uncalibrated gateway destination"
+/obj/effect/landmark/event_scatter/Initialize()
+	. = ..()
+	eventdestinations += src
+//VOREStation Add End

@@ -1,17 +1,16 @@
 /mob/Logout()
-	log_message("[key_name(src)] is no longer owning mob [src]([src.type])", LOG_OWNERSHIP)
-	SStgui.on_logout(src)
-	unset_machine()
-	GLOB.player_list -= src
+	SSnanoui.user_logout(src) // this is used to clean up (remove) this user's Nano UIs
+	player_list -= src
+	disconnect_time = world.realtime	//VOREStation Addition: logging when we disappear.
+	update_client_z(null)
+	log_access_out(src)
+	if(admin_datums[src.ckey])
+		if (ticker && ticker.current_state == GAME_STATE_PLAYING) //Only report this stuff if we are currently playing.
+			var/admins_number = admins.len
 
+			message_admins("Admin logout: [key_name(src)]")
+			if(admins_number == 0) //Apparently the admin logging out is no longer an admin at this point, so we have to check this towards 0 and not towards 1. Awell.
+				send2adminirc("[key_name(src)] logged out - no more admins online.")
 	..()
 
-	if(loc)
-		loc.on_log(FALSE)
-	
-	if(client)
-		for(var/foo in client.player_details.post_logout_callbacks)
-			var/datum/callback/CB = foo
-			CB.Invoke()
-
-	return TRUE
+	return 1

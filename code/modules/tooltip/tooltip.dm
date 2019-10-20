@@ -8,17 +8,17 @@ Configuration:
 - Set control to the correct skin element (remember to actually place the skin element)
 - Set file to the correct path for the .html file (remember to actually place the html file)
 - Attach the datum to the user client on login, e.g.
-	/client/New()
-		src.tooltips = new /datum/tooltip(src)
+/client/New()
+	src.tooltips = new /datum/tooltip(src)
 
 Usage:
 - Define mouse event procs on your (probably HUD) object and simply call the show and hide procs respectively:
-	/obj/screen/hud
-		MouseEntered(location, control, params)
-			usr.client.tooltip.show(params, title = src.name, content = src.desc)
+/obj/screen/hud
+	MouseEntered(location, control, params)
+		usr.client.tooltip.show(params, title = src.name, content = src.desc)
 
-		MouseExited()
-			usr.client.tooltip.hide()
+	MouseExited()
+		usr.client.tooltip.hide()
 
 Customization:
 - Theming can be done by passing the theme var to show() and using css in the html file to change the look
@@ -42,10 +42,7 @@ Notes:
 /datum/tooltip/New(client/C)
 	if (C)
 		owner = C
-		var/datum/asset/stuff = get_asset_datum(/datum/asset/simple/jquery)
-		stuff.send(owner)
 		owner << browse(file2text('code/modules/tooltip/tooltip.html'), "window=[control]")
-
 	..()
 
 
@@ -72,6 +69,8 @@ Notes:
 	title = replacetext(title, "\improper", "")
 
 	//Make our dumb param object
+	if(params[1] != "i") //Byond Bug: http://www.byond.com/forum/?post=2352648
+		params = "icon-x=16;icon-y=16;[params]" //Put in some placeholders
 	params = {"{ "cursor": "[params]", "screenLoc": "[thing.screen_loc]" }"}
 
 	//Send stuff to the tooltip
@@ -105,14 +104,14 @@ Notes:
 //Open a tooltip for user, at a location based on params
 //Theme is a CSS class in tooltip.html, by default this wrapper chooses a CSS class based on the user's UI_style (Midnight, Plasmafire, Retro, etc)
 //Includes sanity.checks
-/proc/openToolTip(mob/user = null, atom/movable/tip_src = null, params = null,title = "",content = "",theme = "")
+/proc/openToolTip(mob/user = null, atom/movable/tip_src = null, params = null, title = "", content = "", theme = "")
 	if(istype(user))
 		if(user.client && user.client.tooltips)
-			if(!theme && user.client.prefs && user.client.prefs.UI_style)
-				theme = lowertext(user.client.prefs.UI_style)
+			if(!theme && user.client.prefs && user.client.prefs.tooltipstyle)
+				theme = lowertext(user.client.prefs.tooltipstyle)
 			if(!theme)
-				theme = "default"
-			user.client.tooltips.show(tip_src, params,title,content,theme)
+				theme = "midnight"
+			user.client.tooltips.show(tip_src, params, title, content, theme)
 
 
 //Arbitrarily close a user's tooltip

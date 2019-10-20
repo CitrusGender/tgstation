@@ -1,114 +1,187 @@
 /obj/structure
 	icon = 'icons/obj/structures.dmi'
-	pressure_resistance = 8
-	max_integrity = 300
-	interaction_flags_atom = INTERACT_ATOM_ATTACK_HAND | INTERACT_ATOM_UI_INTERACT
-	layer = BELOW_OBJ_LAYER
-	
-	var/climb_time = 20
-	var/climb_stun = 20
-	var/climbable = FALSE
-	var/mob/living/structureclimber
-	var/broken = 0 //similar to machinery's stat BROKEN
+	w_class = ITEMSIZE_NO_CONTAINER
 
-
-/obj/structure/Initialize()
-	if (!armor)
-		armor = list("melee" = 0, "bullet" = 0, "laser" = 0, "energy" = 0, "bomb" = 0, "bio" = 0, "rad" = 0, "fire" = 50, "acid" = 50)
-	. = ..()
-	if(smooth)
-		queue_smooth(src)
-		queue_smooth_neighbors(src)
-		icon_state = ""
-	GLOB.cameranet.updateVisibility(src)
+	var/climbable
+	var/climb_delay = 3.5 SECONDS
+	var/breakable
+	var/parts
+	var/list/climbers = list()
+	var/block_turf_edges = FALSE // If true, turf edge icons will not be made on the turf this occupies.
 
 /obj/structure/Destroy()
-	GLOB.cameranet.updateVisibility(src)
-	if(smooth)
-		queue_smooth_neighbors(src)
-	return ..()
+	if(parts)
+		new parts(loc)
+	. = ..()
 
 /obj/structure/attack_hand(mob/user)
-	. = ..()
-	if(.)
-		return
-	if(structureclimber && structureclimber != user)
-		user.changeNext_move(CLICK_CD_MELEE)
-		user.do_attack_animation(src)
-		structureclimber.Paralyze(40)
-		structureclimber.visible_message("<span class='warning'>[structureclimber] has been knocked off [src].", "You're knocked off [src]!", "You see [structureclimber] get knocked off [src].</span>")
+	if(breakable)
+		if(HULK in user.mutations)
+			user.say(pick(";RAAAAAAAARGH!", ";HNNNNNNNNNGGGGGGH!", ";GWAAAAAAAARRRHHH!", "NNNNNNNNGGGGGGGGHH!", ";AAAAAAARRRGH!" ))
+			attack_generic(user,1,"smashes")
+		else if(istype(user,/mob/living/carbon/human))
+			var/mob/living/carbon/human/H = user
+			if(H.species.can_shred(user))
+				attack_generic(user,1,"slices")
 
-/obj/structure/ui_act(action, params)
-	..()
-	add_fingerprint(usr)
+	if(climbers.len && !(user in climbers))
+		user.visible_message("<span class='warning'>[user.name] shakes \the [src].</span>", \
+					"<span class='notice'>You shake \the [src].</span>")
+		structure_shaken()
 
-/obj/structure/MouseDrop_T(atom/movable/O, mob/user)
-	. = ..()
-	if(!climbable)
-		return
-	if(user == O && iscarbon(O))
-		var/mob/living/carbon/C = O
-		if(C.mobility_flags & MOBILITY_MOVE)
-			climb_structure(user)
+	return ..()
+
+/obj/structure/attack_tk()
+	return
+
+/obj/structure/ex_act(severity)
+	switch(severity)
+		if(1.0)
+			qdel(src)
 			return
-	if(!istype(O, /obj/item) || user.get_active_held_item() != O)
-		return
-	if(iscyborg(user))
-		return
-	if(!user.dropItemToGround(O))
-		return
-	if (O.loc != src.loc)
-		step(O, get_dir(O, src))
+		if(2.0)
+			if(prob(50))
+				qdel(src)
+				return
+		if(3.0)
+			return
 
-/obj/structure/proc/do_climb(atom/movable/A)
+/obj/structure/New()
+	..()
 	if(climbable)
-		density = FALSE
-		. = step(A,get_dir(A,src.loc))
-		density = TRUE
+		verbs += /obj/structure/proc/climb_on
 
-/obj/structure/proc/climb_structure(mob/living/user)
-	src.add_fingerprint(user)
-	user.visible_message("<span class='warning'>[user] starts climbing onto [src].</span>", \
-								"<span class='notice'>You start climbing onto [src]...</span>")
-	var/adjusted_climb_time = climb_time
-	if(user.restrained()) //climbing takes twice as long when restrained.
-		adjusted_climb_time *= 2
-	if(isalien(user))
-		adjusted_climb_time *= 0.25 //aliens are terrifyingly fast
-	if(HAS_TRAIT(user, TRAIT_FREERUNNING)) //do you have any idea how fast I am???
-		adjusted_climb_time *= 0.8
-	structureclimber = user
-	if(do_mob(user, user, adjusted_climb_time))
-		if(src.loc) //Checking if structure has been destroyed
-			if(do_climb(user))
-				user.visible_message("<span class='warning'>[user] climbs onto [src].</span>", \
-									"<span class='notice'>You climb onto [src].</span>")
-				log_combat(user, src, "climbed onto")
-				if(climb_stun)
-					user.Stun(climb_stun)
-				. = 1
+/obj/structure/proc/climb_on()
+
+	set name = "Climb structure"
+	set desc = "Climbs onto a structure."
+	set category = "Object"
+	set src in oview(1)
+
+	do_climb(usr)
+
+/obj/structure/MouseDrop_T(mob/target, mob/user)
+
+	var/mob/living/H = user
+	if(istype(H) && can_climb(H) && target == user)
+		do_climb(target)
+	else
+		return ..()
+
+/obj/structure/proc/can_climb(var/mob/living/user, post_climb_check=0)
+	if (!climbable || !can_touch(user) || (!post_climb_check && (user in climbers)))
+		return 0
+
+	if (!user.Adjacent(src))
+		user << "<span class='danger'>You can't climb there, the way is blocked.</span>"
+		return 0
+
+	var/obj/occupied = turf_is_crowded()
+	if(occupied)
+		user << "<span class='danger'>There's \a [occupied] in the way.</span>"
+		return 0
+	return 1
+
+/obj/structure/proc/turf_is_crowded()
+	var/turf/T = get_turf(src)
+	if(!T || !istype(T))
+		return 0
+	for(var/obj/O in T.contents)
+		if(istype(O,/obj/structure))
+			var/obj/structure/S = O
+			if(S.climbable) continue
+		if(O && O.density && !(O.flags & ON_BORDER)) //ON_BORDER structures are handled by the Adjacent() check.
+			return O
+	return 0
+
+/obj/structure/proc/do_climb(var/mob/living/user)
+	if (!can_climb(user))
+		return
+
+	usr.visible_message("<span class='warning'>[user] starts climbing onto \the [src]!</span>")
+	climbers |= user
+
+	if(!do_after(user,(issmall(user) ? climb_delay * 0.6 : climb_delay)))
+		climbers -= user
+		return
+
+	if (!can_climb(user, post_climb_check=1))
+		climbers -= user
+		return
+
+	usr.forceMove(get_turf(src))
+
+	if (get_turf(user) == get_turf(src))
+		usr.visible_message("<span class='warning'>[user] climbs onto \the [src]!</span>")
+	climbers -= user
+
+/obj/structure/proc/structure_shaken()
+	for(var/mob/living/M in climbers)
+		M.Weaken(1)
+		M << "<span class='danger'>You topple as you are shaken off \the [src]!</span>"
+		climbers.Cut(1,2)
+
+	for(var/mob/living/M in get_turf(src))
+		if(M.lying) return //No spamming this on people.
+
+		M.Weaken(3)
+		M << "<span class='danger'>You topple as \the [src] moves under you!</span>"
+
+		if(prob(25))
+
+			var/damage = rand(15,30)
+			var/mob/living/carbon/human/H = M
+			if(!istype(H))
+				H << "<span class='danger'>You land heavily!</span>"
+				M.adjustBruteLoss(damage)
+				return
+
+			var/obj/item/organ/external/affecting
+
+			switch(pick(list("ankle","wrist","head","knee","elbow")))
+				if("ankle")
+					affecting = H.get_organ(pick(BP_L_FOOT, BP_R_FOOT))
+				if("knee")
+					affecting = H.get_organ(pick(BP_L_LEG, BP_R_LEG))
+				if("wrist")
+					affecting = H.get_organ(pick(BP_L_HAND, BP_R_HAND))
+				if("elbow")
+					affecting = H.get_organ(pick(BP_L_ARM, BP_R_ARM))
+				if("head")
+					affecting = H.get_organ(BP_HEAD)
+
+			if(affecting)
+				M << "<span class='danger'>You land heavily on your [affecting.name]!</span>"
+				affecting.take_damage(damage, 0)
+				if(affecting.parent)
+					affecting.parent.add_autopsy_data("Misadventure", damage)
 			else
-				to_chat(user, "<span class='warning'>You fail to climb onto [src].</span>")
-	structureclimber = null
+				H << "<span class='danger'>You land heavily!</span>"
+				H.adjustBruteLoss(damage)
 
-/obj/structure/examine(mob/user)
-	. = ..()
-	if(!(resistance_flags & INDESTRUCTIBLE))
-		if(resistance_flags & ON_FIRE)
-			. += "<span class='warning'>It's on fire!</span>"
-		if(broken)
-			. += "<span class='notice'>It appears to be broken.</span>"
-		var/examine_status = examine_status(user)
-		if(examine_status)
-			. += examine_status
+			H.UpdateDamageIcon()
+			H.updatehealth()
+	return
 
-/obj/structure/proc/examine_status(mob/user) //An overridable proc, mostly for falsewalls.
-	var/healthpercent = (obj_integrity/max_integrity) * 100
-	switch(healthpercent)
-		if(50 to 99)
-			return  "It looks slightly damaged."
-		if(25 to 50)
-			return  "It appears heavily damaged."
-		if(0 to 25)
-			if(!broken)
-				return  "<span class='warning'>It's falling apart!</span>"
+/obj/structure/proc/can_touch(var/mob/user)
+	if (!user)
+		return 0
+	if(!Adjacent(user))
+		return 0
+	if (user.restrained() || user.buckled)
+		user << "<span class='notice'>You need your hands and legs free for this.</span>"
+		return 0
+	if (user.stat || user.paralysis || user.sleeping || user.lying || user.weakened)
+		return 0
+	if (isAI(user))
+		user << "<span class='notice'>You need hands for this.</span>"
+		return 0
+	return 1
+
+/obj/structure/attack_generic(var/mob/user, var/damage, var/attack_verb)
+	if(!breakable || damage < STRUCTURE_MIN_DAMAGE_THRESHOLD)
+		return 0
+	visible_message("<span class='danger'>[user] [attack_verb] the [src] apart!</span>")
+	user.do_attack_animation(src)
+	spawn(1) qdel(src)
+	return 1

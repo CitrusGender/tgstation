@@ -1,295 +1,165 @@
-/turf/open/floor
-	//NOTE: Floor code has been refactored, many procs were removed and refactored
-	//- you should use istype() if you want to find out whether a floor has a certain type
-	//- floor_tile is now a path, and not a tile obj
-	name = "floor"
-	icon = 'icons/turf/floors.dmi'
-	baseturfs = /turf/open/floor/plating
+/turf/simulated/floor
+	name = "plating"
+	desc = "Unfinished flooring."
+	icon = 'icons/turf/flooring/plating_vr.dmi'
+	icon_state = "plating"
 
-	footstep = FOOTSTEP_FLOOR
-	barefootstep = FOOTSTEP_HARD_BAREFOOT
-	clawfootstep = FOOTSTEP_HARD_CLAW
-	heavyfootstep = FOOTSTEP_GENERIC_HEAVY
+	// Damage to flooring.
+	var/broken
+	var/burnt
 
-	var/icon_regular_floor = "floor" //used to remember what icon the tile should have by default
-	var/icon_plating = "plating"
+	// Plating data.
+	var/base_name = "plating"
+	var/base_desc = "The naked hull."
+	var/base_icon = 'icons/turf/flooring/plating_vr.dmi'
+	var/base_icon_state = "plating"
+	var/static/list/base_footstep_sounds = list("human" = list(
+		'sound/effects/footstep/plating1.ogg',
+		'sound/effects/footstep/plating2.ogg',
+		'sound/effects/footstep/plating3.ogg',
+		'sound/effects/footstep/plating4.ogg',
+		'sound/effects/footstep/plating5.ogg'))
+
+	var/list/old_decals = null // VOREStation Edit - Remember what decals we had between being pried up and replaced.
+
+	// Flooring data.
+	var/flooring_override
+	var/initial_flooring
+	var/decl/flooring/flooring
+	var/mineral = DEFAULT_WALL_MATERIAL
+
 	thermal_conductivity = 0.040
 	heat_capacity = 10000
-	intact = 1
-	var/broken = 0
-	var/burnt = 0
-	var/floor_tile = null //tile that this floor drops
-	var/list/broken_states
-	var/list/burnt_states
+	var/lava = 0
 
-	tiled_dirt = TRUE
+/turf/simulated/floor/is_plating()
+	return !flooring
 
-/turf/open/floor/Initialize(mapload)
-
-	if (!broken_states)
-		broken_states = typelist("broken_states", list("damaged1", "damaged2", "damaged3", "damaged4", "damaged5"))
+/turf/simulated/floor/New(var/newloc, var/floortype)
+	..(newloc)
+	if(!floortype && initial_flooring)
+		floortype = initial_flooring
+	if(floortype)
+		set_flooring(get_flooring_data(floortype))
 	else
-		broken_states = typelist("broken_states", broken_states)
-	burnt_states = typelist("burnt_states", burnt_states)
-	if(!broken && broken_states && (icon_state in broken_states))
-		broken = TRUE
-	if(!burnt && burnt_states && (icon_state in burnt_states))
-		burnt = TRUE
-	. = ..()
-	//This is so damaged or burnt tiles or platings don't get remembered as the default tile
-	var/static/list/icons_to_ignore_at_floor_init = list("foam_plating", "plating","light_on","light_on_flicker1","light_on_flicker2",
-					"light_on_clicker3","light_on_clicker4","light_on_clicker5",
-					"light_on_broken","light_off","wall_thermite","grass", "sand",
-					"asteroid","asteroid_dug",
-					"asteroid0","asteroid1","asteroid2","asteroid3","asteroid4",
-					"asteroid5","asteroid6","asteroid7","asteroid8","asteroid9","asteroid10","asteroid11","asteroid12",
-					"basalt","basalt_dug",
-					"basalt0","basalt1","basalt2","basalt3","basalt4",
-					"basalt5","basalt6","basalt7","basalt8","basalt9","basalt10","basalt11","basalt12",
-					"oldburning","light-on-r","light-on-y","light-on-g","light-on-b", "wood", "carpetsymbol", "carpetstar",
-					"carpetcorner", "carpetside", "carpet", "ironsand1", "ironsand2", "ironsand3", "ironsand4", "ironsand5",
-					"ironsand6", "ironsand7", "ironsand8", "ironsand9", "ironsand10", "ironsand11",
-					"ironsand12", "ironsand13", "ironsand14", "ironsand15")
-	if(broken || burnt || (icon_state in icons_to_ignore_at_floor_init)) //so damaged/burned tiles or plating icons aren't saved as the default
-		icon_regular_floor = "floor"
-	else
-		icon_regular_floor = icon_state
-	if(mapload && prob(33))
-		MakeDirty()
+		footstep_sounds = base_footstep_sounds
+	if(can_dirty && can_start_dirty)
+		if(prob(dirty_prob))
+			dirt += rand(50,100)
+			update_dirt() //5% chance to start with dirt on a floor tile- give the janitor something to do
 
-/turf/open/floor/ex_act(severity, target)
-	var/shielded = is_shielded()
-	..()
-	if(severity != 1 && shielded && target != src)
-		return
-	if(target == src)
-		ScrapeAway(flags = CHANGETURF_INHERIT_AIR)
-		return
-	if(target != null)
-		severity = 3
+/turf/simulated/floor/proc/set_flooring(var/decl/flooring/newflooring)
+	make_plating(defer_icon_update = 1)
+	flooring = newflooring
+	footstep_sounds = newflooring.footstep_sounds
+	// VOREStation Edit - We are plating switching to flooring, swap out old_decals for decals
+	var/tmp/list/overfloor_decals = old_decals
+	old_decals = decals
+	decals = overfloor_decals
+	// VOREStation Edit End
+	update_icon(1)
+	levelupdate()
 
-	switch(severity)
-		if(1)
-			ScrapeAway(2, flags = CHANGETURF_INHERIT_AIR)
-		if(2)
-			switch(pick(1,2;75,3))
-				if(1)
-					if(!length(baseturfs) || !ispath(baseturfs[baseturfs.len-1], /turf/open/floor))
-						ScrapeAway(flags = CHANGETURF_INHERIT_AIR)
-						ReplaceWithLattice()
-					else
-						ScrapeAway(2, flags = CHANGETURF_INHERIT_AIR)
-					if(prob(33))
-						new /obj/item/stack/sheet/metal(src)
-				if(2)
-					ScrapeAway(2, flags = CHANGETURF_INHERIT_AIR)
-				if(3)
-					if(prob(80))
-						ScrapeAway(flags = CHANGETURF_INHERIT_AIR)
-					else
-						break_tile()
-					hotspot_expose(1000,CELL_VOLUME)
-					if(prob(33))
-						new /obj/item/stack/sheet/metal(src)
-		if(3)
-			if (prob(50))
-				src.break_tile()
-				src.hotspot_expose(1000,CELL_VOLUME)
+//This proc will set floor_type to null and the update_icon() proc will then change the icon_state of the turf
+//This proc auto corrects the grass tiles' siding.
+/turf/simulated/floor/proc/make_plating(var/place_product, var/defer_icon_update)
 
-/turf/open/floor/is_shielded()
-	for(var/obj/structure/A in contents)
-		if(A.level == 3)
-			return 1
+	cut_overlays()
+	// VOREStation Edit - We are flooring switching to plating, swap out old_decals for decals.
+	if(flooring)
+		var/tmp/list/underfloor_decals = old_decals
+		old_decals = decals
+		decals = underfloor_decals
+	// VOREStation Edit End
 
-/turf/open/floor/blob_act(obj/structure/blob/B)
-	return
+	name = base_name
+	desc = base_desc
+	icon = base_icon
+	icon_state = base_icon_state
+	footstep_sounds = base_footstep_sounds
 
-/turf/open/floor/update_icon()
-	. = ..()
-	update_visuals()
+	if(flooring)
+		if(flooring.build_type && place_product)
+			new flooring.build_type(src)
+		flooring = null
 
-/turf/open/floor/attack_paw(mob/user)
-	return attack_hand(user)
+	set_light(0)
+	broken = null
+	burnt = null
+	flooring_override = null
+	levelupdate()
 
-/turf/open/floor/proc/gets_drilled()
-	return
+	if(!defer_icon_update)
+		update_icon(1)
 
-/turf/open/floor/proc/break_tile_to_plating()
-	var/turf/open/floor/plating/T = make_plating()
-	if(!istype(T))
-		return
-	T.break_tile()
+/turf/simulated/floor/levelupdate()
+	for(var/obj/O in src)
+		O.hide(O.hides_under_flooring() && src.flooring)
 
-/turf/open/floor/proc/break_tile()
-	if(broken)
-		return
-	icon_state = pick(broken_states)
-	broken = 1
-
-/turf/open/floor/burn_tile()
-	if(broken || burnt)
-		return
-	if(burnt_states.len)
-		icon_state = pick(burnt_states)
-	else
-		icon_state = pick(broken_states)
-	burnt = 1
-
-/turf/open/floor/proc/make_plating()
-	return ScrapeAway(flags = CHANGETURF_INHERIT_AIR)
-
-/turf/open/floor/ChangeTurf(path, new_baseturf, flags)
-	if(!isfloorturf(src))
-		return ..() //fucking turfs switch the fucking src of the fucking running procs
-	if(!ispath(path, /turf/open/floor))
-		return ..()
-	var/old_icon = icon_regular_floor
-	var/old_dir = dir
-	var/turf/open/floor/W = ..()
-	W.icon_regular_floor = old_icon
-	W.setDir(old_dir)
-	W.update_icon()
-	return W
-
-/turf/open/floor/attackby(obj/item/C, mob/user, params)
-	if(!C || !user)
-		return 1
-	if(..())
-		return 1
-	if(intact && istype(C, /obj/item/stack/tile))
-		try_replace_tile(C, user, params)
-	return 0
-
-/turf/open/floor/crowbar_act(mob/living/user, obj/item/I)
-	if(intact && pry_tile(I, user))
-		return TRUE
-
-/turf/open/floor/proc/try_replace_tile(obj/item/stack/tile/T, mob/user, params)
-	if(T.turf_type == type)
-		return
-	var/obj/item/crowbar/CB = user.is_holding_item_of_type(/obj/item/crowbar)
-	if(!CB)
-		return
-	var/turf/open/floor/plating/P = pry_tile(CB, user, TRUE)
-	if(!istype(P))
-		return
-	P.attackby(T, user, params)
-
-/turf/open/floor/proc/pry_tile(obj/item/I, mob/user, silent = FALSE)
-	I.play_tool_sound(src, 80)
-	return remove_tile(user, silent)
-
-/turf/open/floor/proc/remove_tile(mob/user, silent = FALSE, make_tile = TRUE)
-	if(broken || burnt)
-		broken = 0
-		burnt = 0
-		if(user && !silent)
-			to_chat(user, "<span class='notice'>You remove the broken plating.</span>")
-	else
-		if(user && !silent)
-			to_chat(user, "<span class='notice'>You remove the floor tile.</span>")
-		if(floor_tile && make_tile)
-			new floor_tile(src)
-	return make_plating()
-
-/turf/open/floor/singularity_pull(S, current_size)
-	..()
-	if(current_size == STAGE_THREE)
-		if(prob(30))
-			if(floor_tile)
-				new floor_tile(src)
-				make_plating()
-	else if(current_size == STAGE_FOUR)
-		if(prob(50))
-			if(floor_tile)
-				new floor_tile(src)
-				make_plating()
-	else if(current_size >= STAGE_FIVE)
-		if(floor_tile)
-			if(prob(70))
-				new floor_tile(src)
-				make_plating()
-		else if(prob(50))
-			ReplaceWithLattice()
-
-/turf/open/floor/narsie_act(force, ignore_mobs, probability = 20)
-	. = ..()
-	if(.)
-		ChangeTurf(/turf/open/floor/engine/cult, flags = CHANGETURF_INHERIT_AIR)
-
-/turf/open/floor/acid_melt()
-	ScrapeAway(flags = CHANGETURF_INHERIT_AIR)
-
-/turf/open/floor/rcd_vals(mob/user, obj/item/construction/rcd/the_rcd)
-	switch(the_rcd.mode)
-		if(RCD_FLOORWALL)
-			return list("mode" = RCD_FLOORWALL, "delay" = 20, "cost" = 16)
-		if(RCD_AIRLOCK)
-			if(the_rcd.airlock_glass)
-				return list("mode" = RCD_AIRLOCK, "delay" = 50, "cost" = 20)
-			else
-				return list("mode" = RCD_AIRLOCK, "delay" = 50, "cost" = 16)
-		if(RCD_DECONSTRUCT)
-			return list("mode" = RCD_DECONSTRUCT, "delay" = 50, "cost" = 33)
-		if(RCD_WINDOWGRILLE)
-			return list("mode" = RCD_WINDOWGRILLE, "delay" = 10, "cost" = 4)
-		if(RCD_MACHINE)
-			return list("mode" = RCD_MACHINE, "delay" = 20, "cost" = 25)
-		if(RCD_COMPUTER)
-			return list("mode" = RCD_COMPUTER, "delay" = 20, "cost" = 25)
-	return FALSE
-
-/turf/open/floor/rcd_act(mob/user, obj/item/construction/rcd/the_rcd, passed_mode)
+/turf/simulated/floor/rcd_values(mob/living/user, obj/item/weapon/rcd/the_rcd, passed_mode)
 	switch(passed_mode)
 		if(RCD_FLOORWALL)
-			to_chat(user, "<span class='notice'>You build a wall.</span>")
-			PlaceOnTop(/turf/closed/wall)
+			// A wall costs four sheets to build (two for the grider and two for finishing it).
+			var/cost = RCD_SHEETS_PER_MATTER_UNIT * 4
+			// R-walls cost five sheets, however.
+			if(the_rcd.make_rwalls)
+				cost += RCD_SHEETS_PER_MATTER_UNIT * 1
+			return list(
+				RCD_VALUE_MODE = RCD_FLOORWALL,
+				RCD_VALUE_DELAY = 2 SECONDS,
+				RCD_VALUE_COST = cost
+			)
+		if(RCD_AIRLOCK)
+			// Airlock assemblies cost four sheets. Let's just add another for the electronics/wires/etc.
+			return list(
+				RCD_VALUE_MODE = RCD_AIRLOCK,
+				RCD_VALUE_DELAY = 5 SECONDS,
+				RCD_VALUE_COST = RCD_SHEETS_PER_MATTER_UNIT * 5
+			)
+		if(RCD_WINDOWGRILLE)
+			// One steel sheet for the girder (two rods, which is one sheet).
+			return list(
+				RCD_VALUE_MODE = RCD_WINDOWGRILLE,
+				RCD_VALUE_DELAY = 1 SECOND,
+				RCD_VALUE_COST = RCD_SHEETS_PER_MATTER_UNIT * 1
+			)
+		if(RCD_DECONSTRUCT)
+			// Old RCDs made deconning the floor cost 10 units (IE, three times on full RCD).
+			// Now it's ten sheets worth of units (which is the same capacity-wise, three times on full RCD).
+			return list(
+				RCD_VALUE_MODE = RCD_DECONSTRUCT,
+				RCD_VALUE_DELAY = 5 SECONDS,
+				RCD_VALUE_COST = RCD_SHEETS_PER_MATTER_UNIT * 10
+			)
+	return FALSE
+
+
+/turf/simulated/floor/rcd_act(mob/living/user, obj/item/weapon/rcd/the_rcd, passed_mode)
+	switch(passed_mode)
+		if(RCD_FLOORWALL)
+			to_chat(user, span("notice", "You build a wall."))
+			ChangeTurf(/turf/simulated/wall)
+			var/turf/simulated/wall/T = get_turf(src) // Ref to the wall we just built.
+			// Apparently set_material(...) for walls requires refs to the material singletons and not strings.
+			// This is different from how other material objects with their own set_material(...) do it, but whatever.
+			var/material/M = name_to_material[the_rcd.material_to_use]
+			T.set_material(M, the_rcd.make_rwalls ? M : null, M)
+			T.add_hiddenprint(user)
 			return TRUE
 		if(RCD_AIRLOCK)
 			if(locate(/obj/machinery/door/airlock) in src)
-				return FALSE
-			to_chat(user, "<span class='notice'>You build an airlock.</span>")
-			var/obj/machinery/door/airlock/A = new the_rcd.airlock_type(src)
-
-			A.electronics = new/obj/item/electronics/airlock(A)
-
-			if(the_rcd.conf_access)
-				A.electronics.accesses = the_rcd.conf_access.Copy()
-			A.electronics.one_access = the_rcd.use_one_access
-
-			if(A.electronics.one_access)
-				A.req_one_access = A.electronics.accesses
-			else
-				A.req_access = A.electronics.accesses
-			A.autoclose = TRUE
-			return TRUE
-		if(RCD_DECONSTRUCT)
-			if(!ScrapeAway(flags = CHANGETURF_INHERIT_AIR))
-				return FALSE
-			to_chat(user, "<span class='notice'>You deconstruct [src].</span>")
+				return FALSE // No more airlock stacking.
+			to_chat(user, span("notice", "You build an airlock."))
+			new the_rcd.airlock_type(src)
 			return TRUE
 		if(RCD_WINDOWGRILLE)
 			if(locate(/obj/structure/grille) in src)
 				return FALSE
-			to_chat(user, "<span class='notice'>You construct the grille.</span>")
+			to_chat(user, span("notice", "You construct the grille."))
 			var/obj/structure/grille/G = new(src)
 			G.anchored = TRUE
 			return TRUE
-		if(RCD_MACHINE)
-			if(locate(/obj/structure/frame/machine) in src)
-				return FALSE
-			var/obj/structure/frame/machine/M = new(src)
-			M.state = 2
-			M.icon_state = "box_1"
-			M.anchored = TRUE
+		if(RCD_DECONSTRUCT)
+			to_chat(user, span("notice", "You deconstruct \the [src]."))
+			ChangeTurf(get_base_turf_by_area(src), preserve_outdoors = TRUE)
 			return TRUE
-		if(RCD_COMPUTER)
-			if(locate(/obj/structure/frame/computer) in src)
-				return FALSE
-			var/obj/structure/frame/computer/C = new(src)
-			C.anchored = TRUE
-			C.state = 1
-			C.setDir(the_rcd.computer_dir)
-			return TRUE
-
-	return FALSE

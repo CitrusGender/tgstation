@@ -1,92 +1,97 @@
 /obj/structure/lattice
 	name = "lattice"
-	desc = "A lightweight support lattice. These hold our station together."
-	icon = 'icons/obj/smooth_structures/lattice.dmi'
-	icon_state = "lattice"
-	density = FALSE
-	anchored = TRUE
-	armor = list("melee" = 50, "bullet" = 0, "laser" = 0, "energy" = 0, "bomb" = 0, "bio" = 0, "rad" = 0, "fire" = 80, "acid" = 50)
-	max_integrity = 50
-	layer = LATTICE_LAYER //under pipes
-	plane = FLOOR_PLANE
-	var/number_of_rods = 1
-	canSmoothWith = list(/obj/structure/lattice,
-	/turf/open/floor,
-	/turf/closed/wall,
-	/obj/structure/falsewall)
-	smooth = SMOOTH_MORE
-	//	flags = CONDUCT_1
+	desc = "A lightweight support lattice."
+	icon = 'icons/obj/structures.dmi'
+	icon_state = "latticefull"
+	density = 0
+	anchored = 1.0
+	w_class = ITEMSIZE_NORMAL
+	plane = PLATING_PLANE
 
-/obj/structure/lattice/examine(mob/user)
+/obj/structure/lattice/Initialize()
 	. = ..()
-	. += deconstruction_hints(user)
 
-/obj/structure/lattice/proc/deconstruction_hints(mob/user)
-	return "<span class='notice'>The rods look like they could be <b>cut</b>. There's space for more <i>rods</i> or a <i>tile</i>.</span>"
+	if(!(istype(src.loc, /turf/space) || istype(src.loc, /turf/simulated/open) || istype(src.loc, /turf/simulated/mineral)))
+		return INITIALIZE_HINT_QDEL
 
-/obj/structure/lattice/Initialize(mapload)
-	. = ..()
-	for(var/obj/structure/lattice/LAT in loc)
+	for(var/obj/structure/lattice/LAT in src.loc)
 		if(LAT != src)
-			QDEL_IN(LAT, 0)
+			crash_with("Found multiple lattices at '[log_info_line(loc)]'")
+			return INITIALIZE_HINT_QDEL
+	icon = 'icons/obj/smoothlattice.dmi'
+	icon_state = "latticeblank"
+	updateOverlays()
+	for (var/dir in cardinal)
+		var/obj/structure/lattice/L
+		if(locate(/obj/structure/lattice, get_step(src, dir)))
+			L = locate(/obj/structure/lattice, get_step(src, dir))
+			L.updateOverlays()
 
-/obj/structure/lattice/blob_act(obj/structure/blob/B)
+/obj/structure/lattice/Destroy()
+	for (var/dir in cardinal)
+		var/obj/structure/lattice/L
+		if(locate(/obj/structure/lattice, get_step(src, dir)))
+			L = locate(/obj/structure/lattice, get_step(src, dir))
+			L.updateOverlays(src.loc)
+	if(istype(loc, /turf/simulated/open))
+		var/turf/simulated/open/O = loc
+		spawn(1)
+			if(istype(O)) // If we built a new floor with the lattice, the open turf won't exist anymore.
+				O.update() // This lattice may be supporting things on top of it.  If it's being deleted, they need to fall down.
+	. = ..()
+
+/obj/structure/lattice/ex_act(severity)
+	switch(severity)
+		if(1.0)
+			qdel(src)
+			return
+		if(2.0)
+			qdel(src)
+			return
+		if(3.0)
+			return
+		else
 	return
 
-/obj/structure/lattice/attackby(obj/item/C, mob/user, params)
-	if(resistance_flags & INDESTRUCTIBLE)
-		return
-	if(C.tool_behaviour == TOOL_WIRECUTTER)
-		to_chat(user, "<span class='notice'>Slicing [name] joints ...</span>")
-		deconstruct()
-	else
+/obj/structure/lattice/attackby(obj/item/C as obj, mob/user as mob)
+
+	if (istype(C, /obj/item/stack/tile/floor))
 		var/turf/T = get_turf(src)
-		return T.attackby(C, user) //hand this off to the turf instead (for building plating, catwalks, etc)
-
-/obj/structure/lattice/deconstruct(disassembled = TRUE)
-	if(!(flags_1 & NODECONSTRUCT_1))
-		new /obj/item/stack/rods(get_turf(src), number_of_rods)
-	qdel(src)
-
-/obj/structure/lattice/rcd_vals(mob/user, obj/item/construction/rcd/the_rcd)
-	if(the_rcd.mode == RCD_FLOORWALL)
-		return list("mode" = RCD_FLOORWALL, "delay" = 0, "cost" = 2)
-
-/obj/structure/lattice/rcd_act(mob/user, obj/item/construction/rcd/the_rcd, passed_mode)
-	if(passed_mode == RCD_FLOORWALL)
-		to_chat(user, "<span class='notice'>You build a floor.</span>")
-		var/turf/T = src.loc
-		if(isspaceturf(T))
-			T.PlaceOnTop(/turf/open/floor/plating, flags = CHANGETURF_INHERIT_AIR)
+		T.attackby(C, user) //BubbleWrap - hand this off to the underlying turf instead
+		return
+	if (istype(C, /obj/item/weapon/weldingtool))
+		var/obj/item/weapon/weldingtool/WT = C
+		if(WT.welding == 1)
+			if(WT.remove_fuel(0, user))
+				user << "<span class='notice'>Slicing lattice joints ...</span>"
+			new /obj/item/stack/rods(src.loc)
 			qdel(src)
-			return TRUE
-	return FALSE
+		return
+	if (istype(C, /obj/item/stack/rods))
+		var/obj/item/stack/rods/R = C
+		if(R.use(2))
+			user << "<span class='notice'>You start connecting \the [R.name] to \the [src.name] ...</span>"
+			if(do_after(user, 5 SECONDS))
+				src.alpha = 0 // Note: I don't know why this is set, Eris did it, just trusting for now. ~Leshana
+				new /obj/structure/catwalk(src.loc)
+				qdel(src)
+		return
+	return
 
-/obj/structure/lattice/singularity_pull(S, current_size)
-	if(current_size >= STAGE_FOUR)
-		deconstruct()
+/obj/structure/lattice/proc/updateOverlays()
+	//if(!(istype(src.loc, /turf/space)))
+	//	qdel(src)
+	spawn(1)
+		overlays = list()
 
-/obj/structure/lattice/catwalk
-	name = "catwalk"
-	desc = "A catwalk for easier EVA maneuvering and cable placement."
-	icon = 'icons/obj/smooth_structures/catwalk.dmi'
-	icon_state = "catwalk"
-	number_of_rods = 2
-	smooth = SMOOTH_TRUE
-	canSmoothWith = null
-	obj_flags = CAN_BE_HIT | BLOCK_Z_FALL 
+		var/dir_sum = 0
 
-/obj/structure/lattice/catwalk/deconstruction_hints(mob/user)
-	return "<span class='notice'>The supporting rods look like they could be <b>cut</b>.</span>"
+		for (var/direction in cardinal)
+			if(locate(/obj/structure/lattice, get_step(src, direction)))
+				dir_sum += direction
+			else
+				if(!(istype(get_step(src, direction), /turf/space)))
+					dir_sum += direction
 
-/obj/structure/lattice/catwalk/Move()
-	var/turf/T = loc
-	for(var/obj/structure/cable/C in T)
-		C.deconstruct()
-	..()
-
-/obj/structure/lattice/catwalk/deconstruct()
-	var/turf/T = loc
-	for(var/obj/structure/cable/C in T)
-		C.deconstruct()
-	..()
+		icon_state = "lattice[dir_sum]"
+		return

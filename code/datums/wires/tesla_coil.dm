@@ -1,13 +1,18 @@
-
 /datum/wires/tesla_coil
-	randomize = 1	//Only one wire don't need blueprints
+	wire_count = 1
 	holder_type = /obj/machinery/power/tesla_coil
 
-/datum/wires/tesla_coil/New(atom/holder)
-	wires = list(WIRE_ZAP)
-	..()
+var/const/WIRE_ZAP = 1
 
-/datum/wires/tesla_coil/on_pulse(wire)
-	var/obj/machinery/power/tesla_coil/C = holder
-	C.zap()
+/datum/wires/tesla_coil/CanUse(mob/living/L)
+	var/obj/machinery/power/tesla_coil/T = holder
+	if(T && T.panel_open)
+		return 1
+	return 0
+
+/datum/wires/tesla_coil/UpdatePulsed(index)
+	var/obj/machinery/power/tesla_coil/T = holder
+	switch(index)
+		if(WIRE_ZAP)
+			T.zap()
 	..()

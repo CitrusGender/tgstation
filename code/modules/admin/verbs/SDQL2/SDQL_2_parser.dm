@@ -1,3 +1,4 @@
+
 //I'm pretty sure that this is a recursive [s]descent[/s] ascent parser.
 
 
@@ -19,27 +20,23 @@
 //
 //	from_item			:	'world' | expression
 //
-//	call_function		:	<function name> '(' [expression_list] ')'
+//	call_function		:	<function name> '(' [arguments] ')'
+//	arguments			:	expression [',' arguments]
 //
 //	object_type			:	<type path>
 //
 //	assignments			:	assignment [',' assignments]
 //	assignment			:	<variable name> '=' expression
-//	variable			:	<variable name> | variable '.' variable | variable '[' <list index> ']' | '{' <ref as hex number> '}' | '(' expression ')' | call_function
+//	variable			:	<variable name> | <variable name> '.' variable | '[' <hex number> ']' | '[' <hex number> ']' '.' variable
 //
 //	bool_expression		:	expression comparitor expression  [bool_operator bool_expression]
 //	expression			:	( unary_expression | '(' expression ')' | value ) [binary_operator expression]
-//	expression_list		:	expression [',' expression_list]
-//	unary_expression	:	unary_operator ( unary_expression | value )
-//
+//	unary_expression	:	unary_operator ( unary_expression | value | '(' expression ')' )
 //	comparitor			:	'=' | '==' | '!=' | '<>' | '<' | '<=' | '>' | '>='
-//	value				:	variable | string | number | 'null' | object_type | array | selectors_array
+//	value				:	variable | string | number | 'null' | object_type
 //	unary_operator		:	'!' | '-' | '~'
 //	binary_operator		:	comparitor | '+' | '-' | '/' | '*' | '&' | '|' | '^' | '%'
 //	bool_operator		:	'AND' | '&&' | 'OR' | '||'
-//
-//	array				:	'[' expression_list ']'
-//	selectors_array		:	'@[' object_selectors ']'
 //
 //	string				:	''' <some text> ''' | '"' <some text > '"'
 //	number				:	<some digits>
@@ -322,7 +319,7 @@
 
 
 //assignment:	<variable name> '=' expression
-/datum/SDQL_parser/proc/assignment(i, list/node, list/assignment_list = list())
+/datum/SDQL_parser/proc/assignment(var/i, var/list/node, var/list/assignment_list = list())
 	assignment_list += token(i)
 
 	if(token(i + 1) == ".")
@@ -340,7 +337,7 @@
 	return i
 
 
-//variable:	<variable name> | variable '.' variable | variable '[' <list index> ']' | '{' <ref as hex number> '}' | '(' expression ')' | call_function
+//variable:	<variable name> | <variable name> '.' variable | '[' <hex number> ']' | '[' <hex number> ']' '.' variable
 /datum/SDQL_parser/proc/variable(i, list/node)
 	var/list/L = list(token(i))
 	node[++node.len] = L
@@ -351,16 +348,6 @@
 
 		if(token(i) != "}")
 			parse_error("Missing } at end of pointer.")
-
-	else if(token(i) == "(") // not a proc but an expression
-		var/list/sub_expression = list()
-
-		i = expression(i + 1, sub_expression)
-
-		if(token(i) != ")")
-			parse_error("Missing ) at end of expression.")
-
-		L[++L.len] = sub_expression
 
 	if(token(i + 1) == ".")
 		L += "."
@@ -438,8 +425,8 @@
 
 	return i + 1
 
-//array:	'[' expression_list ']'
-/datum/SDQL_parser/proc/array(i, list/node)
+//array:	'[' expression, expression, ... ']'
+/datum/SDQL_parser/proc/array(var/i, var/list/node)
 	// Arrays get turned into this: list("[", list(exp_1a = exp_1b, ...), ...), "[" is to mark the next node as an array.
 	if(copytext(token(i), 1, 2) != "\[")
 		parse_error("Expected an array but found '[token(i)]'")
@@ -482,13 +469,18 @@
 			temp_expression_list = list()
 			i = expression(i, temp_expression_list)
 
-#if MIN_COMPILER_VERSION > 512
-#warn Remove this outdated workaround
-#elif DM_BUILD < 1467
-			// http://www.byond.com/forum/post/2445083
-			var/dummy = src.type
-			dummy = dummy
-#endif
+			// Ok, what the fuck BYOND?
+			// Not having these lines here causes the parser to die
+			// on an error saying that list/token() doesn't exist as a proc.
+			// These lines prevent that.
+			// I assume the compiler/VM is shitting itself and swapping out some variables internally?
+			// While throwing in debug logging it disappeared
+			// And these 3 lines prevent it from happening while being quiet.
+			// So.. it works.
+			// Don't touch it.
+			var/whatthefuck = i
+			whatthefuck = src.type
+			whatthefuck = whatthefuck
 
 		while(token(i) && token(i) != "]")
 
@@ -496,23 +488,6 @@
 			expression_list[++expression_list.len] = temp_expression_list
 
 	node[++node.len] = expression_list
-
-	return i + 1
-
-//selectors_array:	'@[' object_selectors ']'
-/datum/SDQL_parser/proc/selectors_array(i, list/node)
-	if(token(i) == "@\[")
-		node += token(i++)
-		if(token(i) != "]")
-			var/list/select = list()
-			i = object_selectors(i, select)
-			node[++node.len] = select
-			if(token(i) != "]")
-				parse_error("Expected ']' to close selector array, but found '[token(i)]'")
-		else
-			parse_error("Selector array expected a selector, but found nothing")
-	else
-		parse_error("Expected '@\[' but found '[token(i)]'")
 
 	return i + 1
 
@@ -546,11 +521,24 @@
 	return i + 1
 
 
-//expression:	( unary_expression | value ) [binary_operator expression]
+//expression:	( unary_expression | '(' expression ')' | value ) [binary_operator expression]
 /datum/SDQL_parser/proc/expression(i, list/node)
 
 	if(token(i) in unary_operators)
 		i = unary_expression(i, node)
+
+	else if(token(i) == "(")
+		var/list/expr = list()
+
+		i = expression(i + 1, expr)
+
+		if(token(i) != ")")
+			parse_error("Missing ) at end of expression.")
+
+		else
+			i++
+
+		node[++node.len] = expr
 
 	else
 		i = value(i, node)
@@ -571,7 +559,7 @@
 	return i
 
 
-//unary_expression:	unary_operator ( unary_expression | value )
+//unary_expression:	unary_operator ( unary_expression | value | '(' expression ')' )
 /datum/SDQL_parser/proc/unary_expression(i, list/node)
 
 	if(token(i) in unary_operators)
@@ -582,6 +570,19 @@
 
 		if(token(i) in unary_operators)
 			i = unary_expression(i, unary_exp)
+
+		else if(token(i) == "(")
+			var/list/expr = list()
+
+			i = expression(i + 1, expr)
+
+			if(token(i) != ")")
+				parse_error("Missing ) at end of expression.")
+
+			else
+				i++
+
+			unary_exp[++unary_exp.len] = expr
 
 		else
 			i = value(i, unary_exp)
@@ -607,7 +608,7 @@
 	return i + 1
 
 
-//value:	variable | string | number | 'null' | object_type | array | selectors_array
+//value:	variable | string | number | 'null' | object_type
 /datum/SDQL_parser/proc/value(i, list/node)
 	if(token(i) == "null")
 		node += "null"
@@ -626,13 +627,8 @@
 
 	else if(copytext(token(i), 1, 2) == "\[") // Start a list.
 		i = array(i, node)
-
-	else if(copytext(token(i), 1, 3) == "@\[")
-		i = selectors_array(i, node)
-
 	else if(copytext(token(i), 1, 2) == "/")
 		i = object_type(i, node)
-
 	else
 		i = variable(i, node)
 

@@ -1,15 +1,31 @@
 /client/proc/panicbunker()
 	set category = "Server"
 	set name = "Toggle Panic Bunker"
-	if (!CONFIG_GET(flag/sql_enabled))
+	
+	if(!check_rights(R_ADMIN))
+		return
+
+	if (!config.sql_enabled)
 		to_chat(usr, "<span class='adminnotice'>The Database is not enabled!</span>")
 		return
 
-	var/new_pb = !CONFIG_GET(flag/panic_bunker)
-	CONFIG_SET(flag/panic_bunker, new_pb)
+	config.panic_bunker = (!config.panic_bunker)
 
-	log_admin("[key_name(usr)] has toggled the Panic Bunker, it is now [new_pb ? "on" : "off"]")
-	message_admins("[key_name_admin(usr)] has toggled the Panic Bunker, it is now [new_pb ? "enabled" : "disabled"].")
-	if (new_pb && !SSdbcore.Connect())
+	log_and_message_admins("[key_name(usr)] has toggled the Panic Bunker, it is now [(config.panic_bunker?"on":"off")]")
+	if (config.panic_bunker && (!dbcon || !dbcon.IsConnected()))
 		message_admins("The Database is not connected! Panic bunker will not work until the connection is reestablished.")
-	SSblackbox.record_feedback("nested tally", "admin_toggle", 1, list("Toggle Panic Bunker", "[new_pb ? "Enabled" : "Disabled"]")) //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
+	feedback_add_details("admin_verb","PANIC") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
+
+/client/proc/paranoia_logging()
+	set category = "Server"
+	set name = "New Player Warnings"
+
+	if(!check_rights(R_ADMIN))
+		return
+
+	config.paranoia_logging = (!config.paranoia_logging)
+
+	log_and_message_admins("[key_name(usr)] has toggled Paranoia Logging, it is now [(config.paranoia_logging?"on":"off")]")
+	if (config.paranoia_logging && (!dbcon || !dbcon.IsConnected()))
+		message_admins("The Database is not connected! Paranoia logging will not be able to give 'player age' (time since first connection) warnings, only Byond account warnings.")
+	feedback_add_details("admin_verb","PARLOG") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!

@@ -1,112 +1,84 @@
 //Please use mob or src (not usr) in these procs. This way they can be called in the same fashion as procs.
 /client/verb/wiki(query as text)
 	set name = "wiki"
-	set desc = "Type what you want to know about.  This will open the wiki in your web browser. Type nothing to go to the main page."
-	set hidden = 1
-	var/wikiurl = CONFIG_GET(string/wikiurl)
-	if(wikiurl)
+	set desc = "Type what you want to know about.  This will open the wiki on your web browser."
+	set category = "OOC"
+	if(config.wikiurl)
 		if(query)
-			var/output = wikiurl + "/index.php?title=Special%3ASearch&profile=default&search=" + query
-			src << link(output)
-		else if (query != null)
-			src << link(wikiurl)
+			if(config.wikisearchurl)
+				var/output = replacetext(config.wikisearchurl, "%s", url_encode(query))
+				src << link(output)
+			else
+				src << "<span class='warning'> The wiki search URL is not set in the server configuration.</span>"
+		else
+			src << link(config.wikiurl)
 	else
-		to_chat(src, "<span class='danger'>The wiki URL is not set in the server configuration.</span>")
-	return
+		src << "<span class='warning'>The wiki URL is not set in the server configuration.</span>"
+		return
 
 /client/verb/forum()
 	set name = "forum"
 	set desc = "Visit the forum."
 	set hidden = 1
-	var/forumurl = CONFIG_GET(string/forumurl)
-	if(forumurl)
-		if(alert("This will open the forum in your browser. Are you sure?",,"Yes","No")!="Yes")
+	if( config.forumurl )
+		if(alert("This will open the forum in your browser. Are you sure?",,"Yes","No")=="No")
 			return
-		src << link(forumurl)
+		src << link(config.forumurl)
 	else
-		to_chat(src, "<span class='danger'>The forum URL is not set in the server configuration.</span>")
-	return
+		src << "<span class='warning'>The forum URL is not set in the server configuration.</span>"
+		return
 
 /client/verb/rules()
-	set name = "rules"
+	set name = "Rules"
 	set desc = "Show Server Rules."
 	set hidden = 1
-	var/rulesurl = CONFIG_GET(string/rulesurl)
-	if(rulesurl)
-		if(alert("This will open the rules in your browser. Are you sure?",,"Yes","No")!="Yes")
+
+	if(config.rulesurl)
+		if(alert("This will open the rules in your browser. Are you sure?",,"Yes","No")=="No")
 			return
-		src << link(rulesurl)
+		src << link(config.rulesurl)
 	else
-		to_chat(src, "<span class='danger'>The rules URL is not set in the server configuration.</span>")
+		src << "<span class='danger'>The rules URL is not set in the server configuration.</span>"
+	return
+
+/client/verb/map()
+	set name = "Map"
+	set desc = "See the map."
+	set hidden = 1
+
+	if(config.mapurl)
+		if(alert("This will open the map in your browser. Are you sure?",,"Yes","No")=="No")
+			return
+		src << link(config.mapurl)
+	else
+		src << "<span class='danger'>The map URL is not set in the server configuration.</span>"
 	return
 
 /client/verb/github()
-	set name = "github"
-	set desc = "Visit Github"
+	set name = "GitHub"
+	set desc = "Visit the GitHub"
 	set hidden = 1
-	var/githuburl = CONFIG_GET(string/githuburl)
-	if(githuburl)
-		if(alert("This will open the Github repository in your browser. Are you sure?",,"Yes","No")!="Yes")
-			return
-		src << link(githuburl)
-	else
-		to_chat(src, "<span class='danger'>The Github URL is not set in the server configuration.</span>")
-	return
 
-/client/verb/reportissue()
-	set name = "report-issue"
-	set desc = "Report an issue"
-	set hidden = 1
-	var/githuburl = CONFIG_GET(string/githuburl)
-	if(githuburl)
-		var/message = "This will open the Github issue reporter in your browser. Are you sure?"
-		if(GLOB.revdata.testmerge.len)
-			message += "<br>The following experimental changes are active and are probably the cause of any new or sudden issues you may experience. If possible, please try to find a specific thread for your issue instead of posting to the general issue tracker:<br>"
-			message += GLOB.revdata.GetTestMergeInfo(FALSE)
-		if(tgalert(src, message, "Report Issue","Yes","No")!="Yes")
+	if(config.githuburl)
+		if(alert("This will open the GitHub in your browser. Are you sure?",,"Yes","No")=="No")
 			return
-		var/static/issue_template = file2text(".github/ISSUE_TEMPLATE.md")
-		var/servername = CONFIG_GET(string/servername)
-		var/url_params = "Reporting client version: [byond_version].[byond_build]\n\n[issue_template]"
-		if(GLOB.round_id || servername)
-			url_params = "Issue reported from [GLOB.round_id ? " Round ID: [GLOB.round_id][servername ? " ([servername])" : ""]" : servername]\n\n[url_params]"
-		DIRECT_OUTPUT(src, link("[githuburl]/issues/new?body=[url_encode(url_params)]"))
+		src << link(config.githuburl)
 	else
-		to_chat(src, "<span class='danger'>The Github URL is not set in the server configuration.</span>")
+		src << "<span class='danger'>The GitHub URL is not set in the server configuration.</span>"
 	return
 
 /client/verb/hotkeys_help()
 	set name = "hotkeys-help"
 	set category = "OOC"
 
-	var/adminhotkeys = {"<font color='purple'>
+	var/admin = {"<font color='purple'>
 Admin:
-\tF3 = asay
 \tF5 = Aghost (admin-ghost)
-\tF6 = player-panel
-\tF7 = Buildmode
+\tF6 = player-panel-new
+\tF7 = admin-pm
 \tF8 = Invisimin
-\tCtrl+F8 = Stealthmin
 </font>"}
 
-	mob.hotkey_help()
-
-	if(holder)
-		to_chat(src, adminhotkeys)
-
-/client/verb/changelog()
-	set name = "Changelog"
-	set category = "OOC"
-	var/datum/asset/changelog = get_asset_datum(/datum/asset/simple/changelog)
-	changelog.send(src)
-	src << browse('html/changelog.html', "window=changes;size=675x650")
-	if(prefs.lastchangelog != GLOB.changelog_hash)
-		prefs.lastchangelog = GLOB.changelog_hash
-		prefs.save_preferences()
-		winset(src, "infowindow.changelog", "font-style=;")
-
-
-/mob/proc/hotkey_help()
 	var/hotkey_mode = {"<font color='purple'>
 Hotkey-Mode: (hotkey-mode must be on)
 \tTAB = toggle hotkey-mode
@@ -117,23 +89,19 @@ Hotkey-Mode: (hotkey-mode must be on)
 \tq = drop
 \te = equip
 \tr = throw
-\tm = me
 \tt = say
-\to = OOC
-\tb = resist
-\t<B></B>h = stop pulling
+\t5 = emote
 \tx = swap-hand
 \tz = activate held object (or y)
-\tShift+e = Put held item into belt(or belt slot) or take out most recent item added.
-\tShift+b = Put held item into backpack(or back slot) or take out most recent item added.
+\tj = toggle-aiming-mode
 \tf = cycle-intents-left
 \tg = cycle-intents-right
 \t1 = help-intent
 \t2 = disarm-intent
 \t3 = grab-intent
 \t4 = harm-intent
-\tNumpad = Body target selection (Press 8 repeatedly for Head->Eyes->Mouth)
-\tAlt(HOLD) = Alter movement intent
+\tCtrl+Click = pull
+\tShift+Click = examine
 </font>"}
 
 	var/other = {"<font color='purple'>
@@ -145,9 +113,6 @@ Any-Mode: (hotkey doesn't need to be on)
 \tCtrl+q = drop
 \tCtrl+e = equip
 \tCtrl+r = throw
-\tCtrl+b = resist
-\tCtrl+h = stop pulling
-\tCtrl+o = OOC
 \tCtrl+x = swap-hand
 \tCtrl+z = activate held object (or Ctrl+y)
 \tCtrl+f = cycle-intents-left
@@ -156,23 +121,19 @@ Any-Mode: (hotkey doesn't need to be on)
 \tCtrl+2 = disarm-intent
 \tCtrl+3 = grab-intent
 \tCtrl+4 = harm-intent
-\tCtrl+'+/-' OR
-\tShift+Mousewheel = Ghost zoom in/out
+\tF1 = adminhelp
+\tF2 = ooc
+\tF3 = say
+\tF4 = emote
 \tDEL = stop pulling
 \tINS = cycle-intents-right
 \tHOME = drop
 \tPGUP = swap-hand
 \tPGDN = activate held object
 \tEND = throw
-\tCtrl+Numpad = Body target selection (Press 8 repeatedly for Head->Eyes->Mouth)
 </font>"}
 
-	to_chat(src, hotkey_mode)
-	to_chat(src, other)
-
-/mob/living/silicon/robot/hotkey_help()
-	//h = talk-wheel has a nonsense tag in it because \th is an escape sequence in BYOND.
-	var/hotkey_mode = {"<font color='purple'>
+	var/robot_hotkey_mode = {"<font color='purple'>
 Hotkey-Mode: (hotkey-mode must be on)
 \tTAB = toggle hotkey-mode
 \ta = left
@@ -180,12 +141,8 @@ Hotkey-Mode: (hotkey-mode must be on)
 \td = right
 \tw = up
 \tq = unequip active module
-\t<B></B>h = stop pulling
-\tm = me
 \tt = say
-\to = OOC
 \tx = cycle active modules
-\tb = resist
 \tz = activate held object (or y)
 \tf = cycle-intents-left
 \tg = cycle-intents-right
@@ -193,9 +150,12 @@ Hotkey-Mode: (hotkey-mode must be on)
 \t2 = activate module 2
 \t3 = activate module 3
 \t4 = toggle intents
+\t5 = emote
+\tCtrl+Click = pull
+\tShift+Click = examine
 </font>"}
 
-	var/other = {"<font color='purple'>
+	var/robot_other = {"<font color='purple'>
 Any-Mode: (hotkey doesn't need to be on)
 \tCtrl+a = left
 \tCtrl+s = down
@@ -203,9 +163,6 @@ Any-Mode: (hotkey doesn't need to be on)
 \tCtrl+w = up
 \tCtrl+q = unequip active module
 \tCtrl+x = cycle active modules
-\tCtrl+b = resist
-\tCtrl+h = stop pulling
-\tCtrl+o = OOC
 \tCtrl+z = activate held object (or Ctrl+y)
 \tCtrl+f = cycle-intents-left
 \tCtrl+g = cycle-intents-right
@@ -213,11 +170,32 @@ Any-Mode: (hotkey doesn't need to be on)
 \tCtrl+2 = activate module 2
 \tCtrl+3 = activate module 3
 \tCtrl+4 = toggle intents
+\tF1 = adminhelp
+\tF2 = ooc
+\tF3 = say
+\tF4 = emote
 \tDEL = stop pulling
 \tINS = toggle intents
 \tPGUP = cycle active modules
 \tPGDN = activate held object
 </font>"}
 
-	to_chat(src, hotkey_mode)
-	to_chat(src, other)
+	if(isrobot(src.mob))
+		src << robot_hotkey_mode
+		src << robot_other
+	else
+		src << hotkey_mode
+		src << other
+	if(holder)
+		src << admin
+
+// Set the DreamSeeker input macro to the type appropriate for its mob
+/client/proc/set_hotkeys_macro(macro_name = "macro", hotkey_macro_name = "hotkeymode", hotkeys_enabled = null)
+	// If hotkeys mode was not specified, fall back to choice of default in client preferences.
+	if(isnull(hotkeys_enabled))
+		hotkeys_enabled = is_preference_enabled(/datum/client_preference/hotkeys_default)
+
+	if(hotkeys_enabled)
+		winset(src, null, "mainwindow.macro=[hotkey_macro_name] hotkey_toggle.is-checked=true mapwindow.map.focus=true")
+	else
+		winset(src, null, "mainwindow.macro=[macro_name] hotkey_toggle.is-checked=false input.focus=true")

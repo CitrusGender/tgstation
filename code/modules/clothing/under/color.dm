@@ -1,231 +1,145 @@
-/obj/item/clothing/under/color
-	desc = "A standard issue colored jumpsuit. Variety is the spice of life!"
-	dying_key = DYE_REGISTRY_UNDER
-	icon = 'icons/obj/clothing/under/color.dmi'
-	mob_overlay_icon = 'icons/mob/clothing/under/color.dmi'
-
-/obj/item/clothing/under/color/jumpskirt
-	body_parts_covered = CHEST|GROIN|ARMS
-	can_adjust = FALSE
-	fitted = FEMALE_UNIFORM_TOP
-
-/obj/item/clothing/under/color/random
-	icon_state = "random_jumpsuit"
-
-/obj/item/clothing/under/color/random/Initialize()
-	..()
-	var/obj/item/clothing/under/color/C = pick(subtypesof(/obj/item/clothing/under/color) - typesof(/obj/item/clothing/under/color/jumpskirt) - /obj/item/clothing/under/color/random - /obj/item/clothing/under/color/grey/glorf - /obj/item/clothing/under/color/black/ghost)
-	if(ishuman(loc))
-		var/mob/living/carbon/human/H = loc
-		H.equip_to_slot_or_del(new C(H), SLOT_W_UNIFORM) //or else you end up with naked assistants running around everywhere...
-	else
-		new C(loc)
-	return INITIALIZE_HINT_QDEL
-
-/obj/item/clothing/under/color/jumpskirt/random
-	icon_state = "random_jumpsuit"		//Skirt variant needed
-
-/obj/item/clothing/under/color/jumpskirt/random/Initialize()
-	..()
-	var/obj/item/clothing/under/color/jumpskirt/C = pick(subtypesof(/obj/item/clothing/under/color/jumpskirt) - /obj/item/clothing/under/color/jumpskirt/random)
-	if(ishuman(loc))
-		var/mob/living/carbon/human/H = loc
-		H.equip_to_slot_or_del(new C(H), SLOT_W_UNIFORM)
-	else
-		new C(loc)
-	return INITIALIZE_HINT_QDEL
-
 /obj/item/clothing/under/color/black
 	name = "black jumpsuit"
 	icon_state = "black"
-	item_state = "bl_suit"
-	resistance_flags = NONE
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/jumpskirt/black
+/obj/item/clothing/under/color/blackf
+	name = "feminine black jumpsuit"
+	desc = "It's very smart and in a ladies size!"
+	icon_state = "black"
+	worn_state = "blackf"
+
+/obj/item/clothing/under/color/blackjumpskirt
 	name = "black jumpskirt"
-	icon_state = "black_skirt"
-	item_state = "bl_suit"
-
-/obj/item/clothing/under/color/black/ghost
-	item_flags = DROPDEL
-
-/obj/item/clothing/under/color/black/ghost/Initialize()
-	. = ..()
-	ADD_TRAIT(src, TRAIT_NODROP, CULT_TRAIT)
-
-/obj/item/clothing/under/color/grey
-	name = "grey jumpsuit"
-	desc = "A tasteful grey jumpsuit that reminds you of the good old days."
-	icon_state = "grey"
-	item_state = "gy_suit"
-
-/obj/item/clothing/under/color/jumpskirt/grey
-	name = "grey jumpskirt"
-	desc = "A tasteful grey jumpskirt that reminds you of the good old days."
-	icon_state = "grey_skirt"
-	item_state = "gy_suit"
-
-/obj/item/clothing/under/color/grey/glorf
-	name = "ancient jumpsuit"
-	desc = "A terribly ragged and frayed grey jumpsuit. It looks like it hasn't been washed in over a decade."
-
-/obj/item/clothing/under/color/grey/glorf/hit_reaction(mob/living/carbon/human/owner, atom/movable/hitby, attack_text = "the attack", final_block_chance = 0, damage = 0, attack_type = MELEE_ATTACK)
-	owner.forcesay(GLOB.hit_appends)
-	return 0
+	desc = "A slimming black jumpskirt."
+	icon_state = "blackjumpskirt"
+	item_state_slots = list(slot_r_hand_str = "black", slot_l_hand_str = "black")
 
 /obj/item/clothing/under/color/blue
 	name = "blue jumpsuit"
 	icon_state = "blue"
-	item_state = "b_suit"
-
-/obj/item/clothing/under/color/jumpskirt/blue
-	name = "blue jumpskirt"
-	icon_state = "blue_skirt"
-	item_state = "b_suit"
+	rolled_sleeves = 0
 
 /obj/item/clothing/under/color/green
 	name = "green jumpsuit"
 	icon_state = "green"
-	item_state = "g_suit"
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/jumpskirt/green
-	name = "green jumpskirt"
-	icon_state = "green_skirt"
-	item_state = "g_suit"
+/obj/item/clothing/under/color/grey
+	name = "grey jumpsuit"
+	icon_state = "grey"
+	rolled_sleeves = 0
 
+//TFF 5/8/19 - add a non perma-set orange jumpsuit, splits prison into its own obj with override var settings.
+//TFF 5/9/19 - add a different icon_state to both jumpsuits, orange and prison. Refactors orange and prison jumpsuit slightly.
 /obj/item/clothing/under/color/orange
 	name = "orange jumpsuit"
-	desc = "Don't wear this near paranoid security officers."
 	icon_state = "orange"
-	item_state = "o_suit"
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/jumpskirt/orange
-	name = "orange jumpskirt"
-	icon_state = "orange_skirt"
-	item_state = "o_suit"
+/obj/item/clothing/under/color/prison
+	name = "prison jumpsuit"
+	desc = "It's standardized prisoner-wear. Its suit sensors are permanently set to the \"Tracking\" position."
+	icon_state = "prison"
+	has_sensor = 2
+	sensor_mode = 3
 
 /obj/item/clothing/under/color/pink
 	name = "pink jumpsuit"
 	icon_state = "pink"
-	desc = "Just looking at this makes you feel <i>fabulous</i>."
-	item_state = "p_suit"
-
-/obj/item/clothing/under/color/jumpskirt/pink
-	name = "pink jumpskirt"
-	icon_state = "pink_skirt"
-	item_state = "p_suit"
+	rolled_sleeves = 0
 
 /obj/item/clothing/under/color/red
 	name = "red jumpsuit"
 	icon_state = "red"
-	item_state = "r_suit"
-
-/obj/item/clothing/under/color/jumpskirt/red
-	name = "red jumpskirt"
-	icon_state = "red_skirt"
-	item_state = "r_suit"
+	rolled_sleeves = 0
 
 /obj/item/clothing/under/color/white
 	name = "white jumpsuit"
 	icon_state = "white"
-	item_state = "w_suit"
-
-/obj/item/clothing/under/color/jumpskirt/white
-	name = "white jumpskirt"
-	icon_state = "white_skirt"
-	item_state = "w_suit"
+	rolled_sleeves = 0
 
 /obj/item/clothing/under/color/yellow
 	name = "yellow jumpsuit"
 	icon_state = "yellow"
-	item_state = "y_suit"
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/jumpskirt/yellow
-	name = "yellow jumpskirt"
-	icon_state = "yellow_skirt"
-	item_state = "y_suit"
+/obj/item/clothing/under/psyche
+	name = "psychedelic jumpsuit"
+	desc = "Groovy!"
+	icon_state = "psyche"
 
-/obj/item/clothing/under/color/darkblue
-	name = "darkblue jumpsuit"
-	icon_state = "darkblue"
-	item_state = "b_suit"
+/obj/item/clothing/under/color/lightblue
+	name = "lightblue jumpsuit"
+	desc = "A light blue jumpsuit."
+	icon_state = "lightblue"
+	item_state_slots = list(slot_r_hand_str = "blue", slot_l_hand_str = "blue")
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/jumpskirt/darkblue
-	name = "darkblue jumpskirt"
-	icon_state = "darkblue_skirt"
-	item_state = "b_suit"
+/obj/item/clothing/under/color/aqua
+	name = "aqua jumpsuit"
+	desc = "An aqua jumpsuit."
+	icon_state = "aqua"
+	item_state_slots = list(slot_r_hand_str = "blue", slot_l_hand_str = "blue")
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/teal
-	name = "teal jumpsuit"
-	icon_state = "teal"
-	item_state = "b_suit"
-
-/obj/item/clothing/under/color/jumpskirt/teal
-	name = "teal jumpskirt"
-	icon_state = "teal_skirt"
-	item_state = "b_suit"
-
+/obj/item/clothing/under/color
+	name = "purple jumpsuit"
+	desc = "The latest in space fashion."
+	icon_state = "purple"
+	rolled_sleeves = 0
 
 /obj/item/clothing/under/color/lightpurple
-	name = "purple jumpsuit"
+	name = "lightpurple jumpsuit"
+	desc = "A light purple jumpsuit."
 	icon_state = "lightpurple"
-	item_state = "p_suit"
+	item_state_slots = list(slot_r_hand_str = "purple", slot_l_hand_str = "purple")
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/jumpskirt/lightpurple
-	name = "lightpurple jumpskirt"
-	icon_state = "lightpurple_skirt"
-	item_state = "p_suit"
-
-/obj/item/clothing/under/color/darkgreen
-	name = "darkgreen jumpsuit"
-	icon_state = "darkgreen"
-	item_state = "g_suit"
-
-/obj/item/clothing/under/color/jumpskirt/darkgreen
-	name = "darkgreen jumpskirt"
-	icon_state = "darkgreen_skirt"
-	item_state = "g_suit"
+/obj/item/clothing/under/color/lightgreen
+	name = "lightgreen jumpsuit"
+	desc = "A light green jumpsuit."
+	icon_state = "lightgreen"
+	item_state_slots = list(slot_r_hand_str = "green", slot_l_hand_str = "green")
+	rolled_sleeves = 0
 
 /obj/item/clothing/under/color/lightbrown
 	name = "lightbrown jumpsuit"
+	desc = "A light brown jumpsuit."
 	icon_state = "lightbrown"
-	item_state = "lb_suit"
-
-/obj/item/clothing/under/color/jumpskirt/lightbrown
-	name = "lightbrown jumpskirt"
-	icon_state = "lightbrown_skirt"
-	item_state = "lb_suit"
+	rolled_sleeves = 0
 
 /obj/item/clothing/under/color/brown
 	name = "brown jumpsuit"
+	desc = "A brown jumpsuit."
 	icon_state = "brown"
-	item_state = "lb_suit"
+	item_state_slots = list(slot_r_hand_str = "lightbrown", slot_l_hand_str = "lightbrown")
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/jumpskirt/brown
-	name = "brown jumpskirt"
-	icon_state = "brown_skirt"
-	item_state = "lb_suit"
+/obj/item/clothing/under/color/yellowgreen
+	name = "yellowgreen jumpsuit"
+	desc = "A... yellow green jumpsuit?"
+	icon_state = "yellowgreen"
+	item_state_slots = list(slot_r_hand_str = "yellow", slot_l_hand_str = "yellow")
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/maroon
-	name = "maroon jumpsuit"
-	icon_state = "maroon"
-	item_state = "r_suit"
+/obj/item/clothing/under/color/darkblue
+	name = "darkblue jumpsuit"
+	desc = "A dark blue jumpsuit."
+	icon_state = "darkblue"
+	item_state_slots = list(slot_r_hand_str = "blue", slot_l_hand_str = "blue")
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/jumpskirt/maroon
-	name = "maroon jumpskirt"
-	icon_state = "maroon_skirt"
-	item_state = "r_suit"
+/obj/item/clothing/under/color/lightred
+	name = "lightred jumpsuit"
+	desc = "A light red jumpsuit."
+	icon_state = "lightred"
+	item_state_slots = list(slot_r_hand_str = "red", slot_l_hand_str = "red")
+	rolled_sleeves = 0
 
-/obj/item/clothing/under/color/rainbow
-	name = "rainbow jumpsuit"
-	desc = "A multi-colored jumpsuit!"
-	icon_state = "rainbow"
-	item_state = "rainbow"
-	can_adjust = FALSE
-
-/obj/item/clothing/under/color/jumpskirt/rainbow
-	name = "rainbow jumpskirt"
-	desc = "A multi-colored jumpskirt!"
-	icon_state = "rainbow_skirt"
-	item_state = "rainbow"
-	can_adjust = FALSE
+/obj/item/clothing/under/color/darkred
+	name = "darkred jumpsuit"
+	desc = "A dark red jumpsuit."
+	icon_state = "darkred"
+	item_state_slots = list(slot_r_hand_str = "red", slot_l_hand_str = "red")
+	rolled_sleeves = 0

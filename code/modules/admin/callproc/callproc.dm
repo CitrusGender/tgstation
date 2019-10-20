@@ -1,53 +1,51 @@
 /client/proc/callproc()
 	set category = "Debug"
 	set name = "Advanced ProcCall"
-	set waitfor = FALSE
-	callproc_blocking()
+	set waitfor = 0
 
-/client/proc/callproc_blocking(list/get_retval)
 	if(!check_rights(R_DEBUG))
 		return
 
-	var/datum/target
-	var/targetselected = FALSE
-	var/returnval
+	var/datum/target = null
+	var/targetselected = 0
+	var/returnval = null
 
 	switch(alert("Proc owned by something?",,"Yes","No"))
 		if("Yes")
-			targetselected = TRUE
-			var/list/value = vv_get_value(default_class = VV_ATOM_REFERENCE, classes = list(VV_ATOM_REFERENCE, VV_DATUM_REFERENCE, VV_MOB_REFERENCE, VV_CLIENT, VV_MARKED_DATUM, VV_TEXT_LOCATE, VV_PROCCALL_RETVAL))
+			targetselected = 1
+			var/list/value = vv_get_value(default_class = VV_ATOM_REFERENCE, classes = list(VV_ATOM_REFERENCE, VV_DATUM_REFERENCE, VV_MOB_REFERENCE, VV_CLIENT))
 			if (!value["class"] || !value["value"])
 				return
 			target = value["value"]
-			if(!istype(target))
-				to_chat(usr, "<span class='danger'>Invalid target.</span>")
-				return
 		if("No")
 			target = null
-			targetselected = FALSE
+			targetselected = 0
 
-	var/procpath = input("Proc path, eg: /proc/fake_blood","Path:", null) as text|null
-	if(!procpath)
+	var/procname = input("Proc path, eg: /proc/fake_blood","Path:", null) as text|null
+	if(!procname)
 		return
 
-	//strip away everything but the proc name
-	var/list/proclist = splittext(procpath, "/")
-	if (!length(proclist))
-		return
-
-	var/procname = proclist[proclist.len]
-	var/proctype = ("verb" in proclist) ? "verb" :"proc"
-
+	//hascall() doesn't support proc paths (eg: /proc/gib(), it only supports "gib")
+	var/testname = procname
 	if(targetselected)
-		if(!hascall(target, procname))
-			to_chat(usr, "<span class='warning'>Error: callproc(): type [target.type] has no [proctype] named [procpath].</span>")
-			return
-	else
-		procpath = "/[proctype]/[procname]"
-		if(!text2path(procpath))
-			to_chat(usr, "<span class='warning'>Error: callproc(): [procpath] does not exist.</span>")
-			return
+		//Find one of the 3 possible ways they could have written /proc/PROCNAME
+		if(findtext(procname, "/proc/"))
+			testname = replacetext(procname, "/proc/", "")
+		else if(findtext(procname, "/proc"))
+			testname = replacetext(procname, "/proc", "")
+		else if(findtext(procname, "proc/"))
+			testname = replacetext(procname, "proc/", "")
+		//Clear out any parenthesis if they're a dummy
+		testname = replacetext(testname, "()", "")
 
+	if(targetselected && !hascall(target,testname))
+		to_chat(usr, "<font color='red'>Error: callproc(): type [target.type] has no proc named [procname].</font>")
+		return
+	else
+		var/procpath = text2path(procname)
+		if (!procpath)
+			to_chat(usr, "<font color='red'>Error: callproc(): proc [procname] does not exist. (Did you forget the /proc/ part?)</font>")
+			return
 	var/list/lst = get_callproc_args()
 	if(!lst)
 		return
@@ -58,20 +56,18 @@
 			return
 		var/msg = "[key_name(src)] called [target]'s [procname]() with [lst.len ? "the arguments [list2params(lst)]":"no arguments"]."
 		log_admin(msg)
-		message_admins(msg)				//Proccall announce removed.
+		//message_admins(msg)				//Proccall announce removed.
 		admin_ticket_log(target, msg)
 		returnval = WrapAdminProcCall(target, procname, lst) // Pass the lst as an argument list to the proc
 	else
 		//this currently has no hascall protection. wasn't able to get it working.
 		log_admin("[key_name(src)] called [procname]() with [lst.len ? "the arguments [list2params(lst)]":"no arguments"].")
-		message_admins("[key_name(src)] called [procname]() with [lst.len ? "the arguments [list2params(lst)]":"no arguments"].")			//Proccall announce removed.
+		//message_admins("[key_name(src)] called [procname]() with [lst.len ? "the arguments [list2params(lst)]":"no arguments"].")			//Proccall announce removed.
 		returnval = WrapAdminProcCall(GLOBAL_PROC, procname, lst) // Pass the lst as an argument list to the proc
-	SSblackbox.record_feedback("tally", "admin_verb", 1, "Advanced ProcCall") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
-	if(get_retval)
-		get_retval += returnval
 	. = get_callproc_returnval(returnval, procname)
 	if(.)
 		to_chat(usr, .)
+	feedback_add_details("admin_verb","APC") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 GLOBAL_VAR(AdminProcCaller)
 GLOBAL_PROTECT(AdminProcCaller)
@@ -109,7 +105,7 @@ GLOBAL_PROTECT(AdminProcCallSpamPrevention)
 			UNTIL(!GLOB.AdminProcCaller)
 	GLOB.LastAdminCalledProc = procname
 	if(target != GLOBAL_PROC)
-		GLOB.LastAdminCalledTargetRef = REF(target)
+		GLOB.LastAdminCalledTargetRef = "\ref[target]"
 	GLOB.AdminProcCaller = ckey	//if this runtimes, too bad for you
 	++GLOB.AdminProcCallCount
 	. = world.WrapAdminProcCall(target, procname, arguments)
@@ -153,11 +149,11 @@ GLOBAL_PROTECT(AdminProcCallSpamPrevention)
 	if(!A || !IsValidSrc(A))
 		to_chat(usr, "<span class='warning'>Error: callproc_datum(): owner of proc no longer exists.</span>")
 		return
-	log_admin("[key_name(src)] called [A]'s [procname]() with [lst.len ? "the arguments [list2params(lst)]":"no arguments"].")
 	var/msg = "[key_name(src)] called [A]'s [procname]() with [lst.len ? "the arguments [list2params(lst)]":"no arguments"]."
-	message_admins(msg)
+	log_admin(msg)
+	//message_admins(msg)
 	admin_ticket_log(A, msg)
-	SSblackbox.record_feedback("tally", "admin_verb", 1, "Atom ProcCall") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
+	feedback_add_details("admin_verb","TPC") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 	var/returnval = WrapAdminProcCall(A, procname, lst) // Pass the lst as an argument list to the proc
 	. = get_callproc_returnval(returnval,procname)
@@ -167,21 +163,28 @@ GLOBAL_PROTECT(AdminProcCallSpamPrevention)
 /client/proc/get_callproc_args()
 	var/argnum = input("Number of arguments","Number:",0) as num|null
 	if(isnull(argnum))
-		return
+		return null					//Cancel
 
 	. = list()
-	var/list/named_args = list()
+	//var/list/named_args = list()			//Named arguments are removed, due to them making proccalling take too long.
 	while(argnum--)
+		/*						//Named arguments are removed, due to them making proccalling take too long.
 		var/named_arg = input("Leave blank for positional argument. Positional arguments will be considered as if they were added first.", "Named argument") as text|null
+		if(isnull(named_arg))
+			return null				//Cancel
+		*/
 		var/value = vv_get_value(restricted_classes = list(VV_RESTORE_DEFAULT))
 		if (!value["class"])
-			return
+			return null				//Cancel
+		/*						//Named arguments are removed, due to them making proccalling take too long.
 		if(named_arg)
 			named_args[named_arg] = value["value"]
 		else
 			. += value["value"]
 	if(LAZYLEN(named_args))
 		. += named_args
+		*/
+		. += value["value"]
 
 /client/proc/get_callproc_returnval(returnval,procname)
 	. = ""

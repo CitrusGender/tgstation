@@ -1,29 +1,16 @@
+
 /mob/living/Login()
 	..()
 	//Mind updates
-	sync_mind()
-	mind.show_memory(src, 0)
+	mind_initialize()	//updates the mind (or creates and initializes one if one doesn't exist)
+	mind.active = 1		//indicates that the mind is currently synced with a client
+	//If they're SSD, remove it so they can wake back up.
+	update_antag_icons(mind)
+	client.screen |= global_hud.darksight
+	client.images |= dsoverlay
 
-	//Round specific stuff
-	if(SSticker.mode)
-		switch(SSticker.mode.name)
-			if("sandbox")
-				CanBuild()
+	if(ai_holder && !ai_holder.autopilot)
+		ai_holder.go_sleep()
+		to_chat(src,"<span class='notice'>Mob AI disabled while you are controlling the mob.</span>")
 
-	update_damage_hud()
-	update_health_hud()
-
-	var/turf/T = get_turf(src)
-	if (isturf(T))
-		update_z(T.z)
-
-	//Vents
-	if(ventcrawler)
-		to_chat(src, "<span class='notice'>You can ventcrawl! Use alt+click on vents to quickly travel about the station.</span>")
-
-	if(ranged_ability)
-		ranged_ability.add_ranged_ability(src, "<span class='notice'>You currently have <b>[ranged_ability]</b> active!</span>")
-
-	var/datum/antagonist/changeling/changeling = mind.has_antag_datum(/datum/antagonist/changeling)
-	if(changeling)
-		changeling.regain_powers()
+	return .

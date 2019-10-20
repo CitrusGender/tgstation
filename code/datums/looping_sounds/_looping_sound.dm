@@ -11,8 +11,11 @@
 
 	chance			(num)					Chance per loop to play a mid_sound
 	volume			(num)					Sound output volume
+	muted			(bool)					Private. Used to stop the sound loop.
 	max_loops		(num)					The max amount of loops to run for.
 	direct			(bool)					If true plays directly to provided atoms instead of from them
+	opacity_check	(bool)					If true, things behind walls/opaque things won't hear the sounds.
+	pref_check		(type)					If set to a /datum/client_preference type, will check if the hearer has that preference active before playing it to them.
 */
 /datum/looping_sound
 	var/list/atom/output_atoms
@@ -23,11 +26,10 @@
 	var/end_sound
 	var/chance
 	var/volume = 100
-	var/vary = FALSE
 	var/max_loops
 	var/direct
-	var/extra_range = 0
-	var/falloff
+	var/opacity_check
+	var/pref_check
 
 	var/timerid
 
@@ -70,7 +72,7 @@
 	if(!chance || prob(chance))
 		play(get_sound(starttime))
 	if(!timerid)
-		timerid = addtimer(CALLBACK(src, .proc/sound_loop, world.time), mid_length, TIMER_CLIENT_TIME | TIMER_STOPPABLE | TIMER_LOOP)
+		timerid = addtimer(CALLBACK(src, .proc/sound_loop, world.time), mid_length, TIMER_STOPPABLE | TIMER_LOOP)
 
 /datum/looping_sound/proc/play(soundfile)
 	var/list/atoms_cache = output_atoms
@@ -81,21 +83,28 @@
 	for(var/i in 1 to atoms_cache.len)
 		var/atom/thing = atoms_cache[i]
 		if(direct)
+			if(ismob(thing))
+				var/mob/M = thing
+				if(!M.is_preference_enabled(pref_check))
+					continue
 			SEND_SOUND(thing, S)
 		else
-			playsound(thing, S, volume, vary, extra_range, falloff)
+			playsound(thing, S, volume, ignore_walls = !opacity_check, preference = pref_check)
 
 /datum/looping_sound/proc/get_sound(starttime, _mid_sounds)
-	. = _mid_sounds || mid_sounds
+	if(!_mid_sounds)
+		. = mid_sounds
+	else
+		. = _mid_sounds
 	while(!isfile(.) && !isnull(.))
 		. = pickweight(.)
 
 /datum/looping_sound/proc/on_start()
-	var/start_wait = 0
+	var/start_wait = 1 // On TG this is 0, however it needs to be 1 to work around an issue.
 	if(start_sound)
 		play(start_sound)
 		start_wait = start_length
-	addtimer(CALLBACK(src, .proc/sound_loop), start_wait, TIMER_CLIENT_TIME)
+	addtimer(CALLBACK(src, .proc/sound_loop), start_wait)
 
 /datum/looping_sound/proc/on_stop()
 	if(end_sound)

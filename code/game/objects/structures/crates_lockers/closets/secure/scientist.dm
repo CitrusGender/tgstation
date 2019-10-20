@@ -1,32 +1,57 @@
-/obj/structure/closet/secure_closet/RD
-	name = "\proper research director's locker"
-	req_access = list(ACCESS_RD)
-	icon_state = "rd"
+/obj/structure/closet/secure_closet/scientist
+	name = "scientist's locker"
+	icon_state = "secureres1"
+	icon_closed = "secureres"
+	icon_locked = "secureres1"
+	icon_opened = "secureresopen"
+	icon_broken = "secureresbroken"
+	icon_off = "secureresoff"
+	req_access = list(access_tox_storage)
 
-/obj/structure/closet/secure_closet/RD/PopulateContents()
-	..()
-	new /obj/item/clothing/neck/cloak/rd(src)
-	new /obj/item/clothing/suit/bio_suit/scientist(src)
-	new /obj/item/clothing/head/bio_hood/scientist(src)
-	new /obj/item/clothing/suit/toggle/labcoat(src)
-	new /obj/item/clothing/under/rank/rnd/research_director(src)
-	new /obj/item/clothing/under/rank/rnd/research_director/skirt(src)
-	new /obj/item/clothing/under/rank/rnd/research_director/alt(src)
-	new /obj/item/clothing/under/rank/rnd/research_director/alt/skirt(src)
-	new /obj/item/clothing/under/rank/rnd/research_director/turtleneck(src)
-	new /obj/item/clothing/under/rank/rnd/research_director/turtleneck/skirt(src)
-	new /obj/item/clothing/shoes/sneakers/brown(src)
-	new /obj/item/cartridge/rd(src)
-	new /obj/item/clothing/gloves/color/latex(src)
-	new /obj/item/radio/headset/heads/rd(src)
-	new /obj/item/tank/internals/oxygen(src)
-	new /obj/item/clothing/mask/gas(src)
-	new /obj/item/megaphone/command(src)
-	new /obj/item/storage/lockbox/medal/sci(src)
-	new /obj/item/clothing/suit/armor/reactive/teleport(src)
-	new /obj/item/assembly/flash/handheld(src)
-	new /obj/item/laser_pointer(src)
-	new /obj/item/door_remote/research_director(src)
-	new /obj/item/circuitboard/machine/techfab/department/science(src)
-	new /obj/item/storage/photo_album/RD(src)
-	new /obj/item/card/id/departmental_budget/sci(src)
+	starts_with = list(
+		/obj/item/clothing/under/rank/scientist,
+		/obj/item/clothing/suit/storage/toggle/labcoat,
+		/obj/item/clothing/shoes/white,
+		/obj/item/device/radio/headset/headset_sci,
+		/obj/item/weapon/tank/air,
+		/obj/item/clothing/mask/gas,
+		/obj/item/clothing/suit/storage/hooded/wintercoat/science,
+		/obj/item/clothing/shoes/boots/winter/science)
+
+/obj/structure/closet/secure_closet/scientist/Initialize()
+	if(prob(50))
+		starts_with += /obj/item/weapon/storage/backpack/dufflebag/sci
+	else
+		starts_with += /obj/item/weapon/storage/backpack/toxins
+	return ..()
+
+
+/obj/structure/closet/secure_closet/RD
+	name = "research director's locker"
+	icon_state = "rdsecure1"
+	icon_closed = "rdsecure"
+	icon_locked = "rdsecure1"
+	icon_opened = "rdsecureopen"
+	icon_broken = "rdsecurebroken"
+	icon_off = "rdsecureoff"
+	req_access = list(access_rd)
+
+	starts_with = list(
+		/obj/item/clothing/suit/bio_suit/scientist,
+		/obj/item/clothing/head/bio_hood/scientist,
+		/obj/item/clothing/under/rank/research_director,
+		/obj/item/clothing/under/rank/research_director/rdalt,
+		/obj/item/clothing/under/rank/research_director/dress_rd,
+		/obj/item/clothing/suit/storage/toggle/labcoat,
+		/obj/item/weapon/cartridge/rd,
+		/obj/item/clothing/shoes/white,
+		/obj/item/clothing/shoes/leather,
+		/obj/item/clothing/gloves/sterile/latex,
+		/obj/item/device/radio/headset/heads/rd,
+		/obj/item/device/radio/headset/heads/rd/alt,
+		/obj/item/weapon/tank/air,
+		/obj/item/clothing/mask/gas,
+		/obj/item/device/flash,
+		/obj/item/clothing/suit/storage/hooded/wintercoat/science,
+		/obj/item/clothing/shoes/boots/winter/science,
+		/obj/item/weapon/bluespace_harpoon) //VOREStation Add

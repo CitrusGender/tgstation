@@ -1,235 +1,342 @@
-#define AREA_ERRNONE 0
-#define AREA_STATION 1
-#define AREA_SPACE 2
-#define AREA_SPECIAL 3
-
-/obj/item/areaeditor
-	name = "area modification item"
-	icon = 'icons/obj/items_and_weapons.dmi'
-	icon_state = "blueprints"
-	attack_verb = list("attacked", "bapped", "hit")
-	var/fluffnotice = "Nobody's gonna read this stuff!"
-	var/in_use = FALSE
-
-/obj/item/areaeditor/attack_self(mob/user)
-	add_fingerprint(user)
-	. = "<BODY><HTML><head><title>[src]</title></head> \
-				<h2>[station_name()] [src.name]</h2> \
-				<small>[fluffnotice]</small><hr>"
-	switch(get_area_type())
-		if(AREA_SPACE)
-			. += "<p>According to the [src.name], you are now in an unclaimed territory.</p>"
-		if(AREA_SPECIAL)
-			. += "<p>This place is not noted on the [src.name].</p>"
-	. += "<p><a href='?src=[REF(src)];create_area=1'>Create or modify an existing area</a></p>"
-
-
-/obj/item/areaeditor/Topic(href, href_list)
-	if(..())
-		return TRUE
-	if(!usr.canUseTopic(src) || usr != loc)
-		usr << browse(null, "window=blueprints")
-		return TRUE
-	if(href_list["create_area"])
-		if(in_use)
-			return
-		in_use = TRUE
-		create_area(usr)
-		in_use = FALSE
-	updateUsrDialog()
-
-//Station blueprints!!!
-/obj/item/areaeditor/blueprints
+/obj/item/blueprints
 	name = "station blueprints"
 	desc = "Blueprints of the station. There is a \"Classified\" stamp and several coffee stains on it."
-	icon = 'icons/obj/items_and_weapons.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "blueprints"
-	fluffnotice = "Property of Nanotrasen. For heads of staff only. Store in high-secure storage."
-	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | ACID_PROOF
-	var/list/image/showing = list()
-	var/client/viewing
-	var/legend = FALSE	//Viewing the wire legend
+	attack_verb = list("attacked", "bapped", "hit")
+	preserve_item = 1
+	var/const/AREA_ERRNONE = 0
+	var/const/AREA_STATION = 1
+	var/const/AREA_SPACE =   2
+	var/const/AREA_SPECIAL = 3
 
+	var/const/BORDER_ERROR = 0
+	var/const/BORDER_NONE = 1
+	var/const/BORDER_BETWEEN =   2
+	var/const/BORDER_2NDTILE = 3
+	var/const/BORDER_SPACE = 4
 
-/obj/item/areaeditor/blueprints/Destroy()
-	clear_viewer()
-	return ..()
+	var/const/ROOM_ERR_LOLWAT = 0
+	var/const/ROOM_ERR_SPACE = -1
+	var/const/ROOM_ERR_TOOLARGE = -2
 
-
-/obj/item/areaeditor/blueprints/attack_self(mob/user)
-	. = ..()
-	if(!legend)
-		var/area/A = get_area(user)
-		if(get_area_type() == AREA_STATION)
-			. += "<p>According to \the [src], you are now in <b>\"[html_encode(A.name)]\"</b>.</p>"
-			. += "<p><a href='?src=[REF(src)];edit_area=1'>Change area name</a></p>"
-		. += "<p><a href='?src=[REF(src)];view_legend=1'>View wire colour legend</a></p>"
-		if(!viewing)
-			. += "<p><a href='?src=[REF(src)];view_blueprints=1'>View structural data</a></p>"
-		else
-			. += "<p><a href='?src=[REF(src)];refresh=1'>Refresh structural data</a></p>"
-			. += "<p><a href='?src=[REF(src)];hide_blueprints=1'>Hide structural data</a></p>"
-	else
-		if(legend == TRUE)
-			. += "<a href='?src=[REF(src)];exit_legend=1'><< Back</a>"
-			. += view_wire_devices(user);
-		else
-			//legend is a wireset
-			. += "<a href='?src=[REF(src)];view_legend=1'><< Back</a>"
-			. += view_wire_set(user, legend)
-	var/datum/browser/popup = new(user, "blueprints", "[src]", 700, 500)
-	popup.set_content(.)
-	popup.open()
-	onclose(user, "blueprints")
-
-
-/obj/item/areaeditor/blueprints/Topic(href, href_list)
-	if(..())
-		return
-	if(href_list["edit_area"])
-		if(get_area_type()!=AREA_STATION)
-			return
-		if(in_use)
-			return
-		in_use = TRUE
-		edit_area()
-		in_use = FALSE
-	if(href_list["exit_legend"])
-		legend = FALSE;
-	if(href_list["view_legend"])
-		legend = TRUE;
-	if(href_list["view_wireset"])
-		legend = href_list["view_wireset"];
-	if(href_list["view_blueprints"])
-		set_viewer(usr, "<span class='notice'>You flip the blueprints over to view the complex information diagram.</span>")
-	if(href_list["hide_blueprints"])
-		clear_viewer(usr,"<span class='notice'>You flip the blueprints over to view the simple information diagram.</span>")
-	if(href_list["refresh"])
-		clear_viewer(usr)
-		set_viewer(usr)
-
-	attack_self(usr) //this is not the proper way, but neither of the old update procs work! it's too ancient and I'm tired shush.
-
-/obj/item/areaeditor/blueprints/proc/get_images(turf/T, viewsize)
-	. = list()
-	for(var/turf/TT in range(viewsize, T))
-		if(TT.blueprint_data)
-			. += TT.blueprint_data
-
-/obj/item/areaeditor/blueprints/proc/set_viewer(mob/user, message = "")
-	if(user && user.client)
-		if(viewing)
-			clear_viewer()
-		viewing = user.client
-		showing = get_images(get_turf(user), viewing.view)
-		viewing.images |= showing
-		if(message)
-			to_chat(user, message)
-
-/obj/item/areaeditor/blueprints/proc/clear_viewer(mob/user, message = "")
-	if(viewing)
-		viewing.images -= showing
-		viewing = null
-	showing.Cut()
-	if(message)
-		to_chat(user, message)
-
-/obj/item/areaeditor/blueprints/dropped(mob/user)
-	..()
-	clear_viewer()
-	legend = FALSE
-
-
-/obj/item/areaeditor/proc/get_area_type(area/A)
-	if (!A)
-		A = get_area(usr)
-	if(A.outdoors)
-		return AREA_SPACE
-	var/list/SPECIALS = list(
+	var/static/list/SPACE_AREA_TYPES = list(
+		/area/space,
+		/area/mine
+	)
+	var/static/list/SPECIAL_AREA_TYPES = list(
 		/area/shuttle,
+		/area/admin,
+		/area/arrival,
 		/area/centcom,
 		/area/asteroid,
 		/area/tdome,
+		/area/syndicate_station,
 		/area/wizard_station,
-		/area/hilbertshotel,
-		/area/hilbertshotelstorage
+		/area/prison
+		// /area/derelict //commented out, all hail derelict-rebuilders!
 	)
-	for (var/type in SPECIALS)
-		if ( istype(A,type) )
+
+	// For the color overlays
+	var/list/areaColor_turfs = list()
+	// Easy configuring of what we're allowed to do where or whatnot
+	var/can_create_areas_in = AREA_SPACE	// Must be standing in space to create
+	var/can_create_areas_into = AREA_SPACE	// New areas will only overwrite space area turfs.
+	var/can_expand_areas_in = AREA_STATION	// Must be standing in station to expand
+	var/can_expand_areas_into = AREA_SPACE	// Can expand station areas only into space.
+	var/can_rename_areas_in = AREA_STATION	// Only station areas can be reanamed
+
+/obj/item/blueprints/attack_self(mob/M as mob)
+	if (!istype(M,/mob/living/carbon/human))
+		M << "This stack of blue paper means nothing to you." //monkeys cannot into projecting
+		return
+	interact()
+	return
+
+/obj/item/blueprints/Topic(href, href_list)
+	..()
+	if ((usr.restrained() || usr.stat || usr.get_active_hand() != src))
+		return
+	if (!href_list["action"])
+		return
+	switch(href_list["action"])
+		if ("create_area")
+			if (!(get_area_type() & can_create_areas_in))
+				usr << "<span class='danger'>You can't make a new area here.</span>"
+				interact()
+				return
+			create_area()
+		if ("edit_area")
+			if (!(get_area_type() & can_rename_areas_in))
+				usr << "<span class='danger'>You can't rename this area.</span>"
+				interact()
+				return
+			edit_area()
+		if ("expand_area")
+			if (!(get_area_type() & can_expand_areas_in))
+				usr << "<span class='danger'>You can't expand this area.</span>"
+				interact()
+				return
+			expand_area()
+
+/obj/item/blueprints/interact()
+	var/area/A = get_area()
+	var/text = {"<HTML><head><title>[src]</title></head><BODY>
+<h2>[station_name()] blueprints</h2>
+<small>Property of [using_map.company_name]. For heads of staff only. Store in high-secure storage.</small><hr>
+"}
+	var/curAreaType = get_area_type()
+	switch (curAreaType)
+		if (AREA_SPACE)
+			text += "<p>According the blueprints, you are now in <b>outer space</b>.  Hold your breath.</p>"
+		if (AREA_STATION)
+			text += "<p>According the blueprints, you are now in <b>\"[A.name]\"</b>.</p>"
+		if (AREA_SPECIAL)
+			text += "<p>This place isn't noted on the blueprint.</p>"
+		else
+			text += "<p class='danger'>There is a coffee stain over this part of the blueprint.</p>"
+			return // Shouldn ever get here, just sanity check
+
+	// Offer links for what user is allowed to do based on current area
+	if(curAreaType & can_create_areas_in)
+		text += "<p>You can <a href='?src=\ref[src];action=create_area'>Mark this place as new area</a>.</p>"
+	if(curAreaType & can_expand_areas_in)
+		text += "<p>You can <a href='?src=\ref[src];action=expand_area'>expand the area</a>.</p>"
+	if(curAreaType & can_rename_areas_in)
+		text += "<p>You can <a href='?src=\ref[src];action=edit_area'>rename the area</a>.</p>"
+
+	text += "</BODY></HTML>"
+	usr << browse(text, "window=blueprints")
+	onclose(usr, "blueprints")
+
+
+/obj/item/blueprints/proc/get_area()
+	var/turf/T = get_turf(usr)
+	var/area/A = T.loc
+	return A
+
+/obj/item/blueprints/proc/get_area_type(var/area/A = get_area())
+	for(var/type in SPACE_AREA_TYPES)
+		if(istype(A, type))
+			return AREA_SPACE
+	for (var/type in SPECIAL_AREA_TYPES)
+		if(istype(A, type))
 			return AREA_SPECIAL
 	return AREA_STATION
 
-/obj/item/areaeditor/blueprints/proc/view_wire_devices(mob/user)
-	var/message = "<br>You examine the wire legend.<br>"
-	for(var/wireset in GLOB.wire_color_directory)
-		message += "<br><a href='?src=[REF(src)];view_wireset=[wireset]'>[GLOB.wire_name_directory[wireset]]</a>"
-	message += "</p>"
-	return message
+/**
+ * Create a new area encompasing the current room.
+ */
+/obj/item/blueprints/proc/create_area()
+	var/res = detect_room_ex(get_turf(usr), can_create_areas_into)
+	if(!istype(res,/list))
+		switch(res)
+			if(ROOM_ERR_SPACE)
+				usr << "<span class='warning'>The new area must be completely airtight!</span>"
+				return
+			if(ROOM_ERR_TOOLARGE)
+				usr << "<span class='warning'>The new area too large!</span>"
+				return
+			else
+				usr << "<span class='warning'>Error! Please notify administration!</span>"
+				return
+	var/list/turf/turfs = res
+	var/str = sanitizeSafe(input("New area name:","Blueprint Editing", ""), MAX_NAME_LEN)
+	if(!str || !length(str)) //cancel
+		return
+	if(length(str) > 50)
+		usr << "<span class='warning'>Name too long.</span>"
+		return
+	var/area/A = new
+	A.name = str
+	A.power_equip = 0
+	A.power_light = 0
+	A.power_environ = 0
+	A.always_unpowered = 0
+	move_turfs_to_area(turfs, A)
 
-/obj/item/areaeditor/blueprints/proc/view_wire_set(mob/user, wireset)
-	//for some reason you can't use wireset directly as a derefencer so this is the next best :/
-	for(var/device in GLOB.wire_color_directory)
-		if("[device]" == wireset)	//I know... don't change it...
-			var/message = "<p><b>[GLOB.wire_name_directory[device]]:</b>"
-			for(var/Col in GLOB.wire_color_directory[device])
-				var/wire_name = GLOB.wire_color_directory[device][Col]
-				if(!findtext(wire_name, WIRE_DUD_PREFIX))	//don't show duds
-					message += "<p><span style='color: [Col]'>[Col]</span>: [wire_name]</p>"
-			message += "</p>"
-			return message
-	return ""
+	A.always_unpowered = 0
 
-/obj/item/areaeditor/proc/edit_area()
-	var/area/A = get_area(usr)
+	spawn(5)
+		interact()
+	return
+
+/**
+ * Expand the current area to fill the current room.
+ */
+/obj/item/blueprints/proc/expand_area()
+	var/turf/startingTurf = get_turf(usr)
+	var/res = detect_room_ex(startingTurf, can_expand_areas_into)
+	if(!istype(res,/list))
+		switch(res)
+			if(ROOM_ERR_SPACE)
+				usr << "<span class='warning'>The new area must be completely airtight!</span>"
+				return
+			if(ROOM_ERR_TOOLARGE)
+				usr << "<span class='warning'>The new area too large!</span>"
+				return
+			else
+				usr << "<span class='warning'>Error! Please notify administration!</span>"
+				return
+	var/list/turf/turfs = res
+
+	var/area/A = get_area(startingTurf)
+	for(var/turf/T in A.contents)
+		turfs -= T // Don't add turfs already in A to A
+	if(turfs.len == 0)
+		usr << "<span class='warning'>\The [A] already covers the entire room.</span>"
+		return
+
+	move_turfs_to_area(turfs, A)
+	usr << "<span class='notice'>Expanded \the [A] by [turfs.len] turfs</span>"
+	spawn(5)
+		interact()
+	return
+
+/obj/item/blueprints/proc/move_turfs_to_area(var/list/turf/turfs, var/area/A)
+	A.contents.Add(turfs)
+		//oldarea.contents.Remove(usr.loc) // not needed
+		//T.loc = A //error: cannot change constant value
+
+
+/obj/item/blueprints/proc/edit_area()
+	var/area/A = get_area()
 	var/prevname = "[A.name]"
-	var/str = stripped_input(usr,"New area name:", "Area Creation", "", MAX_NAME_LEN)
+	var/str = sanitizeSafe(input("New area name:","Blueprint Editing", prevname), MAX_NAME_LEN)
 	if(!str || !length(str) || str==prevname) //cancel
 		return
 	if(length(str) > 50)
-		to_chat(usr, "<span class='warning'>The given name is too long.  The area's name is unchanged.</span>")
+		usr << "<span class='warning'>Text too long.</span>"
 		return
-
-	rename_area(A, str)
-
-	to_chat(usr, "<span class='notice'>You rename the '[prevname]' to '[str]'.</span>")
-	log_game("[key_name(usr)] has renamed [prevname] to [str]")
-	A.update_areasize()
+	set_area_machinery_title(A,str,prevname)
+	A.name = str
+	usr << "<span class='notice'>You set the area '[prevname]' title to '[str]'.</span>"
 	interact()
-	return TRUE
-
-//Blueprint Subtypes
-
-/obj/item/areaeditor/blueprints/cyborg
-	name = "station schematics"
-	desc = "A digital copy of the station blueprints stored in your memory."
-	icon = 'icons/obj/items_and_weapons.dmi'
-	icon_state = "blueprints"
-	fluffnotice = "Intellectual Property of Nanotrasen. For use in engineering cyborgs only. Wipe from memory upon departure from the station."
-
-/proc/rename_area(a, new_name)
-	var/area/A = get_area(a)
-	var/prevname = "[A.name]"
-	set_area_machinery_title(A, new_name, prevname)
-	A.name = new_name
-	if(A.firedoors)
-		for(var/D in A.firedoors)
-			var/obj/machinery/door/firedoor/FD = D
-			FD.CalculateAffectingAreas()
-	A.update_areasize()
-	return TRUE
+	return
 
 
-/proc/set_area_machinery_title(area/A, title, oldtitle)
-	if(!oldtitle) // or replacetext goes to infinite loop
+
+/obj/item/blueprints/proc/set_area_machinery_title(var/area/A,var/title,var/oldtitle)
+	if (!oldtitle) // or replacetext goes to infinite loop
 		return
-	for(var/obj/machinery/airalarm/M in A)
+
+	for(var/obj/machinery/alarm/M in A)
 		M.name = replacetext(M.name,oldtitle,title)
 	for(var/obj/machinery/power/apc/M in A)
 		M.name = replacetext(M.name,oldtitle,title)
-	for(var/obj/machinery/atmospherics/components/unary/vent_scrubber/M in A)
+	for(var/obj/machinery/atmospherics/unary/vent_scrubber/M in A)
 		M.name = replacetext(M.name,oldtitle,title)
-	for(var/obj/machinery/atmospherics/components/unary/vent_pump/M in A)
+	for(var/obj/machinery/atmospherics/unary/vent_pump/M in A)
 		M.name = replacetext(M.name,oldtitle,title)
 	for(var/obj/machinery/door/M in A)
 		M.name = replacetext(M.name,oldtitle,title)
 	//TODO: much much more. Unnamed airlocks, cameras, etc.
+
+
+
+/**
+ * This detects an airtight room, following ZAS's rules for airtightness.
+ * @param first The turf to start searching from. Needn't be anything in particular.
+ * @param allowedAreas Bitfield of area types allowed to be included in the room.
+ *	This way you can prevent overwriting special areas or station areas etc.
+ *  Note: The first turf is always allowed, and turfs in its area.
+ * @return On success, a list of turfs included in the room.  On failure will return a ROOM_ERR_* constant.
+*/
+/obj/item/blueprints/proc/detect_room_ex(var/turf/first, var/allowedAreas = AREA_SPACE)
+	if(!istype(first))
+		return ROOM_ERR_LOLWAT
+	var/list/turf/found = new
+	var/list/turf/pending = list(first)
+	while(pending.len)
+		if (found.len+pending.len > 300)
+			return ROOM_ERR_TOOLARGE
+		var/turf/T = pending[1] //why byond havent list::pop()?
+		pending -= T
+		for (var/dir in cardinal)
+			var/turf/NT = get_step(T,dir)
+			if (!isturf(NT) || (NT in found) || (NT in pending))
+				continue
+			// We ask ZAS to determine if its airtight.  Thats what matters anyway right?
+			if(air_master.air_blocked(T, NT))
+				// Okay thats the edge of the room
+				if(get_area_type(NT.loc) == AREA_SPACE && air_master.air_blocked(NT, NT))
+					found += NT // So we include walls/doors not already in any area
+				continue
+			if (istype(NT, /turf/space))
+				return ROOM_ERR_SPACE //omg hull breach we all going to die here
+			if (istype(NT, /turf/simulated/shuttle))
+				return ROOM_ERR_SPACE // Unsure why this, but was in old code. Trusting for now.
+			if (NT.loc != first.loc && !(get_area_type(NT.loc) & allowedAreas))
+				// Edge of a protected area.  Lets stop here...
+				continue
+			if (!istype(NT, /turf/simulated))
+				// Great, unsimulated... eh, just stop searching here
+				continue
+			// Okay, NT looks promising, lets continue the search there!
+			pending += NT
+		found += T
+	// end while
+	return found
+
+/obj/item/blueprints/verb/seeAreaColors()
+	set src in usr
+	set category = "Blueprints"
+	set name = "Show Area Colors"
+
+	// Remove any existing
+	seeAreaColors_remove()
+
+	usr << "<span class='notice'>\The [src] shows nearby areas in different colors.</span>"
+	var/i = 0
+	for(var/area/A in range(usr))
+		if(get_area_type(A) == AREA_SPACE)
+			continue // Don't overlay all of space!
+		var/icon/areaColor = new('icons/misc/debug_rebuild.dmi', "[++i]")
+		usr << "- [A] as [i]"
+		for(var/turf/T in A.contents)
+			usr << image(areaColor, T, "blueprints", TURF_LAYER)
+			areaColor_turfs += T
+
+/obj/item/blueprints/verb/seeRoomColors()
+	set src in usr
+	set category = "Blueprints"
+	set name = "Show Room Colors"
+
+	// If standing somewhere we can expand from, use expand perms, otherwise create
+	var/canOverwrite = (get_area_type() & can_expand_areas_in) ? can_expand_areas_into : can_create_areas_into
+	var/res = detect_room_ex(get_turf(usr), canOverwrite)
+	if(!istype(res, /list))
+		switch(res)
+			if(ROOM_ERR_SPACE)
+				usr << "<span class='warning'>The new area must be completely airtight!</span>"
+				return
+			if(ROOM_ERR_TOOLARGE)
+				usr << "<span class='warning'>The new area too large!</span>"
+				return
+			else
+				usr << "<span class='danger'>Error! Please notify administration!</span>"
+				return
+	// Okay we got a room, lets color it
+	seeAreaColors_remove()
+	var/icon/green = new('icons/misc/debug_group.dmi', "green")
+	for(var/turf/T in res)
+		usr << image(green, T, "blueprints", TURF_LAYER)
+		areaColor_turfs += T
+	usr << "<span class='notice'>The space covered by the new area is highlighted in green.</span>"
+
+/obj/item/blueprints/verb/seeAreaColors_remove()
+	set src in usr
+	set category = "Blueprints"
+	set name = "Remove Area Colors"
+
+	areaColor_turfs.Cut()
+	if(usr.client.images.len)
+		for(var/image/i in usr.client.images)
+			if(i.icon_state == "blueprints")
+				usr.client.images.Remove(i)
+
+// Make sure to turn off the colors when we drop the blueprints.
+/obj/item/blueprints/dropped(mob/user as mob)
+	if(areaColor_turfs.len)
+		seeAreaColors_remove()
+	return ..()

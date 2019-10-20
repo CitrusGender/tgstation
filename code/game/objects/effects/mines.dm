@@ -1,178 +1,281 @@
 /obj/effect/mine
-	name = "dummy mine"
-	desc = "Better stay away from that thing."
-	density = FALSE
-	anchored = TRUE
-	icon = 'icons/obj/items_and_weapons.dmi'
+	name = "land mine"	//The name and description are deliberately NOT modified, so you can't game the mines you find.
+	desc = "A small explosive land mine."
+	density = 0
+	anchored = 1
+	icon = 'icons/obj/weapons.dmi'
 	icon_state = "uglymine"
 	var/triggered = 0
+	var/smoke_strength = 3
+	var/mineitemtype = /obj/item/weapon/mine
+	var/panel_open = 0
+	var/datum/wires/mines/wires = null
+	register_as_dangerous_object = TRUE
 
-/obj/effect/mine/proc/mineEffect(mob/victim)
-	to_chat(victim, "<span class='danger'>*click*</span>")
+/obj/effect/mine/New()
+	icon_state = "uglyminearmed"
+	wires = new(src)
 
-/obj/effect/mine/Crossed(AM as mob|obj)
-	if(isturf(loc))
-		if(ismob(AM))
-			var/mob/MM = AM
-			if(!(MM.movement_type & FLYING))
-				triggermine(AM)
-		else
-			triggermine(AM)
-
-/obj/effect/mine/proc/triggermine(mob/victim)
-	if(triggered)
-		return
-	visible_message("<span class='danger'>[victim] sets off [icon2html(src, viewers(src))] [src]!</span>")
-	var/datum/effect_system/spark_spread/s = new /datum/effect_system/spark_spread
+/obj/effect/mine/proc/explode(var/mob/living/M)
+	var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread()
+	triggered = 1
 	s.set_up(3, 1, src)
 	s.start()
-	mineEffect(victim)
-	triggered = 1
+	explosion(loc, 0, 2, 3, 4) //land mines are dangerous, folks.
+	visible_message("\The [src.name] detonates!")
+	qdel(s)
 	qdel(src)
 
+/obj/effect/mine/bullet_act()
+	if(prob(50))
+		explode()
 
-/obj/effect/mine/explosive
-	name = "explosive mine"
-	var/range_devastation = 0
-	var/range_heavy = 1
-	var/range_light = 2
-	var/range_flash = 3
+/obj/effect/mine/ex_act(severity)
+	if(severity <= 2 || prob(50))
+		explode()
+	..()
 
-/obj/effect/mine/explosive/mineEffect(mob/victim)
-	explosion(loc, range_devastation, range_heavy, range_light, range_flash)
+/obj/effect/mine/Crossed(AM as mob|obj)
+	Bumped(AM)
 
+/obj/effect/mine/Bumped(mob/M as mob|obj)
 
-/obj/effect/mine/stun
-	name = "stun mine"
-	var/stun_time = 80
-
-/obj/effect/mine/stun/mineEffect(mob/living/victim)
-	if(isliving(victim))
-		victim.Paralyze(stun_time)
-
-/obj/effect/mine/kickmine
-	name = "kick mine"
-
-/obj/effect/mine/kickmine/mineEffect(mob/victim)
-	if(isliving(victim) && victim.client)
-		to_chat(victim, "<span class='userdanger'>You have been kicked FOR NO REISIN!</span>")
-		qdel(victim.client)
-
-
-/obj/effect/mine/gas
-	name = "oxygen mine"
-	var/gas_amount = 360
-	var/gas_type = "o2"
-
-/obj/effect/mine/gas/mineEffect(mob/victim)
-	atmos_spawn_air("[gas_type]=[gas_amount]")
-
-
-/obj/effect/mine/gas/plasma
-	name = "plasma mine"
-	gas_type = "plasma"
-
-
-/obj/effect/mine/gas/n2o
-	name = "\improper N2O mine"
-	gas_type = "n2o"
-
-
-/obj/effect/mine/sound
-	name = "honkblaster 1000"
-	var/sound = 'sound/items/bikehorn.ogg'
-
-/obj/effect/mine/sound/mineEffect(mob/victim)
-	playsound(loc, sound, 100, TRUE)
-
-
-/obj/effect/mine/sound/bwoink
-	name = "bwoink mine"
-	sound = 'sound/effects/adminhelp.ogg'
-
-/obj/effect/mine/pickup
-	name = "pickup"
-	desc = "pick me up"
-	icon = 'icons/effects/effects.dmi'
-	icon_state = "electricity2"
-	density = FALSE
-	var/duration = 0
-
-/obj/effect/mine/pickup/Initialize()
-	. = ..()
-	animate(src, pixel_y = 4, time = 20, loop = -1)
-
-/obj/effect/mine/pickup/triggermine(mob/victim)
 	if(triggered)
 		return
+
+	if(istype(M, /mob/living/))
+		if(!M.hovering)
+			explode(M)
+
+/obj/effect/mine/attackby(obj/item/W as obj, mob/living/user as mob)
+	if(W.is_screwdriver())
+		panel_open = !panel_open
+		user.visible_message("<span class='warning'>[user] very carefully screws the mine's panel [panel_open ? "open" : "closed"].</span>",
+		"<span class='notice'>You very carefully screw the mine's panel [panel_open ? "open" : "closed"].</span>")
+		playsound(src.loc, W.usesound, 50, 1)
+
+	else if((W.is_wirecutter() || istype(W, /obj/item/device/multitool)) && panel_open)
+		interact(user)
+	else
+		..()
+
+/obj/effect/mine/interact(mob/living/user as mob)
+	if(!panel_open || istype(user, /mob/living/silicon/ai))
+		return
+	user.set_machine(src)
+	wires.Interact(user)
+
+/obj/effect/mine/dnascramble
+	mineitemtype = /obj/item/weapon/mine/dnascramble
+
+/obj/effect/mine/dnascramble/explode(var/mob/living/M)
+	var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread()
 	triggered = 1
-	invisibility = INVISIBILITY_ABSTRACT
-	mineEffect(victim)
-	qdel(src)
+	s.set_up(3, 1, src)
+	s.start()
+	if(M)
+		M.radiation += 50
+		randmutb(M)
+		domutcheck(M,null)
+	visible_message("\The [src.name] flashes violently before disintegrating!")
+	spawn(0)
+		qdel(s)
+		qdel(src)
 
+/obj/effect/mine/stun
+	mineitemtype = /obj/item/weapon/mine/stun
 
-/obj/effect/mine/pickup/bloodbath
-	name = "Red Orb"
-	desc = "You feel angry just looking at it."
-	duration = 1200 //2min
-	color = "#FF0000"
+/obj/effect/mine/stun/explode(var/mob/living/M)
+	triggered = 1
+	var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread()
+	s.set_up(3, 1, src)
+	s.start()
+	if(M)
+		M.Stun(30)
+	visible_message("\The [src.name] flashes violently before disintegrating!")
+	spawn(0)
+		qdel(s)
+		qdel(src)
 
-/obj/effect/mine/pickup/bloodbath/mineEffect(mob/living/carbon/victim)
-	if(!victim.client || !istype(victim))
+/obj/effect/mine/n2o
+	mineitemtype = /obj/item/weapon/mine/n2o
+
+/obj/effect/mine/n2o/explode(var/mob/living/M)
+	triggered = 1
+	for (var/turf/simulated/floor/target in range(1,src))
+		if(!target.blocks_air)
+			target.assume_gas("sleeping_agent", 30)
+	visible_message("\The [src.name] detonates!")
+	spawn(0)
+		qdel(src)
+
+/obj/effect/mine/phoron
+	mineitemtype = /obj/item/weapon/mine/phoron
+
+/obj/effect/mine/phoron/explode(var/mob/living/M)
+	triggered = 1
+	for (var/turf/simulated/floor/target in range(1,src))
+		if(!target.blocks_air)
+			target.assume_gas("phoron", 30)
+			target.hotspot_expose(1000, CELL_VOLUME)
+	visible_message("\The [src.name] detonates!")
+	spawn(0)
+		qdel(src)
+
+/obj/effect/mine/kick
+	mineitemtype = /obj/item/weapon/mine/kick
+
+/obj/effect/mine/kick/explode(var/mob/living/M)
+	var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread()
+	triggered = 1
+	s.set_up(3, 1, src)
+	s.start()
+	if(M)
+		qdel(M.client)
+	spawn(0)
+		qdel(s)
+		qdel(src)
+
+/obj/effect/mine/frag
+	mineitemtype = /obj/item/weapon/mine/frag
+	var/fragment_types = list(/obj/item/projectile/bullet/pellet/fragment)
+	var/num_fragments = 20  //total number of fragments produced by the grenade
+	//The radius of the circle used to launch projectiles. Lower values mean less projectiles are used but if set too low gaps may appear in the spread pattern
+	var/spread_range = 7
+
+/obj/effect/mine/frag/explode(var/mob/living/M)
+	var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread()
+	triggered = 1
+	s.set_up(3, 1, src)
+	s.start()
+	var/turf/O = get_turf(src)
+	if(!O)
 		return
-	to_chat(victim, "<span class='reallybig redtext'>RIP AND TEAR</span>")
-	var/old_color = victim.client.color
-	var/static/list/red_splash = list(1,0,0,0.8,0.2,0, 0.8,0,0.2,0.1,0,0)
-	var/static/list/pure_red = list(0,0,0,0,0,0,0,0,0,1,0,0)
+	src.fragmentate(O, 20, 7, list(/obj/item/projectile/bullet/pellet/fragment)) //only 20 weak fragments because you're stepping directly on it
+	visible_message("\The [src.name] detonates!")
+	spawn(0)
+		qdel(s)
+		qdel(src)
 
-	INVOKE_ASYNC(src, .proc/blood_delusion, victim)
+/obj/effect/mine/training	//Name and Desc commented out so it's possible to trick people with the training mines
+//	name = "training mine"
+//	desc = "A mine with its payload removed, for EOD training and demonstrations."
+	mineitemtype = /obj/item/weapon/mine/training
 
-	var/obj/item/twohanded/required/chainsaw/doomslayer/chainsaw = new(victim.loc)
-	victim.log_message("entered a blood frenzy", LOG_ATTACK)
+/obj/effect/mine/training/explode(var/mob/living/M)
+	triggered = 1
+	visible_message("\The [src.name]'s light flashes rapidly as it 'explodes'.")
+	new src.mineitemtype(get_turf(src))
+	spawn(0)
+		qdel(src)
 
-	ADD_TRAIT(chainsaw, TRAIT_NODROP, CHAINSAW_FRENZY_TRAIT)
-	victim.drop_all_held_items()
-	victim.put_in_hands(chainsaw, forced = TRUE)
-	chainsaw.attack_self(victim)
-	chainsaw.wield(victim)
-	victim.reagents.add_reagent(/datum/reagent/medicine/adminordrazine,25)
-	to_chat(victim, "<span class='warning'>KILL, KILL, KILL! YOU HAVE NO ALLIES ANYMORE, KILL THEM ALL!</span>")
+/obj/effect/mine/emp
+	mineitemtype = /obj/item/weapon/mine/emp
 
-	victim.client.color = pure_red
-	animate(victim.client,color = red_splash, time = 10, easing = SINE_EASING|EASE_OUT)
-	sleep(10)
-	animate(victim.client,color = old_color, time = duration)//, easing = SINE_EASING|EASE_OUT)
-	sleep(duration)
-	to_chat(victim, "<span class='notice'>Your bloodlust seeps back into the bog of your subconscious and you regain self control.</span>")
-	qdel(chainsaw)
-	victim.log_message("exited a blood frenzy", LOG_ATTACK)
-	qdel(src)
+/obj/effect/mine/emp/explode(var/mob/living/M)
+	var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread()
+	s.set_up(3, 1, src)
+	s.start()
+	visible_message("\The [src.name] flashes violently before disintegrating!")
+	empulse(loc, 2, 4, 7, 10, 1) // As strong as an EMP grenade
+	spawn(0)
+		qdel(src)
 
-/obj/effect/mine/pickup/bloodbath/proc/blood_delusion(mob/living/carbon/victim)
-	new /datum/hallucination/delusion(victim, TRUE, "demon", duration, 0)
+/obj/effect/mine/incendiary
+	mineitemtype = /obj/item/weapon/mine/incendiary
 
-/obj/effect/mine/pickup/healing
-	name = "Blue Orb"
-	desc = "You feel better just looking at it."
-	color = "#0000FF"
+/obj/effect/mine/incendiary/explode(var/mob/living/M)
+	triggered = 1
+	var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread()
+	s.set_up(3, 1, src)
+	s.start()
+	if(M)
+		M.adjust_fire_stacks(5)
+		M.fire_act()
+	visible_message("\The [src.name] bursts into flames!")
+	spawn(0)
+		qdel(src)
 
-/obj/effect/mine/pickup/healing/mineEffect(mob/living/carbon/victim)
-	if(!victim.client || !istype(victim))
-		return
-	to_chat(victim, "<span class='notice'>You feel great!</span>")
-	victim.revive(full_heal = 1, admin_revive = 1)
+/////////////////////////////////////////////
+// The held item version of the above mines
+/////////////////////////////////////////////
+/obj/item/weapon/mine
+	name = "mine"
+	desc = "A small explosive mine with 'HE' and a grenade symbol on the side."
+	icon = 'icons/obj/weapons.dmi'
+	icon_state = "uglymine"
+	var/countdown = 10
+	var/minetype = /obj/effect/mine		//This MUST be an /obj/effect/mine type, or it'll runtime.
 
-/obj/effect/mine/pickup/speed
-	name = "Yellow Orb"
-	desc = "You feel faster just looking at it."
-	color = "#FFFF00"
-	duration = 300
+/obj/item/weapon/mine/attack_self(mob/user as mob)	// You do not want to move or throw a land mine while priming it... Explosives + Sudden Movement = Bad Times
+	add_fingerprint(user)
+	msg_admin_attack("[key_name_admin(user)] primed \a [src]")
+	user.visible_message("[user] starts priming \the [src.name].", "You start priming \the [src.name]. Hold still!")
+	if(do_after(user, 10 SECONDS))
+		playsound(loc, 'sound/weapons/armbomb.ogg', 75, 1, -3)
+		prime(user)
+	else
+		visible_message("[user] triggers \the [src.name]!", "You accidentally trigger \the [src.name]!")
+		prime(user, TRUE)
+	return
 
-/obj/effect/mine/pickup/speed/mineEffect(mob/living/carbon/victim)
-	if(!victim.client || !istype(victim))
-		return
-	to_chat(victim, "<span class='notice'>You feel fast!</span>")
-	victim.add_movespeed_modifier(MOVESPEED_ID_YELLOW_ORB, update=TRUE, priority=100, multiplicative_slowdown=-2, blacklisted_movetypes=(FLYING|FLOATING))
-	sleep(duration)
-	victim.remove_movespeed_modifier(MOVESPEED_ID_YELLOW_ORB)
-	to_chat(victim, "<span class='notice'>You slow down.</span>")
+/obj/item/weapon/mine/proc/prime(mob/user as mob, var/explode_now = FALSE)
+	visible_message("\The [src.name] beeps as the priming sequence completes.")
+	var/obj/effect/mine/R = new minetype(get_turf(src))
+	src.transfer_fingerprints_to(R)
+	R.add_fingerprint(user)
+	if(explode_now)
+		R.explode(user)
+	spawn(0)
+		qdel(src)
+
+/obj/item/weapon/mine/dnascramble
+	name = "radiation mine"
+	desc = "A small explosive mine with a radiation symbol on the side."
+	minetype = /obj/effect/mine/dnascramble
+
+/obj/item/weapon/mine/phoron
+	name = "incendiary mine"
+	desc = "A small explosive mine with a fire symbol on the side."
+	minetype = /obj/effect/mine/phoron
+
+/obj/item/weapon/mine/kick
+	name = "kick mine"
+	desc = "Concentrated war crimes. Handle with care."
+	minetype = /obj/effect/mine/kick
+
+/obj/item/weapon/mine/n2o
+	name = "nitrous oxide mine"
+	desc = "A small explosive mine with three Z's on the side."
+	minetype = /obj/effect/mine/n2o
+
+/obj/item/weapon/mine/stun
+	name = "stun mine"
+	desc = "A small explosive mine with a lightning bolt symbol on the side."
+	minetype = /obj/effect/mine/stun
+
+/obj/item/weapon/mine/frag
+	name = "fragmentation mine"
+	desc = "A small explosive mine with 'FRAG' and a grenade symbol on the side."
+	minetype = /obj/effect/mine/frag
+
+/obj/item/weapon/mine/training
+	name = "training mine"
+	desc = "A mine with its payload removed, for EOD training and demonstrations."
+	minetype = /obj/effect/mine/training
+
+/obj/item/weapon/mine/emp
+	name = "emp mine"
+	desc = "A small explosive mine with a lightning bolt symbol on the side."
+	minetype = /obj/effect/mine/emp
+
+/obj/item/weapon/mine/incendiary
+	name = "incendiary mine"
+	desc = "A small explosive mine with a fire symbol on the side."
+	minetype = /obj/effect/mine/incendiary
+
+// This tells AI mobs to not be dumb and step on mines willingly.
+/obj/item/weapon/mine/is_safe_to_step(mob/living/L)
+	if(!L.hovering)
+		return FALSE
+	return ..()

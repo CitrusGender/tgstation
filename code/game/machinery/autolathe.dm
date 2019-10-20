@@ -1,444 +1,326 @@
-#define AUTOLATHE_MAIN_MENU		1
-#define AUTOLATHE_CATEGORY_MENU	2
-#define AUTOLATHE_SEARCH_MENU	3
-
 /obj/machinery/autolathe
 	name = "autolathe"
 	desc = "It produces items using metal and glass."
+	icon = 'icons/obj/stationobjs_vr.dmi'
 	icon_state = "autolathe"
-	density = TRUE
-	use_power = IDLE_POWER_USE
+	density = 1
+	anchored = 1
+	use_power = 1
 	idle_power_usage = 10
-	active_power_usage = 100
-	circuit = /obj/item/circuitboard/machine/autolathe
-	layer = BELOW_OBJ_LAYER
+	active_power_usage = 2000
+	circuit = /obj/item/weapon/circuitboard/autolathe
+	var/datum/category_collection/autolathe/machine_recipes
+	var/list/stored_material =  list(DEFAULT_WALL_MATERIAL = 0, "glass" = 0)
+	var/list/storage_capacity = list(DEFAULT_WALL_MATERIAL = 0, "glass" = 0)
+	var/datum/category_group/autolathe/current_category
 
-	var/operating = FALSE
-	var/list/L = list()
-	var/list/LL = list()
-	var/hacked = FALSE
+	var/hacked = 0
 	var/disabled = 0
-	var/shocked = FALSE
-	var/hack_wire
-	var/disable_wire
-	var/shock_wire
+	var/shocked = 0
+	var/busy = 0
 
-	var/busy = FALSE
-	var/prod_coeff = 1
+	var/mat_efficiency = 1
+	var/build_time = 50
 
-	var/datum/design/being_built
-	var/datum/techweb/stored_research
-	var/list/datum/design/matching_designs
-	var/selected_category
-	var/screen = 1
-	var/base_price = 25
-	var/hacked_price = 50
+	var/datum/wires/autolathe/wires = null
 
-	var/list/categories = list(
-							"Tools",
-							"Electronics",
-							"Construction",
-							"T-Comm",
-							"Security",
-							"Machinery",
-							"Medical",
-							"Misc",
-							"Dinnerware",
-							"Imported"
-							)
-
-/obj/machinery/autolathe/Initialize()
-	AddComponent(/datum/component/material_container,
-	list(/datum/material/iron,
-	/datum/material/glass,
-	/datum/material/gold,
-	/datum/material/silver,
-	/datum/material/diamond,
-	/datum/material/uranium,
-	/datum/material/plasma,
-	/datum/material/bluespace,
-	/datum/material/bananium,
-	/datum/material/titanium,
-	/datum/material/runite,
-	/datum/material/plastic,
-	/datum/material/adamantine,
-	/datum/material/mythril
-	), 0, TRUE, null, null, CALLBACK(src, .proc/AfterMaterialInsert))
-	. = ..()
-
-	wires = new /datum/wires/autolathe(src)
-	stored_research = new /datum/techweb/specialized/autounlocking/autolathe
-	matching_designs = list()
+/obj/machinery/autolathe/New()
+	..()
+	wires = new(src)
+	component_parts = list()
+	component_parts += new /obj/item/weapon/stock_parts/matter_bin(src)
+	component_parts += new /obj/item/weapon/stock_parts/matter_bin(src)
+	component_parts += new /obj/item/weapon/stock_parts/matter_bin(src)
+	component_parts += new /obj/item/weapon/stock_parts/manipulator(src)
+	component_parts += new /obj/item/weapon/stock_parts/console_screen(src)
+	RefreshParts()
 
 /obj/machinery/autolathe/Destroy()
-	QDEL_NULL(wires)
+	qdel(wires)
+	wires = null
 	return ..()
 
-/obj/machinery/autolathe/ui_interact(mob/user)
-	. = ..()
-	if(!is_operational())
+/obj/machinery/autolathe/proc/update_recipe_list()
+	if(!machine_recipes)
+		if(!autolathe_recipes)
+			autolathe_recipes = new()
+		machine_recipes = autolathe_recipes
+		current_category = machine_recipes.categories[1]
+
+/obj/machinery/autolathe/interact(mob/user as mob)
+	update_recipe_list()
+
+	if(..() || (disabled && !panel_open))
+		to_chat(user, "<span class='danger'>\The [src] is disabled!</span>")
 		return
 
-	if(shocked && !(stat & NOPOWER))
-		shock(user,50)
+	if(shocked)
+		shock(user, 50)
+	var/list/dat = list()
+	dat += "<center><h1>Autolathe Control Panel</h1><hr/>"
 
-	var/dat
+	if(!disabled)
+		dat += "<table width = '100%'>"
+		var/list/material_top = list("<tr>")
+		var/list/material_bottom = list("<tr>")
 
-	switch(screen)
-		if(AUTOLATHE_MAIN_MENU)
-			dat = main_win(user)
-		if(AUTOLATHE_CATEGORY_MENU)
-			dat = category_win(user,selected_category)
-		if(AUTOLATHE_SEARCH_MENU)
-			dat = search_win(user)
+		for(var/material in stored_material)
+			material_top += "<td width = '25%' align = center><b>[material]</b></td>"
+			material_bottom += "<td width = '25%' align = center>[stored_material[material]]<b>/[storage_capacity[material]]</b></td>"
 
-	var/datum/browser/popup = new(user, "autolathe", name, 400, 500)
-	popup.set_content(dat)
-	popup.open()
+		dat += "[material_top.Join()]</tr>[material_bottom.Join()]</tr></table><hr>"
+		dat += "<h2>Printable Designs</h2><h3>Showing: <a href='?src=\ref[src];change_category=1'>[current_category]</a>.</h3></center><table width = '100%'>"
 
-/obj/machinery/autolathe/on_deconstruction()
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	materials.retrieve_all()
+		for(var/datum/category_item/autolathe/R in current_category.items)
+			if(R.hidden && !hacked)
+				continue
+			var/can_make = 1
+			var/list/material_string = list()
+			var/list/multiplier_string = list()
+			var/max_sheets
+			var/comma
+			if(!R.resources || !R.resources.len)
+				material_string += "No resources required.</td>"
+			else
+				//Make sure it's buildable and list requires resources.
+				for(var/material in R.resources)
+					var/coeff = (R.no_scale ? 1 : mat_efficiency) //stacks are unaffected by production coefficient
+					var/sheets = round(stored_material[material]/round(R.resources[material]*coeff))
+					if(isnull(max_sheets) || max_sheets > sheets)
+						max_sheets = sheets
+					if(!isnull(stored_material[material]) && stored_material[material] < round(R.resources[material]*coeff))
+						can_make = 0
+					if(!comma)
+						comma = 1
+					else
+						material_string += ", "
+					material_string += "[round(R.resources[material] * coeff)] [material]"
+				material_string += ".<br></td>"
+				//Build list of multipliers for sheets.
+				if(R.is_stack)
+					if(max_sheets && max_sheets > 0)
+						max_sheets = min(max_sheets, R.max_stack) // Limit to the max allowed by stack type.
+						multiplier_string += "<br>"
+						for(var/i = 5;i<max_sheets;i*=2) //5,10,20,40...
+							multiplier_string  += "<a href='?src=\ref[src];make=\ref[R];multiplier=[i]'>\[x[i]\]</a>"
+						multiplier_string += "<a href='?src=\ref[src];make=\ref[R];multiplier=[max_sheets]'>\[x[max_sheets]\]</a>"
 
-/obj/machinery/autolathe/attackby(obj/item/O, mob/user, params)
-	if (busy)
-		to_chat(user, "<span class=\"alert\">The autolathe is busy. Please wait for completion of previous operation.</span>")
-		return TRUE
+			dat += "<tr><td width = 180>[R.hidden ? "<font color = 'red'>*</font>" : ""]<b>[can_make ? "<a href='?src=\ref[src];make=\ref[R];multiplier=1'>" : ""][R.name][can_make ? "</a>" : ""]</b>[R.hidden ? "<font color = 'red'>*</font>" : ""][multiplier_string.Join()]</td><td align = right>[material_string.Join()]</tr>"
 
-	if(default_deconstruction_screwdriver(user, "autolathe_t", "autolathe", O))
+		dat += "</table><hr>"
+	//Hacking.
+	if(panel_open)
+		dat += "<h2>Maintenance Panel</h2>"
+		dat += wires.GetInteractWindow()
+
+		dat += "<hr>"
+
+	user << browse(dat.Join(), "window=autolathe")
+	onclose(user, "autolathe")
+
+/obj/machinery/autolathe/attackby(var/obj/item/O as obj, var/mob/user as mob)
+	if(busy)
+		to_chat(user, "<span class='notice'>\The [src] is busy. Please wait for completion of previous operation.</span>")
+		return
+
+	if(default_deconstruction_screwdriver(user, O))
 		updateUsrDialog()
-		return TRUE
-
-	if(default_deconstruction_crowbar(O))
-		return TRUE
-
-	if(panel_open && is_wire_tool(O))
-		wires.interact(user)
-		return TRUE
-
-	if(user.a_intent == INTENT_HARM) //so we can hit the machine
-		return ..()
+		return
+	if(default_deconstruction_crowbar(user, O))
+		return
+	if(default_part_replacement(user, O))
+		return
 
 	if(stat)
-		return TRUE
+		return
 
-	if(istype(O, /obj/item/disk/design_disk))
-		user.visible_message("<span class='notice'>[user] begins to load \the [O] in \the [src]...</span>",
-			"<span class='notice'>You begin to load a design from \the [O]...</span>",
-			"<span class='hear'>You hear the chatter of a floppy drive.</span>")
-		busy = TRUE
-		var/obj/item/disk/design_disk/D = O
-		if(do_after(user, 14.4, target = src))
-			for(var/B in D.blueprints)
-				if(B)
-					stored_research.add_design(B)
-		busy = FALSE
-		return TRUE
+	if(panel_open)
+		//Don't eat multitools or wirecutters used on an open lathe.
+		if(istype(O, /obj/item/device/multitool) || O.is_wirecutter())
+			attack_hand(user)
+			return
 
-	return ..()
+	if(O.loc != user && !(istype(O,/obj/item/stack)))
+		return 0
 
+	if(is_robot_module(O))
+		return 0
 
-/obj/machinery/autolathe/proc/AfterMaterialInsert(item_inserted, id_inserted, amount_inserted)
-	if(istype(item_inserted, /obj/item/stack/ore/bluespace_crystal))
-		use_power(MINERAL_MATERIAL_AMOUNT / 10)
-	else if(custom_materials && custom_materials.len && custom_materials[getmaterialref(/datum/material/glass)])
-		flick("autolathe_r",src)//plays glass insertion animation by default otherwise
+	if(istype(O,/obj/item/ammo_magazine/clip) || istype(O,/obj/item/ammo_magazine/s357) || istype(O,/obj/item/ammo_magazine/s38) || istype (O,/obj/item/ammo_magazine/s44)/* VOREstation Edit*/) // Prevents ammo recycling exploit with speedloaders.
+		to_chat(user, "\The [O] is too hazardous to recycle with the autolathe!")
+		return
+		/*  ToDo: Make this actually check for ammo and change the value of the magazine if it's empty. -Spades
+		var/obj/item/ammo_magazine/speedloader = O
+		if(speedloader.stored_ammo)
+			to_chat(user, "\The [speedloader] is too hazardous to put back into the autolathe while there's ammunition inside of it!")
+			return
+		else
+			speedloader.matter = list(DEFAULT_WALL_MATERIAL = 75) // It's just a hunk of scrap metal now.
+	if(istype(O,/obj/item/ammo_magazine)) // This was just for immersion consistency with above.
+		var/obj/item/ammo_magazine/mag = O
+		if(mag.stored_ammo)
+			to_chat(user, "\The [mag] is too hazardous to put back into the autolathe while there's ammunition inside of it!")
+			return*/
+
+	//Resources are being loaded.
+	var/obj/item/eating = O
+	if(!eating.matter)
+		to_chat(user, "\The [eating] does not contain significant amounts of useful materials and cannot be accepted.")
+		return
+
+	var/filltype = 0       // Used to determine message.
+	var/total_used = 0     // Amount of material used.
+	var/mass_per_sheet = 0 // Amount of material constituting one sheet.
+
+	for(var/material in eating.matter)
+
+		if(isnull(stored_material[material]) || isnull(storage_capacity[material]))
+			continue
+
+		if(stored_material[material] >= storage_capacity[material])
+			continue
+
+		var/total_material = eating.matter[material]
+
+		//If it's a stack, we eat multiple sheets.
+		if(istype(eating,/obj/item/stack))
+			var/obj/item/stack/stack = eating
+			total_material *= stack.get_amount()
+
+		if(stored_material[material] + total_material > storage_capacity[material])
+			total_material = storage_capacity[material] - stored_material[material]
+			filltype = 1
+		else
+			filltype = 2
+
+		stored_material[material] += total_material
+		total_used += total_material
+		mass_per_sheet += eating.matter[material]
+
+	if(!filltype)
+		to_chat(user, "<span class='notice'>\The [src] is full. Please remove material from the autolathe in order to insert more.</span>")
+		return
+	else if(filltype == 1)
+		to_chat(user, "You fill \the [src] to capacity with \the [eating].")
 	else
-		flick("autolathe_o",src)//plays metal insertion animation
-			
-				
-		use_power(min(1000, amount_inserted / 100))
+		to_chat(user, "You fill \the [src] with \the [eating].")
+
+	flick("autolathe_o", src) // Plays metal insertion animation. Work out a good way to work out a fitting animation. ~Z
+
+	if(istype(eating,/obj/item/stack))
+		var/obj/item/stack/stack = eating
+		stack.use(max(1, round(total_used/mass_per_sheet))) // Always use at least 1 to prevent infinite materials.
+	else
+		user.remove_from_mob(O)
+		qdel(O)
+
 	updateUsrDialog()
+	return
+
+/obj/machinery/autolathe/attack_hand(mob/user as mob)
+	user.set_machine(src)
+	interact(user)
 
 /obj/machinery/autolathe/Topic(href, href_list)
 	if(..())
 		return
-	if (!busy)
-		if(href_list["menu"])
-			screen = text2num(href_list["menu"])
-			updateUsrDialog()
 
-		if(href_list["category"])
-			selected_category = href_list["category"]
-			updateUsrDialog()
+	usr.set_machine(src)
+	add_fingerprint(usr)
 
-		if(href_list["make"])
+	if(busy)
+		to_chat(usr, "<span class='notice'>The autolathe is busy. Please wait for completion of previous operation.</span>")
+		return
 
-			/////////////////
-			//href protection
-			being_built = stored_research.isDesignResearchedID(href_list["make"])
-			if(!being_built)
-				return
+	if(href_list["change_category"])
 
-			var/multiplier = text2num(href_list["multiplier"])
-			var/is_stack = ispath(being_built.build_path, /obj/item/stack)
-			multiplier = CLAMP(multiplier,1,50)
+		var/choice = input("Which category do you wish to display?") as null|anything in machine_recipes.categories
+		if(!choice) return
+		current_category = choice
 
-			/////////////////
+	if(href_list["make"] && machine_recipes)
+		var/multiplier = text2num(href_list["multiplier"])
+		var/datum/category_item/autolathe/making = locate(href_list["make"]) in current_category.items
 
-			var/coeff = (is_stack ? 1 : prod_coeff) //stacks are unaffected by production coefficient
-			var/total_amount = 0
+		//Exploit detection, not sure if necessary after rewrite.
+		if(!making || multiplier < 0 || multiplier > 100)
+			var/turf/exploit_loc = get_turf(usr)
+			message_admins("[key_name_admin(usr)] tried to exploit an autolathe to duplicate an item! ([exploit_loc ? "<a href='?_src_=holder;adminplayerobservecoodjump=1;X=[exploit_loc.x];Y=[exploit_loc.y];Z=[exploit_loc.z]'>JMP</a>" : "null"])", 0)
+			log_admin("EXPLOIT : [key_name(usr)] tried to exploit an autolathe to duplicate an item!")
+			return
 
-			for(var/MAT in being_built.materials)
-				total_amount += being_built.materials[MAT]
+		busy = 1
+		update_use_power(2)
 
-			var/power = max(2000, (total_amount)*multiplier/5) //Change this to use all materials
+		//Check if we still have the materials.
+		var/coeff = (making.no_scale ? 1 : mat_efficiency) //stacks are unaffected by production coefficient
+		for(var/material in making.resources)
+			if(!isnull(stored_material[material]))
+				if(stored_material[material] < round(making.resources[material] * coeff) * multiplier)
+					return
 
-			var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
+		//Consume materials.
+		for(var/material in making.resources)
+			if(!isnull(stored_material[material]))
+				stored_material[material] = max(0, stored_material[material] - round(making.resources[material] * coeff) * multiplier)
 
-			var/list/materials_used = list()
-			var/list/custom_materials = list() //These will apply their material effect, This should usually only be one.
+		update_icon() // So lid closes
 
-			for(var/MAT in being_built.materials)
-				var/datum/material/used_material = MAT
-				var/amount_needed = being_built.materials[MAT] * coeff * multiplier
-				if(istext(used_material)) //This means its a category
-					var/list/list_to_show = list()
-					for(var/i in SSmaterials.materials_by_category[used_material])
-						if(materials.materials[i] > 0)
-							list_to_show += i
+		sleep(build_time)
 
-					used_material = input("Choose [used_material]", "Custom Material") as null|anything in list_to_show
-					if(!used_material)
-						return //Didn't pick any material, so you can't build shit either.
-					custom_materials[used_material] += amount_needed
+		busy = 0
+		update_use_power(1)
+		update_icon() // So lid opens
 
-				materials_used[used_material] = amount_needed
+		//Sanity check.
+		if(!making || !src) return
 
-			if(materials.has_materials(materials_used))
-				busy = TRUE
-				use_power(power)
-				icon_state = "autolathe_n"
-				var/time = is_stack ? 32 : (32 * coeff * multiplier) ** 0.8
-				addtimer(CALLBACK(src, .proc/make_item, power, materials_used, custom_materials, multiplier, coeff, is_stack), time)
+		//Create the desired item.
+		var/obj/item/I = new making.path(src.loc)
+		if(multiplier > 1)
+			if(istype(I, /obj/item/stack))
+				var/obj/item/stack/S = I
+				S.amount = multiplier
 			else
-				to_chat(usr, "<span class=\"alert\">Not enough materials for this operation.</span>")
-
-		if(href_list["search"])
-			matching_designs.Cut()
-
-			for(var/v in stored_research.researched_designs)
-				var/datum/design/D = SSresearch.techweb_design_by_id(v)
-				if(findtext(D.name,href_list["to_search"]))
-					matching_designs.Add(D)
-			updateUsrDialog()
-	else
-		to_chat(usr, "<span class=\"alert\">The autolathe is busy. Please wait for completion of previous operation.</span>")
+				for(multiplier; multiplier > 1; --multiplier) // Create multiple items if it's not a stack.
+					new making.path(src.loc)
 
 	updateUsrDialog()
 
-	return
-
-/obj/machinery/autolathe/proc/make_item(power, list/materials_used, list/picked_materials, multiplier, coeff, is_stack)
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	var/atom/A = drop_location()
-	use_power(power)
-
-	materials.use_materials(materials_used)
-
-	if(is_stack)
-		var/obj/item/stack/N = new being_built.build_path(A, multiplier)
-		N.update_icon()
-		N.autolathe_crafted(src)
+/obj/machinery/autolathe/update_icon()
+	if(panel_open)
+		icon_state = "autolathe_t"
+	else if(busy)
+		icon_state = "autolathe_n"
 	else
-		for(var/i=1, i<=multiplier, i++)
-			var/obj/item/new_item = new being_built.build_path(A)
-			new_item.autolathe_crafted(src)
+		if(icon_state == "autolathe_n")
+			flick("autolathe_u", src) // If lid WAS closed, show opening animation
+		icon_state = "autolathe"
 
-			if(length(picked_materials))
-				new_item.set_custom_materials(picked_materials, 1 / multiplier) //Ensure we get the non multiplied amount
-
-
-	icon_state = "autolathe"
-	busy = FALSE
-	updateDialog()
-
+//Updates overall lathe storage size.
 /obj/machinery/autolathe/RefreshParts()
-	var/T = 0
-	for(var/obj/item/stock_parts/matter_bin/MB in component_parts)
-		T += MB.rating*75000
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	materials.max_amount = T
-	T=1.2
-	for(var/obj/item/stock_parts/manipulator/M in component_parts)
-		T -= M.rating*0.2
-	prod_coeff = min(1,max(0,T)) // Coeff going 1 -> 0,8 -> 0,6 -> 0,4
+	..()
+	var/mb_rating = 0
+	var/man_rating = 0
+	for(var/obj/item/weapon/stock_parts/matter_bin/MB in component_parts)
+		mb_rating += MB.rating
+	for(var/obj/item/weapon/stock_parts/manipulator/M in component_parts)
+		man_rating += M.rating
 
-/obj/machinery/autolathe/examine(mob/user)
-	. += ..()
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	if(in_range(user, src) || isobserver(user))
-		. += "<span class='notice'>The status display reads: Storing up to <b>[materials.max_amount]</b> material units.<br>Material consumption at <b>[prod_coeff*100]%</b>.</span>"
+	storage_capacity[DEFAULT_WALL_MATERIAL] = mb_rating  * 25000
+	storage_capacity["glass"] = mb_rating  * 12500
+	build_time = 50 / man_rating
+	mat_efficiency = 1.1 - man_rating * 0.1// Normally, price is 1.25 the amount of material, so this shouldn't go higher than 0.6. Maximum rating of parts is 5
 
-/obj/machinery/autolathe/proc/main_win(mob/user)
-	var/dat = "<div class='statusDisplay'><h3>Autolathe Menu:</h3><br>"
-	dat += materials_printout()
-
-	dat += "<form name='search' action='?src=[REF(src)]'>\
-	<input type='hidden' name='src' value='[REF(src)]'>\
-	<input type='hidden' name='search' value='to_search'>\
-	<input type='hidden' name='menu' value='[AUTOLATHE_SEARCH_MENU]'>\
-	<input type='text' name='to_search'>\
-	<input type='submit' value='Search'>\
-	</form><hr>"
-
-	var/line_length = 1
-	dat += "<table style='width:100%' align='center'><tr>"
-
-	for(var/C in categories)
-		if(line_length > 2)
-			dat += "</tr><tr>"
-			line_length = 1
-
-		dat += "<td><A href='?src=[REF(src)];category=[C];menu=[AUTOLATHE_CATEGORY_MENU]'>[C]</A></td>"
-		line_length++
-
-	dat += "</tr></table></div>"
-	return dat
-
-/obj/machinery/autolathe/proc/category_win(mob/user,selected_category)
-	var/dat = "<A href='?src=[REF(src)];menu=[AUTOLATHE_MAIN_MENU]'>Return to main menu</A>"
-	dat += "<div class='statusDisplay'><h3>Browsing [selected_category]:</h3><br>"
-	dat += materials_printout()
-
-	for(var/v in stored_research.researched_designs)
-		var/datum/design/D = SSresearch.techweb_design_by_id(v)
-		if(!(selected_category in D.category))
+/obj/machinery/autolathe/dismantle()
+	for(var/mat in stored_material)
+		var/material/M = get_material_by_name(mat)
+		if(!istype(M))
 			continue
-
-		if(disabled || !can_build(D))
-			dat += "<span class='linkOff'>[D.name]</span>"
+		var/obj/item/stack/material/S = new M.stack_type(get_turf(src))
+		if(stored_material[mat] > S.perunit)
+			S.amount = round(stored_material[mat] / S.perunit)
 		else
-			dat += "<a href='?src=[REF(src)];make=[D.id];multiplier=1'>[D.name]</a>"
-
-		if(ispath(D.build_path, /obj/item/stack))
-			var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-			var/max_multiplier
-			for(var/datum/material/mat in D.materials)
-				max_multiplier = min(D.maxstack, round(materials.get_material_amount(mat)/D.materials[mat]))
-			if (max_multiplier>10 && !disabled)
-				dat += " <a href='?src=[REF(src)];make=[D.id];multiplier=10'>x10</a>"
-			if (max_multiplier>25 && !disabled)
-				dat += " <a href='?src=[REF(src)];make=[D.id];multiplier=25'>x25</a>"
-			if(max_multiplier > 0 && !disabled)
-				dat += " <a href='?src=[REF(src)];make=[D.id];multiplier=[max_multiplier]'>x[max_multiplier]</a>"
-		else
-			if(!disabled && can_build(D, 5))
-				dat += " <a href='?src=[REF(src)];make=[D.id];multiplier=5'>x5</a>"
-			if(!disabled && can_build(D, 10))
-				dat += " <a href='?src=[REF(src)];make=[D.id];multiplier=10'>x10</a>"
-
-		dat += "[get_design_cost(D)]<br>"
-
-	dat += "</div>"
-	return dat
-
-/obj/machinery/autolathe/proc/search_win(mob/user)
-	var/dat = "<A href='?src=[REF(src)];menu=[AUTOLATHE_MAIN_MENU]'>Return to main menu</A>"
-	dat += "<div class='statusDisplay'><h3>Search results:</h3><br>"
-	dat += materials_printout()
-
-	for(var/v in matching_designs)
-		var/datum/design/D = v
-		if(disabled || !can_build(D))
-			dat += "<span class='linkOff'>[D.name]</span>"
-		else
-			dat += "<a href='?src=[REF(src)];make=[D.id];multiplier=1'>[D.name]</a>"
-
-		if(ispath(D.build_path, /obj/item/stack))
-			var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-			var/max_multiplier
-			for(var/datum/material/mat in D.materials)
-				max_multiplier = min(D.maxstack, round(materials.get_material_amount(mat)/D.materials[mat]))
-			if (max_multiplier>10 && !disabled)
-				dat += " <a href='?src=[REF(src)];make=[D.id];multiplier=10'>x10</a>"
-			if (max_multiplier>25 && !disabled)
-				dat += " <a href='?src=[REF(src)];make=[D.id];multiplier=25'>x25</a>"
-			if(max_multiplier > 0 && !disabled)
-				dat += " <a href='?src=[REF(src)];make=[D.id];multiplier=[max_multiplier]'>x[max_multiplier]</a>"
-
-		dat += "[get_design_cost(D)]<br>"
-
-	dat += "</div>"
-	return dat
-
-/obj/machinery/autolathe/proc/materials_printout()
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	var/dat = "<b>Total amount:</b> [materials.total_amount] / [materials.max_amount] cm<sup>3</sup><br>"
-	for(var/mat_id in materials.materials)
-		var/datum/material/M = mat_id
-		var/mineral_amount = materials.materials[mat_id]
-		if(mineral_amount > 0)
-			dat += "<b>[M.name] amount:</b> [mineral_amount] cm<sup>3</sup><br>"
-	return dat
-
-/obj/machinery/autolathe/proc/can_build(datum/design/D, amount = 1)
-	if(D.make_reagents.len)
-		return FALSE
-
-	var/coeff = (ispath(D.build_path, /obj/item/stack) ? 1 : prod_coeff)
-
-	var/list/required_materials = list()
-
-	for(var/i in D.materials)
-		required_materials[i] = D.materials[i] * coeff * amount
-
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-
-	return materials.has_materials(required_materials)
-
-
-/obj/machinery/autolathe/proc/get_design_cost(datum/design/D)
-	var/coeff = (ispath(D.build_path, /obj/item/stack) ? 1 : prod_coeff)
-	var/dat
-	for(var/i in D.materials)
-		if(istext(i)) //Category handling
-			dat += "[D.materials[i] * coeff] [i]"
-		else
-			var/datum/material/M = i
-			dat += "[D.materials[i] * coeff] [M.name] "
-	return dat
-
-/obj/machinery/autolathe/proc/reset(wire)
-	switch(wire)
-		if(WIRE_HACK)
-			if(!wires.is_cut(wire))
-				adjust_hacked(FALSE)
-		if(WIRE_SHOCK)
-			if(!wires.is_cut(wire))
-				shocked = FALSE
-		if(WIRE_DISABLE)
-			if(!wires.is_cut(wire))
-				disabled = FALSE
-
-/obj/machinery/autolathe/proc/shock(mob/user, prb)
-	if(stat & (BROKEN|NOPOWER))		// unpowered, no shock
-		return FALSE
-	if(!prob(prb))
-		return FALSE
-	var/datum/effect_system/spark_spread/s = new /datum/effect_system/spark_spread
-	s.set_up(5, 1, src)
-	s.start()
-	if (electrocute_mob(user, get_area(src), src, 0.7, TRUE))
-		return TRUE
-	else
-		return FALSE
-
-/obj/machinery/autolathe/proc/adjust_hacked(state)
-	hacked = state
-	for(var/id in SSresearch.techweb_designs)
-		var/datum/design/D = SSresearch.techweb_design_by_id(id)
-		if((D.build_type & AUTOLATHE) && ("hacked" in D.category))
-			if(hacked)
-				stored_research.add_design(D)
-			else
-				stored_research.remove_design(D)
-
-/obj/machinery/autolathe/hacked/Initialize()
-	. = ..()
-	adjust_hacked(TRUE)
-
-//Called when the object is constructed by an autolathe
-//Has a reference to the autolathe so you can do !!FUN!! things with hacked lathes
-/obj/item/proc/autolathe_crafted(obj/machinery/autolathe/A)
-	return
+			qdel(S)
+	..()
+	return 1

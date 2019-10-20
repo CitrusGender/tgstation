@@ -4,7 +4,7 @@
 	//set src in world
 	var/static/cookieoffset = rand(1, 9999) //to force cookies to reset after the round.
 
-	if(!usr.client || !usr.client.holder)		//This is usr because admins can call the proc on other clients, even if they're not admins, to show them VVs.
+	if(!usr.client || !usr.client.holder) //The usr vs src abuse in this proc is intentional and must not be changed
 		to_chat(usr, "<span class='danger'>You need to be an administrator to access this.</span>")
 		return
 
@@ -12,80 +12,89 @@
 		return
 
 	var/islist = islist(D)
-	if(!islist && !istype(D))
+	if (!islist && !istype(D))
 		return
 
 	var/title = ""
-	var/refid = REF(D)
+	var/refid = "\ref[D]"
 	var/icon/sprite
 	var/hash
 
-	var/type = islist? /list : D.type
-	var/no_icon = FALSE
+	var/type = /list
+	if (!islist)
+		type = D.type
 
 	if(istype(D, /atom))
-		sprite = getFlatIcon(D)
-		if(sprite)
-			hash = md5(sprite)
+		var/atom/AT = D
+		if(AT.icon && AT.icon_state)
+			sprite = new /icon(AT.icon, AT.icon_state)
+			hash = md5(AT.icon)
+			hash = md5(hash + AT.icon_state)
 			src << browse_rsc(sprite, "vv[hash].png")
-		else
-			no_icon = TRUE
 
-	title = "[D] ([REF(D)]) = [type]"
+	title = "[D] (\ref[D]) = [type]"
 	var/formatted_type = replacetext("[type]", "/", "<wbr>/")
 
 	var/sprite_text
 	if(sprite)
-		sprite_text = no_icon? "\[NO ICON\]" : "<img src='vv[hash].png'></td><td>"
+		sprite_text = "<img src='vv[hash].png'></td><td>"
 	var/list/header = islist(D)? list("<b>/list</b>") : D.vv_get_header()
 
-	var/marked_line
+	var/marked
 	if(holder && holder.marked_datum && holder.marked_datum == D)
-		marked_line = VV_MSG_MARKED
-	var/varedited_line
+		marked = VV_MSG_MARKED
+	var/varedited_line = ""
 	if(!islist && (D.datum_flags & DF_VAR_EDITED))
 		varedited_line = VV_MSG_EDITED
 	var/deleted_line
 	if(!islist && D.gc_destroyed)
 		deleted_line = VV_MSG_DELETED
 
-	var/list/dropdownoptions
+	var/list/dropdownoptions = list()
+	var/autoconvert_dropdown = FALSE
 	if (islist)
 		dropdownoptions = list(
 			"---",
-			"Add Item" = VV_HREF_TARGETREF_INTERNAL(refid, VV_HK_LIST_ADD),
-			"Remove Nulls" = VV_HREF_TARGETREF_INTERNAL(refid, VV_HK_LIST_ERASE_NULLS),
-			"Remove Dupes" = VV_HREF_TARGETREF_INTERNAL(refid, VV_HK_LIST_ERASE_DUPES),
-			"Set len" = VV_HREF_TARGETREF_INTERNAL(refid, VV_HK_LIST_SET_LENGTH),
-			"Shuffle" = VV_HREF_TARGETREF_INTERNAL(refid, VV_HK_LIST_SHUFFLE),
-			"Show VV To Player" = VV_HREF_TARGETREF_INTERNAL(refid, VV_HK_EXPOSE),
-			"---"
+			"Add Item" = "?_src_=vars;listadd=[refid]",
+			"Remove Nulls" = "?_src_=vars;listnulls=[refid]",
+			"Remove Dupes" = "?_src_=vars;listdupes=[refid]",
+			"Set len" = "?_src_=vars;listlen=[refid]",
+			"Shuffle" = "?_src_=vars;listshuffle=[refid]",
+			"Show VV To Player" = "?_src_=vars;expose=[refid]"
 			)
-		for(var/i in 1 to length(dropdownoptions))
-			var/name = dropdownoptions[i]
-			var/link = dropdownoptions[name]
-			dropdownoptions[i] = "<option value[link? "='[link]'":""]>[name]</option>"
+		autoconvert_dropdown = TRUE
 	else
 		dropdownoptions = D.vv_get_dropdown()
+	var/list/dropdownoptions_html = list()
+	if(autoconvert_dropdown)
+		for (var/name in dropdownoptions)
+			var/link = dropdownoptions[name]
+			if (link)
+				dropdownoptions_html += "<option value='[link]'>[name]</option>"
+			else
+				dropdownoptions_html += "<option value>[name]</option>"
+	else
+		dropdownoptions_html = dropdownoptions + D.get_view_variables_options()
 
 	var/list/names = list()
-	if(!islist)
-		for(var/V in D.vars)
+	if (!islist)
+		for (var/V in D.vars)
 			names += V
-	sleep(1)
+	sleep(1)//For some reason, without this sleep, VVing will cause client to disconnect on certain objects.
 
 	var/list/variable_html = list()
-	if(islist)
+	if (islist)
 		var/list/L = D
-		for(var/i in 1 to L.len)
+		for (var/i in 1 to L.len)
 			var/key = L[i]
 			var/value
-			if(IS_NORMAL_LIST(L) && IS_VALID_ASSOC_KEY(key))
+			if (IS_NORMAL_LIST(L) && !isnum(key))
 				value = L[key]
-			variable_html += debug_variable(i, value, 0, L)
+			variable_html += debug_variable(i, value, 0, D)
 	else
+
 		names = sortList(names)
-		for(var/V in names)
+		for (var/V in names)
 			if(D.can_vv_get(V))
 				variable_html += D.vv_get_var(V)
 
@@ -216,7 +225,7 @@
 						</table>
 						<div align='center'>
 							<b><font size='1'>[formatted_type]</font></b>
-							<span id='marked'>[marked_line]</span>
+							<span id='marked'>[marked]</span>
 							<span id='varedited'>[varedited_line]</span>
 							<span id='deleted'>[deleted_line]</span>
 						</div>
@@ -224,13 +233,13 @@
 					<td width='50%'>
 						<div align='center'>
 							<a id='refresh_link' href='?_src_=vars;
-datumrefresh=[refid];[HrefToken()]'>Refresh</a>
+datumrefresh=[refid]'>Refresh</a>
 							<form>
 								<select name="file" size="1"
 									onchange="handle_dropdown(this)"
 									onmouseclick="this.focus()">
 									<option value selected>Select option</option>
-									[dropdownoptions.Join()]
+									[dropdownoptions_html.Join()]
 								</select>
 							</form>
 						</div>
@@ -272,4 +281,4 @@ datumrefresh=[refid];[HrefToken()]'>Refresh</a>
 	src << browse(html, "window=variables[refid];size=475x650")
 
 /client/proc/vv_update_display(datum/D, span, content)
-	src << output("[span]:[content]", "variables[REF(D)].browser:replace_span")
+	src << output("[span]:[content]", "variables\ref[D].browser:replace_span")

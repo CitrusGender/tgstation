@@ -1,41 +1,26 @@
 /obj/item/stack/telecrystal
 	name = "telecrystal"
 	desc = "It seems to be pulsing with suspiciously enticing energies."
+	description_antag = "Telecrystals can be activated by utilizing them on devices with an actively running uplink. They will not activate on unactivated uplinks."
 	singular_name = "telecrystal"
-	icon = 'icons/obj/telescience.dmi'
+	icon = 'icons/obj/stock_parts.dmi'
 	icon_state = "telecrystal"
-	dye_color = DYE_SYNDICATE
-	w_class = WEIGHT_CLASS_TINY
-	max_amount = 50
-	item_flags = NOBLUDGEON
+	w_class = ITEMSIZE_TINY
+	max_amount = 240
+	origin_tech = list(TECH_MATERIAL = 6, TECH_BLUESPACE = 4)
+	force = 1 //Needs a token force to ensure you can attack because for some reason you can't attack with 0 force things
 
-/obj/item/stack/telecrystal/attack(mob/target, mob/user)
-	if(target == user) //You can't go around smacking people with crystals to find out if they have an uplink or not.
-		for(var/obj/item/implant/uplink/I in target)
-			if(I && I.imp_in)
-				var/datum/component/uplink/hidden_uplink = I.GetComponent(/datum/component/uplink)
-				if(hidden_uplink)
-					hidden_uplink.telecrystals += amount
-					use(amount)
-					to_chat(user, "<span class='notice'>You press [src] onto yourself and charge your hidden uplink.</span>")
+/obj/item/stack/telecrystal/apply_hit_effect(mob/living/target, mob/living/user, var/hit_zone)
+	if(amount >= 5)
+		target.visible_message("<span class='warning'>\The [target] has been transported with \the [src] by \the [user].</span>")
+		safe_blink(target, 14)
+		use(5)
 	else
-		return ..()
+		user << "<span class='warning'>There are not enough telecrystals to do that.</span>"
 
-/obj/item/stack/telecrystal/afterattack(obj/item/I, mob/user, proximity)
-	. = ..()
-	if(!proximity)
-		return
-	if(istype(I, /obj/item/cartridge/virus/frame))
-		var/obj/item/cartridge/virus/frame/cart = I
-		if(!cart.charges)
-			to_chat(user, "<span class='notice'>[cart] is out of charges, it's refusing to accept [src].</span>")
-			return
-		cart.telecrystals += amount
+/obj/item/stack/telecrystal/attack_self(mob/user as mob)
+	if(user.mind.accept_tcrystals) //Checks to see if antag type allows for tcrystals
+		user << "<span class='notice'>You use \the [src], adding [src.amount] to your balance.</span>"
+		user.mind.tcrystals += amount
 		use(amount)
-		to_chat(user, "<span class='notice'>You slot [src] into [cart].  The next time it's used, it will also give telecrystals.</span>")
-
-/obj/item/stack/telecrystal/five
-	amount = 5
-
-/obj/item/stack/telecrystal/twenty
-	amount = 20
+	return

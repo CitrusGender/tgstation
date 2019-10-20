@@ -8,7 +8,6 @@
  **/
 
 //This is the ABSOLUTE ONLY THING that should init globally like this
-//2019 update: the failsafe,config and Global controllers also do it
 GLOBAL_REAL(Master, /datum/controller/master) = new
 
 //THIS IS THE INIT ORDER
@@ -50,27 +49,17 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	var/map_loading = FALSE	//Are we loading in a new map?
 
 	var/current_runlevel	//for scheduling different subsystems for different stages of the round
-	var/sleep_offline_after_initializations = TRUE
 
 	var/static/restart_clear = 0
 	var/static/restart_timeout = 0
 	var/static/restart_count = 0
 
-	var/static/random_seed
-
-	//current tick limit, assigned before running a subsystem.
-	//used by CHECK_TICK as well so that the procs subsystems call can obey that SS's tick limits
-	var/static/current_ticklimit = TICK_LIMIT_RUNNING
+	//current tick limit, assigned by the queue controller before running a subsystem.
+	//used by check_tick as well so that the procs subsystems call can obey that SS's tick limits
+	var/static/current_ticklimit
 
 /datum/controller/master/New()
-	if(!config)
-		config = new
 	// Highlander-style: there can only be one! Kill off the old and replace it with the new.
-
-	if(!random_seed)
-		random_seed = (TEST_RUN_PARAMETER in world.params) ? 29051994 : rand(1, 1e9)
-		rand_seed(random_seed)
-
 	var/list/_subsystems = list()
 	subsystems = _subsystems
 	if (Master != src)
@@ -149,12 +138,14 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 				msg = "The [BadBoy.name] subsystem seems to be destabilizing the MC and will be offlined."
 				BadBoy.flags |= SS_NO_FIRE
 		if(msg)
-			to_chat(GLOB.admins, "<span class='boldannounce'>[msg]</span>")
+			log_game(msg)
+			message_admins("<span class='boldannounce'>[msg]</span>")
 			log_world(msg)
 
 	if (istype(Master.subsystems))
 		if(FireHim)
 			Master.subsystems += new BadBoy.type	//NEW_SS_GLOBAL will remove the old one
+
 		subsystems = Master.subsystems
 		current_runlevel = Master.current_runlevel
 		StartProcessing(10)
@@ -165,14 +156,11 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 
 // Please don't stuff random bullshit here,
 // 	Make a subsystem, give it the SS_NO_FIRE flag, and do your work in it's Initialize()
-/datum/controller/master/Initialize(delay, init_sss, tgs_prime)
+/datum/controller/master/Initialize(delay, init_sss)
 	set waitfor = 0
 
 	if(delay)
 		sleep(delay)
-
-	if(tgs_prime)
-		world.TgsInitializationComplete()
 
 	if(init_sss)
 		init_subtypes(/datum/controller/subsystem, subsystems)
@@ -184,7 +172,7 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 
 	var/start_timeofday = REALTIMEOFDAY
 	// Initialize subsystems.
-	current_ticklimit = CONFIG_GET(number/tick_limit_mc_init)
+	current_ticklimit = config.tick_limit_mc_init
 	for (var/datum/controller/subsystem/SS in subsystems)
 		if (SS.flags & SS_NO_INIT)
 			continue
@@ -198,31 +186,27 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	log_world(msg)
 
 	if (!current_runlevel)
-		SetRunLevel(1)
+		SetRunLevel(RUNLEVEL_LOBBY)
 
 	// Sort subsystems by display setting for easy access.
 	sortTim(subsystems, /proc/cmp_subsystem_display)
 	// Set world options.
-	world.change_fps(CONFIG_GET(number/fps))
+	#ifdef UNIT_TEST
+	world.sleep_offline = 0
+	#else
+	world.sleep_offline = 1
+	#endif
+	world.fps = config.fps
 	var/initialized_tod = REALTIMEOFDAY
-
-	if(sleep_offline_after_initializations)
-		world.sleep_offline = TRUE
 	sleep(1)
-
-	if(sleep_offline_after_initializations && CONFIG_GET(flag/resume_after_initializations))
-		world.sleep_offline = FALSE
 	initializations_finished_with_no_players_logged_in = initialized_tod < REALTIMEOFDAY - 10
 	// Loop.
 	Master.StartProcessing(0)
 
 /datum/controller/master/proc/SetRunLevel(new_runlevel)
-	var/old_runlevel = current_runlevel
-	if(isnull(old_runlevel))
-		old_runlevel = "NULL"
-
+	var/old_runlevel = isnull(current_runlevel) ? "NULL" : runlevel_flags[current_runlevel]
 	testing("MC: Runlevel changed from [old_runlevel] to [new_runlevel]")
-	current_runlevel = log(2, new_runlevel) + 1
+	current_runlevel = RUNLEVEL_FLAG_TO_INDEX(new_runlevel)
 	if(current_runlevel < 1)
 		CRASH("Attempted to set invalid runlevel: [new_runlevel]")
 
@@ -231,7 +215,6 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	set waitfor = 0
 	if(delay)
 		sleep(delay)
-	testing("Master starting processing")
 	var/rtn = Loop()
 	if (rtn > 0 || processing < 0)
 		return //this was suppose to happen.
@@ -270,8 +253,8 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 
 		var/ss_runlevels = SS.runlevels
 		var/added_to_any = FALSE
-		for(var/I in 1 to GLOB.bitflags.len)
-			if(ss_runlevels & GLOB.bitflags[I])
+		for(var/I in 1 to global.runlevel_flags.len)
+			if(ss_runlevels & global.runlevel_flags[I])
 				while(runlevel_sorted_subsystems.len < I)
 					runlevel_sorted_subsystems += list(list())
 				runlevel_sorted_subsystems[I] += SS
@@ -473,6 +456,7 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 			else
 				tick_precentage = tick_remaining
 
+			// Reduce tick allocation for subsystems that overran on their last tick.
 			tick_precentage = max(tick_precentage*0.5, tick_precentage-queue_node.tick_overrun)
 
 			current_ticklimit = round(TICK_USAGE + tick_precentage)
@@ -592,27 +576,25 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	stat("Byond:", "(FPS:[world.fps]) (TickCount:[world.time/world.tick_lag]) (TickDrift:[round(Master.tickdrift,1)]([round((Master.tickdrift/(world.time/world.tick_lag))*100,0.1)]%))")
 	stat("Master Controller:", statclick.update("(TickRate:[Master.processing]) (Iteration:[Master.iteration])"))
 
-/datum/controller/master/StartLoadingMap()
+/datum/controller/master/StartLoadingMap(var/quiet = TRUE)
+	if(map_loading)
+		admin_notice("<span class='danger'>Another map is attempting to be loaded before first map released lock.  Delaying.</span>", R_DEBUG)
+	else if(!quiet)
+		admin_notice("<span class='danger'>Map is now being built.  Locking.</span>", R_DEBUG)
+
 	//disallow more than one map to load at once, multithreading it will just cause race conditions
 	while(map_loading)
 		stoplag()
 	for(var/S in subsystems)
 		var/datum/controller/subsystem/SS = S
 		SS.StartLoadingMap()
+
 	map_loading = TRUE
 
-/datum/controller/master/StopLoadingMap(bounds = null)
+/datum/controller/master/StopLoadingMap(var/quiet = TRUE)
+	if(!quiet)
+		admin_notice("<span class='danger'>Map is finished.  Unlocking.</span>", R_DEBUG)
 	map_loading = FALSE
 	for(var/S in subsystems)
 		var/datum/controller/subsystem/SS = S
 		SS.StopLoadingMap()
-
-
-/datum/controller/master/proc/UpdateTickRate()
-	if (!processing)
-		return
-	var/client_count = length(GLOB.clients)
-	if (client_count < CONFIG_GET(number/mc_tick_rate/disable_high_pop_mc_mode_amount))
-		processing = CONFIG_GET(number/mc_tick_rate/base_mc_tick_rate)
-	else if (client_count > CONFIG_GET(number/mc_tick_rate/high_pop_mc_mode_amount))
-		processing = CONFIG_GET(number/mc_tick_rate/high_pop_mc_tick_rate)

@@ -1,102 +1,77 @@
-/**
-  * Run when a client is put in this mob or reconnets to byond and their client was on this mob
-  *
-  * Things it does:
-  * * Adds player to player_list
-  * * sets lastKnownIP
-  * * sets computer_id
-  * * logs the login
-  * * tells the world to update it's status (for player count)
-  * * create mob huds for the mob if needed
-  * * reset next_move to 1
-  * * parent call
-  * * if the client exists set the perspective to the mob loc
-  * * call on_log on the loc (sigh)
-  * * reload the huds for the mob
-  * * reload all full screen huds attached to this mob
-  * * load any global alternate apperances
-  * * sync the mind datum via sync_mind()
-  * * call any client login callbacks that exist
-  * * grant any actions the mob has to the client
-  * * calls [auto_deadmin_on_login](mob.html#proc/auto_deadmin_on_login)
-  * * send signal COMSIG_MOB_CLIENT_LOGIN
-  */
-/mob/Login()
-	GLOB.player_list |= src
+//handles setting lastKnownIP and computer_id for use by the ban systems as well as checking for multikeying
+/mob/proc/update_Login_details()
+	//Multikey checks and logging
 	lastKnownIP	= client.address
 	computer_id	= client.computer_id
-	log_access("Mob Login: [key_name(src)] was assigned to a [type]")
-	world.update_status()
-	client.screen = list()				//remove hud items just in case
-	client.images = list()
+	log_access_in(client)
+	if(config.log_access)
+		for(var/mob/M in player_list)
+			if(M == src)	continue
+			if( M.key && (M.key != key) )
+				var/matches
+				if( (M.lastKnownIP == client.address) )
+					matches += "IP ([client.address])"
+				if( (client.connection != "web") && (M.computer_id == client.computer_id) )
+					if(matches)	matches += " and "
+					matches += "ID ([client.computer_id])"
+					spawn() alert("You have logged in already with another key this round, please log out of this one NOW or risk being banned!")
+				if(matches)
+					if(M.client)
+						message_admins("<font color='red'><B>Notice: </B></font><font color='blue'><A href='?src=\ref[usr];priv_msg=\ref[src]'>[key_name_admin(src)]</A> has the same [matches] as <A href='?src=\ref[usr];priv_msg=\ref[M]'>[key_name_admin(M)]</A>.</font>", 1)
+						log_adminwarn("Notice: [key_name(src)] has the same [matches] as [key_name(M)].")
+					else
+						message_admins("<font color='red'><B>Notice: </B></font><font color='blue'><A href='?src=\ref[usr];priv_msg=\ref[src]'>[key_name_admin(src)]</A> has the same [matches] as [key_name_admin(M)] (no longer logged in). </font>", 1)
+						log_adminwarn("Notice: [key_name(src)] has the same [matches] as [key_name(M)] (no longer logged in).")
 
-	if(!hud_used)
-		create_mob_hud()
-	if(hud_used)
-		hud_used.show_hud(hud_used.hud_version)
-		hud_used.update_ui_style(ui_style2icon(client.prefs.UI_style))
+/mob/Login()
+
+	player_list |= src
+	update_Login_details()
+	world.update_status()
+
+	client.images = null				//remove the images such as AIs being unable to see runes
+	client.screen = list()				//remove hud items just in case
+	if(hud_used)	qdel(hud_used)		//remove the hud objects
+	hud_used = new /datum/hud(src)
+
+	if(client.prefs && client.prefs.client_fps)
+		client.fps = client.prefs.client_fps
+	else
+		client.fps = 0 // Results in using the server FPS
 
 	next_move = 1
-
+	disconnect_time = null				//VOREStation Addition: clear the disconnect time
+	sight |= SEE_SELF
 	..()
-	if (client && key != client.key)
-		key = client.key
-	reset_perspective(loc)
 
-	if(loc)
-		loc.on_log(TRUE)
-
-	//readd this mob's HUDs (antag, med, etc)
-	reload_huds()
-
+	if(loc && !isturf(loc))
+		client.eye = loc
+		client.perspective = EYE_PERSPECTIVE
+	else
+		client.eye = src
+		client.perspective = MOB_PERSPECTIVE
 	reload_fullscreen() // Reload any fullscreen overlays this mob has.
-
 	add_click_catcher()
+	update_client_color()
 
-	sync_mind()
+	if(!plane_holder) //Lazy
+		plane_holder = new(src) //Not a location, it takes it and saves it.
+	if(!vis_enabled)
+		vis_enabled = list()
+	client.screen += plane_holder.plane_masters
+	recalculate_vis()
 
-	//Reload alternate appearances
-	for(var/v in GLOB.active_alternate_appearances)
-		if(!v)
-			continue
-		var/datum/atom_hud/alternate_appearance/AA = v
-		AA.onNewMob(src)
+	// AO support
+	var/ao_enabled = client.is_preference_enabled(/datum/client_preference/ambient_occlusion)
+	plane_holder.set_ao(VIS_OBJS, ao_enabled)
+	plane_holder.set_ao(VIS_MOBS, ao_enabled)
 
-	update_client_colour()
-	update_mouse_pointer()
-	if(client)
-		client.change_view(CONFIG_GET(string/default_view)) // Resets the client.view in case it was changed.
+	//set macro to normal incase it was overriden (like cyborg currently does)
+	client.set_hotkeys_macro("macro", "hotkeymode")
 
-		if(client.player_details.player_actions.len)
-			for(var/datum/action/A in client.player_details.player_actions)
-				A.Grant(src)
+	if(!client.tooltips)
+		client.tooltips = new(client)
 
-		for(var/foo in client.player_details.post_login_callbacks)
-			var/datum/callback/CB = foo
-			CB.Invoke()
-		log_played_names(client.ckey,name,real_name)
-		auto_deadmin_on_login()
-
-	log_message("Client [key_name(src)] has taken ownership of mob [src]([src.type])", LOG_OWNERSHIP)
-	SEND_SIGNAL(src, COMSIG_MOB_CLIENT_LOGIN, client)
-
-/**
-  * Checks if the attached client is an admin and may deadmin them
-  *
-  * Configs:
-  * * flag/auto_deadmin_players
-  * * client.prefs?.toggles & DEADMIN_ALWAYS
-  * * User is antag and flag/auto_deadmin_antagonists or client.prefs?.toggles & DEADMIN_ANTAGONIST
-  * * or if their job demands a deadminning SSjob.handle_auto_deadmin_roles()
-  *
-  * Called from [login](mob.html#proc/Login)
-  */
-/mob/proc/auto_deadmin_on_login() //return true if they're not an admin at the end.
-	if(!client?.holder)
-		return TRUE
-	if(CONFIG_GET(flag/auto_deadmin_players) || (client.prefs?.toggles & DEADMIN_ALWAYS))
-		return client.holder.auto_deadmin()
-	if(mind.has_antag_datum(/datum/antagonist) && (CONFIG_GET(flag/auto_deadmin_antagonists) || client.prefs?.toggles & DEADMIN_ANTAGONIST))
-		return client.holder.auto_deadmin()
-	if(job)
-		return SSjob.handle_auto_deadmin_roles(client, job)
+	var/turf/T = get_turf(src)
+	if(isturf(T))
+		update_client_z(T.z)

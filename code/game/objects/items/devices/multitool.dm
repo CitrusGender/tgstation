@@ -1,175 +1,92 @@
-#define PROXIMITY_NONE ""
-#define PROXIMITY_ON_SCREEN "_red"
-#define PROXIMITY_NEAR "_yellow"
-
 /**
  * Multitool -- A multitool is used for hacking electronic devices.
+ * TO-DO -- Using it as a power measurement tool for cables etc. Nannek.
  *
  */
 
-
-
-
-/obj/item/multitool
+/obj/item/device/multitool
 	name = "multitool"
 	desc = "Used for pulsing wires to test which to cut. Not recommended by doctors."
-	icon = 'icons/obj/device.dmi'
 	icon_state = "multitool"
-	item_state = "multitool"
-	lefthand_file = 'icons/mob/inhands/equipment/tools_lefthand.dmi'
-	righthand_file = 'icons/mob/inhands/equipment/tools_righthand.dmi'
-	force = 5
-	w_class = WEIGHT_CLASS_SMALL
-	tool_behaviour = TOOL_MULTITOOL
-	throwforce = 0
-	throw_range = 7
+	force = 5.0
+	w_class = ITEMSIZE_SMALL
+	throwforce = 5.0
+	throw_range = 15
 	throw_speed = 3
-	drop_sound = 'sound/items/handling/multitool_drop.ogg'
-	pickup_sound =  'sound/items/handling/multitool_pickup.ogg'
-	custom_materials = list(/datum/material/iron=50, /datum/material/glass=20)
-	var/obj/machinery/buffer // simple machine buffer for device linkage
+	desc = "You can use this on airlocks or APCs to try to hack them without cutting wires."
+
+	matter = list(DEFAULT_WALL_MATERIAL = 50,"glass" = 20)
+
+	var/mode_index = 1
+	var/toolmode = MULTITOOL_MODE_STANDARD
+	var/list/modes = list(MULTITOOL_MODE_STANDARD, MULTITOOL_MODE_INTCIRCUITS)
+
+	origin_tech = list(TECH_MAGNET = 1, TECH_ENGINEERING = 1)
+	var/obj/machinery/telecomms/buffer // simple machine buffer for device linkage
+	var/obj/machinery/clonepod/connecting //same for cryopod linkage
+	var/obj/machinery/connectable	//Used to connect machinery.
+	var/weakref_wiring //Used to store weak references for integrated circuitry. This is now the Omnitool.
 	toolspeed = 1
-	usesound = 'sound/weapons/empty.ogg'
-	var/mode = 0
 
-/obj/item/multitool/examine(mob/user)
-	. = ..()
-	. += "<span class='notice'>Its buffer [buffer ? "contains [buffer]." : "is empty."]</span>"
+/obj/item/device/multitool/attack_self(mob/living/user)
+	var/choice = alert("What do you want to do with \the [src]?","Multitool Menu", "Switch Mode", "Clear Buffers", "Cancel")
+	switch(choice)
+		if("Cancel")
+			to_chat(user,"<span class='notice'>You lower \the [src].</span>")
+			return
+		if("Clear Buffers")
+			to_chat(user,"<span class='notice'>You clear \the [src]'s memory.</span>")
+			buffer = null
+			connecting = null
+			connectable = null
+			weakref_wiring = null
+			accepting_refs = 0
+			if(toolmode == MULTITOOL_MODE_INTCIRCUITS)
+				accepting_refs = 1
+		if("Switch Mode")
+			mode_switch(user)
 
-/obj/item/multitool/suicide_act(mob/living/carbon/user)
-	user.visible_message("<span class='suicide'>[user] puts the [src] to [user.p_their()] chest. It looks like [user.p_theyre()] trying to pulse [user.p_their()] heart off!</span>")
-	return OXYLOSS//theres a reason it wasnt recommended by doctors
+	update_icon()
 
-
-// Syndicate device disguised as a multitool; it will turn red when an AI camera is nearby.
-
-/obj/item/multitool/ai_detect
-	var/track_cooldown = 0
-	var/track_delay = 10 //How often it checks for proximity
-	var/detect_state = PROXIMITY_NONE
-	var/rangealert = 8	//Glows red when inside
-	var/rangewarning = 20 //Glows yellow when inside
-	var/hud_type = DATA_HUD_AI_DETECT
-	var/hud_on = FALSE
-	var/mob/camera/aiEye/remote/ai_detector/eye
-	var/datum/action/item_action/toggle_multitool/toggle_action
-
-/obj/item/multitool/ai_detect/Initialize()
-	. = ..()
-	START_PROCESSING(SSobj, src)
-	eye = new /mob/camera/aiEye/remote/ai_detector()
-	toggle_action = new /datum/action/item_action/toggle_multitool(src)
-
-/obj/item/multitool/ai_detect/Destroy()
-	STOP_PROCESSING(SSobj, src)
-	if(hud_on && ismob(loc))
-		remove_hud(loc)
-	QDEL_NULL(toggle_action)
-	QDEL_NULL(eye)
 	return ..()
 
-/obj/item/multitool/ai_detect/ui_action_click()
+/obj/item/device/multitool/proc/mode_switch(mob/living/user)
+	if(++mode_index > modes.len) mode_index = 1
+
+	else
+		mode_index++
+
+	toolmode = modes[mode_index]
+	to_chat(user,"<span class='notice'>\The [src] is now set to [toolmode].</span>")
+
+	accepting_refs = (toolmode == MULTITOOL_MODE_INTCIRCUITS)
+
 	return
 
-/obj/item/multitool/ai_detect/equipped(mob/living/carbon/human/user, slot)
-	..()
-	if(hud_on)
-		show_hud(user)
+/obj/item/device/multitool/cyborg
+	name = "multitool"
+	desc = "Optimised and stripped-down version of a regular multitool."
+	toolspeed = 0.5
 
-/obj/item/multitool/ai_detect/dropped(mob/living/carbon/human/user)
-	..()
-	if(hud_on)
-		remove_hud(user)
 
-/obj/item/multitool/ai_detect/process()
-	if(track_cooldown > world.time)
-		return
-	detect_state = PROXIMITY_NONE
-	if(eye.eye_user)
-		eye.setLoc(get_turf(src))
-	multitool_detect()
-	update_icon()
-	track_cooldown = world.time + track_delay
 
-/obj/item/multitool/ai_detect/proc/toggle_hud(mob/user)
-	hud_on = !hud_on
-	if(user)
-		to_chat(user, "<span class='notice'>You toggle the ai detection HUD on [src] [hud_on ? "on" : "off"].</span>")
-	if(hud_on)
-		show_hud(user)
-	else
-		remove_hud(user)
+/datum/category_item/catalogue/anomalous/precursor_a/alien_multitool
+	name = "Precursor Alpha Object - Pulse Tool"
+	desc = "This ancient object appears to be an electrical tool. \
+	It has a simple mechanism at the handle, which will cause a pulse of \
+	energy to be emitted from the head of the tool. This can be used on a \
+	conductive object such as a wire, in order to send a pulse signal through it.\
+	<br><br>\
+	These qualities make this object somewhat similar in purpose to the common \
+	multitool, and can probably be used for tasks such as direct interfacing with \
+	an airlock, if one knows how."
+	value = CATALOGUER_REWARD_EASY
 
-/obj/item/multitool/ai_detect/proc/show_hud(mob/user)
-	if(user && hud_type)
-		var/obj/screen/plane_master/camera_static/PM = user.hud_used.plane_masters["[CAMERA_STATIC_PLANE]"]
-		PM.alpha = 150
-		var/datum/atom_hud/H = GLOB.huds[hud_type]
-		if(!H.hudusers[user])
-			H.add_hud_to(user)
-		eye.eye_user = user
-		eye.setLoc(get_turf(src))
-
-/obj/item/multitool/ai_detect/proc/remove_hud(mob/user)
-	if(user && hud_type)
-		var/obj/screen/plane_master/camera_static/PM = user.hud_used.plane_masters["[CAMERA_STATIC_PLANE]"]
-		PM.alpha = 255
-		var/datum/atom_hud/H = GLOB.huds[hud_type]
-		H.remove_hud_from(user)
-		if(eye)
-			eye.setLoc(null)
-			eye.eye_user = null
-
-/obj/item/multitool/ai_detect/proc/multitool_detect()
-	var/turf/our_turf = get_turf(src)
-	for(var/mob/living/silicon/ai/AI in GLOB.ai_list)
-		if(AI.cameraFollow == src)
-			detect_state = PROXIMITY_ON_SCREEN
-			break
-
-	if(detect_state)
-		return
-	var/datum/camerachunk/chunk = GLOB.cameranet.chunkGenerated(our_turf.x, our_turf.y, our_turf.z)
-	if(chunk && chunk.seenby.len)
-		for(var/mob/camera/aiEye/A in chunk.seenby)
-			if(!A.ai_detector_visible)
-				continue
-			var/turf/detect_turf = get_turf(A)
-			if(get_dist(our_turf, detect_turf) < rangealert)
-				detect_state = PROXIMITY_ON_SCREEN
-				break
-			if(get_dist(our_turf, detect_turf) < rangewarning)
-				detect_state = PROXIMITY_NEAR
-				break
-
-/mob/camera/aiEye/remote/ai_detector
-	name = "AI detector eye"
-	ai_detector_visible = FALSE
-	use_static = USE_STATIC_TRANSPARENT
-	visible_icon = FALSE
-
-/datum/action/item_action/toggle_multitool
-	name = "Toggle AI detector HUD"
-	check_flags = NONE
-
-/datum/action/item_action/toggle_multitool/Trigger()
-	if(!..())
-		return 0
-	if(target)
-		var/obj/item/multitool/ai_detect/M = target
-		M.toggle_hud(owner)
-	return 1
-
-/obj/item/multitool/abductor
+/obj/item/device/multitool/alien
 	name = "alien multitool"
 	desc = "An omni-technological interface."
+	catalogue_data = list(/datum/category_item/catalogue/anomalous/precursor_a/alien_multitool)
 	icon = 'icons/obj/abductor.dmi'
 	icon_state = "multitool"
 	toolspeed = 0.1
-
-/obj/item/multitool/cyborg
-	name = "electronic multitool"
-	desc = "Optimised version of a regular multitool. Streamlines processes handled by its internal microchip."
-	icon = 'icons/obj/items_cyborg.dmi'
-	icon_state = "multitool_cyborg"
-	toolspeed = 0.5
+	origin_tech = list(TECH_MAGNET = 5, TECH_ENGINEERING = 5)

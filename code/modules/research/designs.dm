@@ -1,90 +1,64 @@
 /***************************************************************
 **						Design Datums						  **
-**	All the data for building stuff.						  **
+**	All the data for building stuff and tracking reliability. **
 ***************************************************************/
 /*
 For the materials datum, it assumes you need reagents unless specified otherwise. To designate a material that isn't a reagent,
 you use one of the material IDs below. These are NOT ids in the usual sense (they aren't defined in the object or part of a datum),
-they are simply references used as part of a "has materials?" type proc. They all start with a $ to denote that they aren't reagents.
-The currently supporting non-reagent materials. All material amounts are set as the define MINERAL_MATERIAL_AMOUNT, which defaults to 2000
+they are simply references used as part of a "has materials?" type proc. They all start with a  to denote that they aren't reagents.
+The currently supporting non-reagent materials:
 
 Don't add new keyword/IDs if they are made from an existing one (such as rods which are made from metal). Only add raw materials.
 
-Design Guidelines
+Design Guidlines
 - When adding new designs, check rdreadme.dm to see what kind of things have already been made and where new stuff is needed.
 - A single sheet of anything is 2000 units of material. Materials besides metal/glass require help from other jobs (mining for
 other types of metals and chemistry for reagents).
-- Add the AUTOLATHE tag to
-*/
 
-//DESIGNS ARE GLOBAL. DO NOT CREATE OR DESTROY THEM AT RUNTIME OUTSIDE OF INIT, JUST REFERENCE THEM TO WHATEVER YOU'RE DOING! //why are you yelling?
-//DO NOT REFERENCE OUTSIDE OF SSRESEARCH. USE THE PROCS IN SSRESEARCH TO OBTAIN A REFERENCE.
+*/
+//Note: More then one of these can be added to a design.
 
 /datum/design						//Datum for object designs, used in construction
-	var/name = "Name"					//Name of the created object.
-	var/desc = "Desc"					//Description of the created object.
-	var/id = DESIGN_ID_IGNORE						//ID of the created object for easy refernece. Alphanumeric, lower-case, no symbols
-	var/build_type = null				//Flag as to what kind machine the design is built in. See defines.
-	var/list/materials = list()			//List of materials. Format: "id" = amount.
-	var/construction_time				//Amount of time required for building the object
-	var/build_path = null				//The file path of the object that gets created
-	var/list/make_reagents = list()			//Reagents produced. Format: "id" = amount. Currently only supported by the biogenerator.
-	var/list/category = null 			//Primarily used for Mech Fabricators, but can be used for anything
-	var/list/reagents_list = list()			//List of reagents. Format: "id" = amount.
-	var/maxstack = 1
-	var/lathe_time_factor = 1			//How many times faster than normal is this to build on the protolathe
-	var/dangerous_construction = FALSE	//notify and log for admin investigations if this is printed.
-	var/departmental_flags = ALL			//bitflags for deplathes.
-	var/list/datum/techweb_node/unlocked_by = list()
-	var/research_icon					//Replaces the item icon in the research console
-	var/research_icon_state
-	var/icon_cache
+	var/name = null					//Name of the created object. If null it will be 'guessed' from build_path if possible.
+	var/desc = null					//Description of the created object. If null it will use group_desc and name where applicable.
+	var/item_name = null			//An item name before it is modified by various name-modifying procs
+	var/id = "id"					//ID of the created object for easy refernece. Alphanumeric, lower-case, no symbols.
+	var/list/req_tech = list()		//IDs of that techs the object originated from and the minimum level requirements.
+	var/build_type = null			//Flag as to what kind machine the design is built in. See defines.
+	var/list/materials = list()		//List of materials. Format: "id" = amount.
+	var/list/chemicals = list()		//List of chemicals.
+	var/build_path = null			//The path of the object that gets created.
+	var/time = 10					//How many ticks it requires to build
+	var/category = null 			//Primarily used for Mech Fabricators, but can be used for anything.
+	var/sort_string = "ZZZZZ"		//Sorting order
 
-/datum/design/error_design
-	name = "ERROR"
-	desc = "This usually means something in the database has corrupted. If this doesn't go away automatically, inform Central Comamnd so their techs can fix this ASAP(tm)"
+/datum/design/New()
+	..()
+	item_name = name
+	AssembleDesignInfo()
 
-/datum/design/Destroy()
-	SSresearch.techweb_designs -= id
-	return ..()
+//These procs are used in subtypes for assigning names and descriptions dynamically
+/datum/design/proc/AssembleDesignInfo()
+	AssembleDesignName()
+	AssembleDesignDesc()
+	return
 
-/datum/design/proc/InitializeMaterials()
-	var/list/temp_list = list() 
-	for(var/i in materials) //Go through all of our materials, get the subsystem instance, and then replace the list.
-		var/amount = materials[i]
-		if(!istext(i)) //Not a category, so get the ref the normal way
-			var/datum/material/M =  getmaterialref(i)
-			temp_list[M] = amount
-		else
-			temp_list[i] = amount
-	materials = temp_list
+/datum/design/proc/AssembleDesignName()
+	if(!name && build_path)					//Get name from build path if posible
+		var/atom/movable/A = build_path
+		name = initial(A.name)
+		item_name = name
+	return
 
-/datum/design/proc/icon_html(client/user)
-	var/datum/asset/spritesheet/sheet = get_asset_datum(/datum/asset/spritesheet/research_designs)
-	sheet.send(user)
-	return sheet.icon_tag(id)
+/datum/design/proc/AssembleDesignDesc()
+	if(!desc)								//Try to make up a nice description if we don't have one
+		desc = "Allows for the construction of \a [item_name]."
+	return
 
-////////////////////////////////////////
-//Disks for transporting design datums//
-////////////////////////////////////////
+//Returns a new instance of the item for this design
+//This is to allow additional initialization to be performed, including possibly additional contructor arguments.
+/datum/design/proc/Fabricate(var/newloc, var/fabricator)
+	return new build_path(newloc)
 
-/obj/item/disk/design_disk
-	name = "Component Design Disk"
-	desc = "A disk for storing device design data for construction in lathes."
-	icon_state = "datadisk1"
-	custom_materials = list(/datum/material/iron =300, /datum/material/glass =100)
-	var/list/blueprints = list()
-	var/max_blueprints = 1
-
-/obj/item/disk/design_disk/Initialize()
-	. = ..()
-	pixel_x = rand(-5, 5)
-	pixel_y = rand(-5, 5)
-	for(var/i in 1 to max_blueprints)
-		blueprints += null
-
-/obj/item/disk/design_disk/adv
-	name = "Advanced Component Design Disk"
-	desc = "A disk for storing device design data for construction in lathes. This one has extra storage space."
-	custom_materials = list(/datum/material/iron =300, /datum/material/glass = 100, /datum/material/silver = 50)
-	max_blueprints = 5
+/datum/design/item
+	build_type = PROTOLATHE

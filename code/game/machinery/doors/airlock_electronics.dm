@@ -1,67 +1,113 @@
-/obj/item/electronics/airlock
+//This file was auto-corrected by findeclaration.exe on 25.5.2012 20:42:31
+
+/obj/item/weapon/airlock_electronics
 	name = "airlock electronics"
-	req_access = list(ACCESS_MAINT_TUNNELS)
-	custom_price = 5
+	icon = 'icons/obj/doors/door_assembly.dmi'
+	icon_state = "door_electronics"
+	w_class = ITEMSIZE_SMALL //It should be tiny! -Agouri
 
-	var/list/accesses = list()
-	var/one_access = 0
-	var/unres_sides = 0 //unrestricted sides, or sides of the airlock that will open regardless of access
+	matter = list(DEFAULT_WALL_MATERIAL = 50,"glass" = 50)
 
-/obj/item/electronics/airlock/examine(mob/user)
-	. = ..()
-	. += "<span class='notice'>Has a neat <i>selection menu</i> for modifying airlock access levels.</span>"
+	req_access = list(access_engine)
 
-/obj/item/electronics/airlock/ui_interact(mob/user, ui_key = "main", datum/tgui/ui = null, force_open = FALSE, \
-													datum/tgui/master_ui = null, datum/ui_state/state = GLOB.hands_state)
-	ui = SStgui.try_update_ui(user, src, ui_key, ui, force_open)
-	if(!ui)
-		ui = new(user, src, ui_key, "airlock_electronics", name, 420, 485, master_ui, state)
-		ui.open()
+	var/secure = 0 //if set, then wires will be randomized and bolts will drop if the door is broken
+	var/list/conf_access = null
+	var/one_access = 0 //if set to 1, door would receive req_one_access instead of req_access
+	var/last_configurator = null
+	var/locked = 1
 
-/obj/item/electronics/airlock/ui_data()
-	var/list/data = list()
-	var/list/regions = list()
+	attack_self(mob/user as mob)
+		if (!ishuman(user) && !istype(user,/mob/living/silicon/robot))
+			return ..(user)
 
-	for(var/i in 1 to 7)
-		var/list/region = list()
-		var/list/accesses = list()
-		for(var/j in get_region_accesses(i))
-			var/list/access = list()
-			access["name"] = get_access_desc(j)
-			access["id"] = j
-			access["req"] = (j in src.accesses)
-			accesses[++accesses.len] = access
-		region["name"] = get_region_accesses_name(i)
-		region["accesses"] = accesses
-		regions[++regions.len] = region
-	data["regions"] = regions
-	data["oneAccess"] = one_access
-	data["unres_direction"] = unres_sides
+		var/t1 = text("<B>Access control</B><br>\n")
 
-	return data
+		if (last_configurator)
+			t1 += "Operator: [last_configurator]<br>"
 
-/obj/item/electronics/airlock/ui_act(action, params)
-	if(..())
-		return
-	switch(action)
-		if("clear_all")
-			accesses = list()
-			one_access = 0
-			. = TRUE
-		if("grant_all")
-			accesses = get_all_accesses()
-			. = TRUE
-		if("one_access")
-			one_access = !one_access
-			. = TRUE
-		if("set")
-			var/access = text2num(params["access"])
-			if (!(access in accesses))
-				accesses += access
+		if (locked)
+			t1 += "<a href='?src=\ref[src];login=1'>Swipe ID</a><hr>"
+		else
+			t1 += "<a href='?src=\ref[src];logout=1'>Block</a><hr>"
+
+			t1 += "Access requirement is set to "
+			t1 += one_access ? "<a style='color: green' href='?src=\ref[src];one_access=1'>ONE</a><hr>" : "<a style='color: red' href='?src=\ref[src];one_access=1'>ALL</a><hr>"
+
+			t1 += conf_access == null ? "<font color=red>All</font><br>" : "<a href='?src=\ref[src];access=all'>All</a><br>"
+
+			t1 += "<br>"
+
+			var/list/accesses = get_all_station_access()
+			for (var/acc in accesses)
+				var/aname = get_access_desc(acc)
+
+				if (!conf_access || !conf_access.len || !(acc in conf_access))
+					t1 += "<a href='?src=\ref[src];access=[acc]'>[aname]</a><br>"
+				else if(one_access)
+					t1 += "<a style='color: green' href='?src=\ref[src];access=[acc]'>[aname]</a><br>"
+				else
+					t1 += "<a style='color: red' href='?src=\ref[src];access=[acc]'>[aname]</a><br>"
+
+		t1 += text("<p><a href='?src=\ref[];close=1'>Close</a></p>\n", src)
+
+		user << browse(t1, "window=airlock_electronics")
+		onclose(user, "airlock")
+
+	Topic(href, href_list)
+		..()
+		if (usr.stat || usr.restrained() || (!ishuman(usr) && !istype(usr,/mob/living/silicon)))
+			return
+		if (href_list["close"])
+			usr << browse(null, "window=airlock")
+			return
+
+		if (href_list["login"])
+			if(istype(usr,/mob/living/silicon))
+				src.locked = 0
+				src.last_configurator = usr.name
 			else
-				accesses -= access
-			. = TRUE
-		if("direc_set")
-			var/unres_direction = text2num(params["unres_direction"])
-			unres_sides ^= unres_direction //XOR, toggles only the bit that was clicked
-			. = TRUE
+				var/obj/item/I = usr.get_active_hand()
+				if (istype(I, /obj/item/device/pda))
+					var/obj/item/device/pda/pda = I
+					I = pda.id
+				if (I && src.check_access(I))
+					src.locked = 0
+					src.last_configurator = I:registered_name
+
+		if (locked)
+			return
+
+		if (href_list["logout"])
+			locked = 1
+
+		if (href_list["one_access"])
+			one_access = !one_access
+
+		if (href_list["access"])
+			toggle_access(href_list["access"])
+
+		attack_self(usr)
+
+	proc
+		toggle_access(var/acc)
+			if (acc == "all")
+				conf_access = null
+			else
+				var/req = text2num(acc)
+
+				if (conf_access == null)
+					conf_access = list()
+
+				if (!(req in conf_access))
+					conf_access += req
+				else
+					conf_access -= req
+					if (!conf_access.len)
+						conf_access = null
+
+
+/obj/item/weapon/airlock_electronics/secure
+	name = "secure airlock electronics"
+	desc = "designed to be somewhat more resistant to hacking than standard electronics."
+	origin_tech = list(TECH_DATA = 2)
+	secure = 1

@@ -1,60 +1,80 @@
-/// The light switch. Can have multiple per area.
+// the light switch
+// can have multiple per area
+// can also operate on non-loc area through "otherarea" var
 /obj/machinery/light_switch
 	name = "light switch"
-	icon = 'icons/obj/power.dmi'
+	desc = "It turns lights on and off. What are you, simple?"
+	icon = 'icons/obj/power_vr.dmi' // VOREStation Edit
 	icon_state = "light1"
-	desc = "Make dark."
+	anchored = 1.0
+	use_power = 1
+	idle_power_usage = 10
 	power_channel = LIGHT
-	/// Set this to a string, path, or area instance to control that area
-	/// instead of the switch's location.
+	var/on = 1
 	var/area/area = null
+	var/otherarea = null
+	var/image/overlay
 
-/obj/machinery/light_switch/Initialize()
-	. = ..()
-	if(istext(area))
-		area = text2path(area)
-	if(ispath(area))
-		area = GLOB.areas_by_type[area]
-	if(!area)
+/obj/machinery/light_switch/New()
+	..()
+	spawn(5)
 		area = get_area(src)
 
-	if(!name)
-		name = "light switch ([area.name])"
+		if(otherarea)
+			area = locate(text2path("/area/[otherarea]"))
 
-	update_icon()
+		if(!name)
+			name = "light switch ([area.name])"
 
-/obj/machinery/light_switch/update_icon()
+		on = area.lightswitch
+		updateicon()
+
+/obj/machinery/light_switch/proc/updateicon()
+	if(!overlay)
+		overlay = image(icon, "light1-overlay")
+		overlay.plane = PLANE_LIGHTING_ABOVE
+
+	overlays.Cut()
 	if(stat & NOPOWER)
 		icon_state = "light-p"
+		set_light(0)
 	else
-		if(area.lightswitch)
-			icon_state = "light1"
-		else
-			icon_state = "light0"
+		icon_state = "light[on]"
+		overlay.icon_state = "light[on]-overlay"
+		overlays += overlay
+		set_light(2, 0.1, on ? "#82FF4C" : "#F86060")
 
 /obj/machinery/light_switch/examine(mob/user)
-	. = ..()
-	. += "It is [area.lightswitch ? "on" : "off"]."
+	if(..(user, 1))
+		to_chat(user, "A light switch. It is [on? "on" : "off"].")
 
-/obj/machinery/light_switch/interact(mob/user)
-	. = ..()
+/obj/machinery/light_switch/attack_hand(mob/user)
 
-	area.lightswitch = !area.lightswitch
-	area.update_icon()
+	on = !on
+
+	area.lightswitch = on
+	area.updateicon()
+	playsound(src, 'sound/machines/button.ogg', 100, 1, 0) // VOREStation Edit
 
 	for(var/obj/machinery/light_switch/L in area)
-		L.update_icon()
+		L.on = on
+		L.updateicon()
 
 	area.power_change()
 
 /obj/machinery/light_switch/power_change()
-	SHOULD_CALL_PARENT(0)
-	if(area == get_area(src))
-		return ..()
+
+	if(!otherarea)
+		if(powered(LIGHT))
+			stat &= ~NOPOWER
+		else
+			stat |= NOPOWER
+
+		updateicon()
 
 /obj/machinery/light_switch/emp_act(severity)
-	. = ..()
-	if (. & EMP_PROTECT_SELF)
+	if(stat & (BROKEN|NOPOWER))
+		..(severity)
 		return
-	if(!(stat & (BROKEN|NOPOWER)))
-		power_change()
+	power_change()
+	..(severity)

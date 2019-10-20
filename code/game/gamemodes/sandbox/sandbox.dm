@@ -1,22 +1,17 @@
 /datum/game_mode/sandbox
-	name = "sandbox"
+	name = "Sandbox"
 	config_tag = "sandbox"
-	report_type = "sandbox"
 	required_players = 0
-
-	announce_span = "info"
-	announce_text = "Build your own station... or just shoot each other!"
-	
-	allow_persistence_save = FALSE
+	votable = 0
+	round_description = "Build your own station!"
+	extended_round_description = "You can use the sandbox-panel command to access build options."
 
 /datum/game_mode/sandbox/pre_setup()
-	for(var/mob/M in GLOB.player_list)
+	for(var/mob/M in player_list)
 		M.CanBuild()
 	return 1
 
 /datum/game_mode/sandbox/post_setup()
 	..()
-	SSshuttle.registerHostileEnvironment(src)
-
-/datum/game_mode/sandbox/generate_report()
-	return "Sensors indicate that crewmembers have been all given psychic powers from which they can manifest various objects.<br><br>This can only end poorly."
+	if(emergency_shuttle)
+		emergency_shuttle.auto_recall = 1

@@ -76,3 +76,16 @@
     PreInit();\
 }\
 /datum/controller/subsystem/processing/##X
+
+// Boilerplate code for multi-step processors. See machines.dm for example use.
+#define INTERNAL_PROCESS_STEP(this_step, initial_step, proc_to_call, cost_var, next_step)\
+if(current_step == this_step || (initial_step && !resumed)) /* So we start at step 1 if not resumed.*/ {\
+	timer = TICK_USAGE;\
+	proc_to_call(resumed);\
+	cost_var = MC_AVERAGE(cost_var, TICK_DELTA_TO_MS(TICK_USAGE - timer));\
+	if(state != SS_RUNNING){\
+		return;\
+	}\
+	resumed = 0;\
+	current_step = next_step;\
+}

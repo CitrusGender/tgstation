@@ -1,173 +1,206 @@
+#define HUMAN_EATING_NO_ISSUE		0
+#define HUMAN_EATING_NO_MOUTH		1
+#define HUMAN_EATING_BLOCKED_MOUTH	2
 
-/mob/living/carbon/human/restrained(ignore_grab)
-	. = ((wear_suit && wear_suit.breakouttime) || ..())
+/mob/living/carbon/human/can_eat(var/food, var/feedback = 1)
+	var/list/status = can_eat_status()
+	if(status[1] == HUMAN_EATING_NO_ISSUE)
+		return 1
+	if(feedback)
+		if(status[1] == HUMAN_EATING_NO_MOUTH)
+			src << "Where do you intend to put \the [food]? You don't have a mouth!"
+		else if(status[1] == HUMAN_EATING_BLOCKED_MOUTH)
+			src << "<span class='warning'>\The [status[2]] is in the way!</span>"
+	return 0
+
+/mob/living/carbon/human/can_force_feed(var/feeder, var/food, var/feedback = 1)
+	var/list/status = can_eat_status()
+	if(status[1] == HUMAN_EATING_NO_ISSUE)
+		return 1
+	if(feedback)
+		if(status[1] == HUMAN_EATING_NO_MOUTH)
+			feeder << "Where do you intend to put \the [food]? \The [src] doesn't have a mouth!"
+		else if(status[1] == HUMAN_EATING_BLOCKED_MOUTH)
+			feeder << "<span class='warning'>\The [status[2]] is in the way!</span>"
+	return 0
+
+/mob/living/carbon/human/proc/can_eat_status()
+	if(!check_has_mouth())
+		return list(HUMAN_EATING_NO_MOUTH)
+	var/obj/item/blocked = check_mouth_coverage()
+	if(blocked)
+		return list(HUMAN_EATING_BLOCKED_MOUTH, blocked)
+	return list(HUMAN_EATING_NO_ISSUE)
+
+/mob/living/carbon/human/proc/get_coverage()
+	var/list/coverage = list()
+	for(var/obj/item/clothing/C in src)
+		if(item_is_in_hands(C))
+			continue
+		if(C.body_parts_covered & HEAD)
+			coverage += list(organs_by_name[BP_HEAD])
+		if(C.body_parts_covered & UPPER_TORSO)
+			coverage += list(organs_by_name[BP_TORSO])
+		if(C.body_parts_covered & LOWER_TORSO)
+			coverage += list(organs_by_name[BP_GROIN])
+		if(C.body_parts_covered & LEGS)
+			coverage += list(organs_by_name[BP_L_LEG], organs_by_name[BP_R_LEG])
+		if(C.body_parts_covered & ARMS)
+			coverage += list(organs_by_name[BP_R_ARM], organs_by_name[BP_L_ARM])
+		if(C.body_parts_covered & FEET)
+			coverage += list(organs_by_name[BP_L_FOOT], organs_by_name[BP_R_FOOT])
+		if(C.body_parts_covered & HANDS)
+			coverage += list(organs_by_name[BP_L_HAND], organs_by_name[BP_R_HAND])
+	return coverage
 
 
-/mob/living/carbon/human/canBeHandcuffed()
-	if(get_num_arms(FALSE) >= 2)
+//This is called when we want different types of 'cloaks' to stop working, e.g. when attacking.
+/mob/living/carbon/human/break_cloak()
+	if(mind && mind.changeling) //Changeling visible camo
+		mind.changeling.cloaked = 0
+	if(istype(back, /obj/item/weapon/rig)) //Ninja cloak
+		var/obj/item/weapon/rig/suit = back
+		for(var/obj/item/rig_module/stealth_field/cloaker in suit.installed_modules)
+			if(cloaker.active)
+				cloaker.deactivate()
+
+/mob/living/carbon/human/is_cloaked()
+	if(mind && mind.changeling && mind.changeling.cloaked) // Ling camo.
 		return TRUE
-	else
-		return FALSE
-
-//gets assignment from ID or ID inside PDA or PDA itself
-//Useful when player do something with computers
-/mob/living/carbon/human/proc/get_assignment(if_no_id = "No id", if_no_job = "No job", hand_first = TRUE)
-	var/obj/item/card/id/id = get_idcard(hand_first)
-	if(id)
-		. = id.assignment
-	else
-		var/obj/item/pda/pda = wear_id
-		if(istype(pda))
-			. = pda.ownjob
-		else
-			return if_no_id
-	if(!.)
-		return if_no_job
-
-//gets name from ID or ID inside PDA or PDA itself
-//Useful when player do something with computers
-/mob/living/carbon/human/proc/get_authentification_name(if_no_id = "Unknown")
-	var/obj/item/card/id/id = get_idcard(FALSE)
-	if(id)
-		return id.registered_name
-	var/obj/item/pda/pda = wear_id
-	if(istype(pda))
-		return pda.owner
-	return if_no_id
-
-//repurposed proc. Now it combines get_id_name() and get_face_name() to determine a mob's name variable. Made into a separate proc as it'll be useful elsewhere
-/mob/living/carbon/human/get_visible_name()
-	var/face_name = get_face_name("")
-	var/id_name = get_id_name("")
-	if(name_override)
-		return name_override
-	if(face_name)
-		if(id_name && (id_name != face_name))
-			return "[face_name] (as [id_name])"
-		return face_name
-	if(id_name)
-		return id_name
-	return "Unknown"
-
-//Returns "Unknown" if facially disfigured and real_name if not. Useful for setting name when Fluacided or when updating a human's name variable
-/mob/living/carbon/human/proc/get_face_name(if_no_face="Unknown")
-	if( wear_mask && (wear_mask.flags_inv&HIDEFACE) )	//Wearing a mask which hides our face, use id-name if possible
-		return if_no_face
-	if( head && (head.flags_inv&HIDEFACE) )
-		return if_no_face		//Likewise for hats
-	var/obj/item/bodypart/O = get_bodypart(BODY_ZONE_HEAD)
-	if( !O || (HAS_TRAIT(src, TRAIT_DISFIGURED)) || (O.brutestate+O.burnstate)>2 || cloneloss>50 || !real_name )	//disfigured. use id-name if possible
-		return if_no_face
-	return real_name
-
-//gets name from ID or PDA itself, ID inside PDA doesn't matter
-//Useful when player is being seen by other mobs
-/mob/living/carbon/human/proc/get_id_name(if_no_id = "Unknown")
-	var/obj/item/storage/wallet/wallet = wear_id
-	var/obj/item/pda/pda = wear_id
-	var/obj/item/card/id/id = wear_id
-	var/obj/item/modular_computer/tablet/tablet = wear_id
-	if(istype(wallet))
-		id = wallet.front_id
-	if(istype(id))
-		. = id.registered_name
-	else if(istype(pda))
-		. = pda.owner
-	else if(istype(tablet))
-		var/obj/item/computer_hardware/card_slot/card_slot = tablet.all_components[MC_CARD]
-		if(card_slot && (card_slot.stored_card2 || card_slot.stored_card))
-			if(card_slot.stored_card2) //The second card is the one used for authorization in the ID changing program, so we prioritize it here for consistency
-				. = card_slot.stored_card2.registered_name
-			else
-				if(card_slot.stored_card)
-					. = card_slot.stored_card.registered_name
-	if(!.)
-		. = if_no_id	//to prevent null-names making the mob unclickable
-	return
-
-//Gets ID card from a human. If hand_first is false the one in the id slot is prioritized, otherwise inventory slots go first.
-/mob/living/carbon/human/get_idcard(hand_first = TRUE)
-	//Check hands
-	var/obj/item/card/id/id_card
-	var/obj/item/held_item
-	held_item = get_active_held_item()
-	if(held_item) //Check active hand
-		id_card = held_item.GetID()
-	if(!id_card) //If there is no id, check the other hand
-		held_item = get_inactive_held_item()
-		if(held_item)
-			id_card = held_item.GetID()
-
-	if(id_card)
-		if(hand_first)
-			return id_card
-		else
-			. = id_card
-
-	//Check inventory slots
-	if(wear_id)
-		id_card = wear_id.GetID()
-		if(id_card)
-			return id_card
-	else if(belt)
-		id_card = belt.GetID()
-		if(id_card)
-			return id_card
-
-/mob/living/carbon/human/IsAdvancedToolUser()
-	if(HAS_TRAIT(src, TRAIT_MONKEYLIKE))
-		return FALSE
-	return TRUE//Humans can use guns and such
-
-/mob/living/carbon/human/reagent_check(datum/reagent/R)
-	return dna.species.handle_chemicals(R,src)
-	// if it returns 0, it will run the usual on_mob_life for that reagent. otherwise, it will stop after running handle_chemicals for the species.
-
-
-/mob/living/carbon/human/can_track(mob/living/user)
-	if(wear_id && istype(wear_id.GetID(), /obj/item/card/id/syndicate))
-		return 0
-	if(istype(head, /obj/item/clothing/head))
-		var/obj/item/clothing/head/hat = head
-		if(hat.blockTracking)
-			return 0
-
+	else if(istype(back, /obj/item/weapon/rig)) //Ninja cloak
+		var/obj/item/weapon/rig/suit = back
+		for(var/obj/item/rig_module/stealth_field/cloaker in suit.installed_modules)
+			if(cloaker.active)
+				return TRUE
 	return ..()
 
-/mob/living/carbon/human/can_use_guns(obj/item/G)
-	. = ..()
+/mob/living/carbon/human/get_ear_protection()
+	var/sum = 0
+	if(istype(l_ear, /obj/item/clothing/ears))
+		var/obj/item/clothing/ears/L = l_ear
+		sum += L.ear_protection
+	if(istype(r_ear, /obj/item/clothing/ears))
+		var/obj/item/clothing/ears/R = r_ear
+		sum += R.ear_protection
+	if(istype(head, /obj/item/clothing/head))
+		var/obj/item/clothing/head/H = head
+		sum += H.ear_protection
+	return sum
 
-	if(G.trigger_guard == TRIGGER_GUARD_NORMAL)
-		if(HAS_TRAIT(src, TRAIT_CHUNKYFINGERS))
-			to_chat(src, "<span class='warning'>Your meaty finger is much too large for the trigger guard!</span>")
-			return FALSE
-	if(HAS_TRAIT(src, TRAIT_NOGUNS))
-		to_chat(src, "<span class='warning'>You can't bring yourself to use a ranged weapon!</span>")
-		return FALSE
-	return .
+/mob/living/carbon/human/get_gender()
+	return identifying_gender ? identifying_gender : gender
 
-/mob/living/carbon/human/proc/get_bank_account()
-	RETURN_TYPE(/datum/bank_account)
-	var/datum/bank_account/account
-	var/obj/item/card/id/I = get_idcard()
+// This is the 'mechanical' check for synthetic-ness, not appearance
+// Returns the company that made the synthetic
+/mob/living/carbon/human/isSynthetic()
+	if(synthetic) return synthetic //Your synthetic-ness is not going away
+	var/obj/item/organ/external/T = organs_by_name[BP_TORSO]
+	if(T && T.robotic >= ORGAN_ROBOT)
+		src.verbs += /mob/living/carbon/human/proc/self_diagnostics
+		var/datum/robolimb/R = all_robolimbs[T.model]
+		synthetic = R
+		return synthetic
 
-	if(I && I.registered_account)
-		account = I.registered_account
-		return account
+	return 0
 
-	return FALSE
+// Would an onlooker know this person is synthetic?
+// Based on sort of logical reasoning, 'Look at head, look at torso'
+/mob/living/carbon/human/proc/looksSynthetic()
+	var/obj/item/organ/external/T = organs_by_name[BP_TORSO]
+	var/obj/item/organ/external/H = organs_by_name[BP_HEAD]
 
-/mob/living/carbon/human/get_policy_keywords()
-	. = ..()
-	. += "[dna.species.type]"
+	//Look at their head
+	if(!head || !(head && (head.flags_inv & HIDEFACE)))
+		if(H && H.robotic == ORGAN_ROBOT) //Exactly robotic, not higher as lifelike is higher
+			return 1
 
-/mob/living/carbon/human/can_see_reagents()
-	. = ..()
-	if(.) //No need to run through all of this if it's already true.
+	//Look at their torso
+	if(!wear_suit || (wear_suit && !(wear_suit.flags_inv & HIDEJUMPSUIT)))
+		if(!w_uniform || (w_uniform && !(w_uniform.body_parts_covered & UPPER_TORSO)))
+			if(T && T.robotic == ORGAN_ROBOT)
+				return 1
+
+	return 0
+
+// Returns a string based on what kind of brain the FBP has.
+/mob/living/carbon/human/proc/get_FBP_type()
+	if(!isSynthetic())
+		return FBP_NONE
+	var/obj/item/organ/internal/brain/B
+	B = internal_organs_by_name[O_BRAIN]
+	if(B) // Incase we lost our brain for some reason, like if we got decapped.
+		if(istype(B, /obj/item/organ/internal/mmi_holder))
+			var/obj/item/organ/internal/mmi_holder/mmi_holder = B
+			if(istype(mmi_holder.stored_mmi, /obj/item/device/mmi/digital/posibrain))
+				return FBP_POSI
+			else if(istype(mmi_holder.stored_mmi, /obj/item/device/mmi/digital/robot))
+				return FBP_DRONE
+			else if(istype(mmi_holder.stored_mmi, /obj/item/device/mmi)) // This needs to come last because inheritence.
+				return FBP_CYBORG
+
+	return FBP_NONE
+
+/mob/living/carbon/human/make_hud_overlays()
+	hud_list[HEALTH_HUD]      = gen_hud_image(ingame_hud_med, src, "100", plane = PLANE_CH_HEALTH)
+	if(isSynthetic())
+		hud_list[STATUS_HUD]  = gen_hud_image(ingame_hud, src, "hudrobo", plane = PLANE_CH_STATUS)
+		hud_list[LIFE_HUD]	  = gen_hud_image(ingame_hud, src, "hudrobo", plane = PLANE_CH_LIFE)
+	else
+		hud_list[STATUS_HUD]  = gen_hud_image(ingame_hud, src, "hudhealthy", plane = PLANE_CH_STATUS)
+		hud_list[LIFE_HUD]    = gen_hud_image(ingame_hud, src, "hudhealthy", plane = PLANE_CH_LIFE)
+	hud_list[ID_HUD]          = gen_hud_image(using_map.id_hud_icons, src, "hudunknown", plane = PLANE_CH_ID)
+	hud_list[WANTED_HUD]      = gen_hud_image(ingame_hud, src, "hudblank", plane = PLANE_CH_WANTED)
+	hud_list[IMPLOYAL_HUD]    = gen_hud_image(ingame_hud, src, "hudblank", plane = PLANE_CH_IMPLOYAL)
+	hud_list[IMPCHEM_HUD]     = gen_hud_image(ingame_hud, src, "hudblank", plane = PLANE_CH_IMPCHEM)
+	hud_list[IMPTRACK_HUD]    = gen_hud_image(ingame_hud, src, "hudblank", plane = PLANE_CH_IMPTRACK)
+	hud_list[SPECIALROLE_HUD] = gen_hud_image(ingame_hud, src, "hudblank", plane = PLANE_CH_SPECIAL)
+	hud_list[STATUS_HUD_OOC]  = gen_hud_image(ingame_hud, src, "hudhealthy", plane = PLANE_CH_STATUS_OOC)
+	add_overlay(hud_list)
+
+/mob/living/carbon/human/recalculate_vis()
+	if(!vis_enabled || !plane_holder)
 		return
-	if(isclothing(glasses) && (glasses.clothing_flags & SCAN_REAGENTS))
-		return TRUE
-	if(isclothing(head) && (head.clothing_flags & SCAN_REAGENTS))
-		return TRUE
-	if(isclothing(wear_mask) && (wear_mask.clothing_flags & SCAN_REAGENTS))
-		return TRUE
+
+	//These things are allowed to add vision flags.
+	//If you code some crazy item that goes on your feet that lets you see ghosts, you need to add a slot here.
+	var/tmp/list/slots = list(slot_glasses,slot_head)
+	var/tmp/list/compiled_vis = list()
+
+	for(var/slot in slots)
+		var/obj/item/clothing/O = get_equipped_item(slot) //Change this type if you move the vision stuff to item or something.
+		if(istype(O) && O.enables_planes && (slot in O.plane_slots))
+			compiled_vis |= O.enables_planes
+
+	//Check to see if we have a rig (ugh, blame rigs, desnowflake this)
+	var/obj/item/weapon/rig/rig = back
+	if(istype(rig) && rig.visor)
+		if(!rig.helmet || (head && rig.helmet == head))
+			if(rig.visor && rig.visor.vision && rig.visor.active && rig.visor.vision.glasses)
+				var/obj/item/clothing/glasses/V = rig.visor.vision.glasses
+				compiled_vis |= V.enables_planes
+
+	//VOREStation Add - NIF Support
+	if(nif)
+		compiled_vis |= nif.planes_visible()
+	//VOREStation Add End
+
+	if(!compiled_vis.len && !vis_enabled.len)
+		return //Nothin' doin'.
+
+	var/tmp/list/oddities = vis_enabled ^ compiled_vis
+	if(!oddities.len)
+		return //Same thing in both lists!
+
+	var/tmp/list/to_enable = oddities - vis_enabled
+	var/tmp/list/to_disable = oddities - compiled_vis
+
+	for(var/vis in to_enable)
+		plane_holder.set_vis(vis,TRUE)
+		vis_enabled += vis
+	for(var/vis in to_disable)
+		plane_holder.set_vis(vis,FALSE)
+		vis_enabled -= vis
+
+#undef HUMAN_EATING_NO_ISSUE
+#undef HUMAN_EATING_NO_MOUTH
+#undef HUMAN_EATING_BLOCKED_MOUTH

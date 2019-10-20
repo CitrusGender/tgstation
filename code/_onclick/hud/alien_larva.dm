@@ -1,37 +1,33 @@
-/datum/hud/larva
-	ui_style = 'icons/mob/screen_alien.dmi'
+/datum/hud/proc/larva_hud()
 
-/datum/hud/larva/New(mob/owner)
-	..()
+	src.adding = list()
+	src.other = list()
+
 	var/obj/screen/using
 
-	using = new /obj/screen/act_intent/alien()
-	using.icon_state = mymob.a_intent
-	using.hud = src
-	static_inventory += using
-	action_intent = using
+	using = new /obj/screen()
+	using.name = "mov_intent"
+	using.set_dir(SOUTHWEST)
+	using.icon = 'icons/mob/screen1_alien.dmi'
+	using.icon_state = (mymob.m_intent == "run" ? "running" : "walking")
+	using.screen_loc = ui_acti
+	using.layer = HUD_LAYER
+	src.adding += using
+	move_intent = using
 
-	healths = new /obj/screen/healths/alien()
-	healths.hud = src
-	infodisplay += healths
+	mymob.healths = new /obj/screen()
+	mymob.healths.icon = 'icons/mob/screen1_alien.dmi'
+	mymob.healths.icon_state = "health0"
+	mymob.healths.name = "health"
+	mymob.healths.screen_loc = ui_alien_health
 
-	alien_queen_finder = new /obj/screen/alien/alien_queen_finder()
-	alien_queen_finder.hud = src
-	infodisplay += alien_queen_finder
-	
-	pull_icon = new /obj/screen/pull()
-	pull_icon.icon = 'icons/mob/screen_alien.dmi'
-	pull_icon.update_icon()
-	pull_icon.screen_loc = ui_above_movement
-	pull_icon.hud = src
-	hotkeybuttons += pull_icon
+	mymob.fire = new /obj/screen()
+	mymob.fire.icon = 'icons/mob/screen1_alien.dmi'
+	mymob.fire.icon_state = "fire0"
+	mymob.fire.name = "fire"
+	mymob.fire.screen_loc = ui_fire
 
-	using = new/obj/screen/language_menu
-	using.screen_loc = ui_alien_language_menu
-	using.hud = src
-	static_inventory += using
-
-	zone_select = new /obj/screen/zone_sel/alien()
-	zone_select.update_icon()
-	zone_select.hud = src
-	static_inventory += zone_select
+	mymob.client.screen = list()
+	mymob.client.screen += list( mymob.healths, mymob.fire) //, mymob.rest, mymob.sleep, mymob.mach )
+	mymob.client.screen += src.adding + src.other
+	mymob.client.screen += mymob.client.void

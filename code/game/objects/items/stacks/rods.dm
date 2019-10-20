@@ -1,41 +1,32 @@
-GLOBAL_LIST_INIT(rod_recipes, list ( \
-	new/datum/stack_recipe("grille", /obj/structure/grille, 2, time = 10, one_per_turf = TRUE, on_floor = FALSE), \
-	new/datum/stack_recipe("table frame", /obj/structure/table_frame, 2, time = 10, one_per_turf = 1, on_floor = 1), \
-	new/datum/stack_recipe("scooter frame", /obj/item/scooter_frame, 10, time = 25, one_per_turf = 0), \
-	new/datum/stack_recipe("linen bin", /obj/structure/bedsheetbin/empty, 2, time = 5, one_per_turf = 0), \
-	))
-
 /obj/item/stack/rods
 	name = "metal rod"
-	desc = "Some rods. Can be used for building or something."
+	desc = "Some rods. Can be used for building, or something."
 	singular_name = "metal rod"
 	icon_state = "rods"
-	item_state = "rods"
-	flags_1 = CONDUCT_1
-	w_class = WEIGHT_CLASS_NORMAL
-	force = 9
-	throwforce = 10
-	throw_speed = 3
-	throw_range = 7
-	custom_materials = list(/datum/material/iron=1000)
-	mats_per_stack = 1000
-	max_amount = 50
+	w_class = ITEMSIZE_NORMAL
+	force = 9.0
+	throwforce = 15.0
+	throw_speed = 5
+	throw_range = 20
+	matter = list(DEFAULT_WALL_MATERIAL = SHEET_MATERIAL_AMOUNT / 2)
+	max_amount = 60
 	attack_verb = list("hit", "bludgeoned", "whacked")
-	hitsound = 'sound/weapons/gun/general/grenade_launch.ogg'
-	novariants = TRUE
 
-/obj/item/stack/rods/suicide_act(mob/living/carbon/user)
-	user.visible_message("<span class='suicide'>[user] begins to stuff \the [src] down [user.p_their()] throat! It looks like [user.p_theyre()] trying to commit suicide!</span>")//it looks like theyre ur mum
-	return BRUTELOSS
+/obj/item/stack/rods/cyborg
+	name = "metal rod synthesizer"
+	desc = "A device that makes metal rods."
+	gender = NEUTER
+	matter = null
+	uses_charge = 1
+	charge_costs = list(500)
+	stacktype = /obj/item/stack/rods
+	no_variants = TRUE
 
-/obj/item/stack/rods/Initialize(mapload, new_amount, merge = TRUE)
-	. = ..()
+/obj/item/stack/rods/New()
+	..()
+	recipes = rods_recipes
 	update_icon()
 
-/obj/item/stack/rods/get_main_recipes()
-	. = ..()
-	. += GLOB.rod_recipes
-	
 /obj/item/stack/rods/update_icon()
 	var/amount = get_amount()
 	if((amount <= 5) && (amount > 0))
@@ -43,49 +34,72 @@ GLOBAL_LIST_INIT(rod_recipes, list ( \
 	else
 		icon_state = "rods"
 
-/obj/item/stack/rods/attackby(obj/item/W, mob/user, params)
-	if(W.tool_behaviour == TOOL_WELDER)
+var/global/list/datum/stack_recipe/rods_recipes = list( \
+	new/datum/stack_recipe("grille", /obj/structure/grille, 2, time = 10, one_per_turf = 1, on_floor = 0),
+	new/datum/stack_recipe("catwalk", /obj/structure/catwalk, 2, time = 80, one_per_turf = 1, on_floor = 1))
+
+/obj/item/stack/rods/attackby(obj/item/W as obj, mob/user as mob)
+	if (istype(W, /obj/item/weapon/weldingtool))
+		var/obj/item/weapon/weldingtool/WT = W
+
 		if(get_amount() < 2)
-			to_chat(user, "<span class='warning'>You need at least two rods to do this!</span>")
+			to_chat(user, "<span class='warning'>You need at least two rods to do this.</span>")
 			return
 
-		if(W.use_tool(src, user, 0, volume=40))
-			var/obj/item/stack/sheet/metal/new_item = new(usr.loc)
-			user.visible_message("<span class='notice'>[user.name] shaped [src] into metal with [W].</span>", \
-						 "<span class='notice'>You shape [src] into metal with [W].</span>", \
-						 "<span class='hear'>You hear welding.</span>")
+		if(WT.remove_fuel(0,user))
+			var/obj/item/stack/material/steel/new_item = new(usr.loc)
+			new_item.add_to_stacks(usr)
+			for (var/mob/M in viewers(src))
+				M.show_message("<span class='notice'>[src] is shaped into metal by [user.name] with the weldingtool.</span>", 3, "<span class='notice'>You hear welding.</span>", 2)
 			var/obj/item/stack/rods/R = src
 			src = null
-			var/replace = (user.get_inactive_held_item()==R)
+			var/replace = (user.get_inactive_hand()==R)
 			R.use(2)
 			if (!R && replace)
 				user.put_in_hands(new_item)
+		return
 
-	else if(istype(W, /obj/item/reagent_containers/food/snacks))
-		var/obj/item/reagent_containers/food/snacks/S = W
-		if(amount != 1)
-			to_chat(user, "<span class='warning'>You must use a single rod!</span>")
-		else if(S.w_class > WEIGHT_CLASS_SMALL)
-			to_chat(user, "<span class='warning'>The ingredient is too big for [src]!</span>")
-		else
-			var/obj/item/reagent_containers/food/snacks/customizable/A = new/obj/item/reagent_containers/food/snacks/customizable/kebab(get_turf(src))
-			A.initialize_custom_food(src, S, user)
-	else
-		return ..()
+	if (istype(W, /obj/item/weapon/tape_roll))
+		var/obj/item/stack/medical/splint/ghetto/new_splint = new(get_turf(user))
+		new_splint.add_fingerprint(user)
 
-/obj/item/stack/rods/cyborg
-	custom_materials = null
-	is_cyborg = 1
-	cost = 250
+		user.visible_message("<span class='notice'>\The [user] constructs \a [new_splint] out of a [singular_name].</span>", \
+				"<span class='notice'>You use make \a [new_splint] out of a [singular_name].</span>")
+		src.use(1)
+		return
 
-/obj/item/stack/rods/cyborg/update_icon()
+	..()
+
+/*
+/obj/item/stack/rods/attack_self(mob/user as mob)
+	src.add_fingerprint(user)
+
+	if(!istype(user.loc,/turf)) return 0
+
+	if (locate(/obj/structure/grille, usr.loc))
+		for(var/obj/structure/grille/G in usr.loc)
+			if (G.destroyed)
+				G.health = 10
+				G.density = 1
+				G.destroyed = 0
+				G.icon_state = "grille"
+				use(1)
+			else
+				return 1
+
+	else if(!in_use)
+		if(get_amount() < 2)
+			to_chat(user, "<span class='warning'>You need at least two rods to do this.</span>")
+			return
+		to_chat(usr, "<span class='notice'>Assembling grille...</span>")
+		in_use = 1
+		if (!do_after(usr, 10))
+			in_use = 0
+			return
+		var/obj/structure/grille/F = new /obj/structure/grille/ ( usr.loc )
+		to_chat(usr, "<span class='notice'>You assemble a grille</span>")
+		in_use = 0
+		F.add_fingerprint(usr)
+		use(2)
 	return
-
-/obj/item/stack/rods/ten
-	amount = 10
-
-/obj/item/stack/rods/twentyfive
-	amount = 25
-
-/obj/item/stack/rods/fifty
-	amount = 50
+*/

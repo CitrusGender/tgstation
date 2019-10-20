@@ -1,211 +1,316 @@
-#define SMELT_AMOUNT 10
-
 /**********************Mineral processing unit console**************************/
-
-/obj/machinery/mineral
-	var/input_dir = NORTH
-	var/output_dir = SOUTH
-
-/obj/machinery/mineral/proc/unload_mineral(atom/movable/S)
-	S.forceMove(drop_location())
-	var/turf/T = get_step(src,output_dir)
-	if(T)
-		S.forceMove(T)
+#define PROCESS_NONE		0
+#define PROCESS_SMELT		1
+#define PROCESS_COMPRESS	2
+#define PROCESS_ALLOY		3
 
 /obj/machinery/mineral/processing_unit_console
 	name = "production machine console"
-	icon = 'icons/obj/machines/mining_machines.dmi'
+	icon = 'icons/obj/machines/mining_machines_vr.dmi' // VOREStation Edit
 	icon_state = "console"
 	density = TRUE
+	anchored = TRUE
+
+	var/obj/item/weapon/card/id/inserted_id	// Inserted ID card, for points
+
 	var/obj/machinery/mineral/processing_unit/machine = null
-	var/machinedir = EAST
-	speed_process = TRUE
+	var/show_all_ores = FALSE
 
 /obj/machinery/mineral/processing_unit_console/Initialize()
 	. = ..()
-	machine = locate(/obj/machinery/mineral/processing_unit, get_step(src, machinedir))
+	src.machine = locate(/obj/machinery/mineral/processing_unit) in range(5, src)
 	if (machine)
-		machine.CONSOLE = src
+		machine.console = src
 	else
-		return INITIALIZE_HINT_QDEL
+		log_debug("Ore processing machine console at [src.x], [src.y], [src.z] could not find its machine!")
+		qdel(src)
 
-/obj/machinery/mineral/processing_unit_console/ui_interact(mob/user)
+/obj/machinery/mineral/processing_unit_console/Destroy()
+	if(inserted_id)
+		inserted_id.forceMove(loc) //Prevents deconstructing from deleting whatever ID was inside it.
 	. = ..()
-	if(!machine)
+
+/obj/machinery/mineral/processing_unit_console/attack_hand(mob/user)
+	if(..())
+		return
+	interact(user)
+
+/obj/machinery/mineral/processing_unit_console/attackby(var/obj/item/I, var/mob/user)
+	if(istype(I, /obj/item/weapon/card/id))
+		if(!powered())
+			return
+		if(!inserted_id && user.unEquip(I))
+			I.forceMove(src)
+			inserted_id = I
+			interact(user)
+		return
+	..()
+
+/obj/machinery/mineral/processing_unit_console/interact(mob/user)
+	if(..())
 		return
 
-	var/dat = machine.get_machine_data()
+	if(!allowed(user))
+		to_chat(user, "<span class='warning'>Access denied.</span>")
+		return
 
-	var/datum/browser/popup = new(user, "processing", "Smelting Console", 300, 500)
-	popup.set_content(dat)
-	popup.open()
+	user.set_machine(src)
+
+	var/dat = "<h1>Ore processor console</h1>"
+
+	dat += "Current unclaimed points: [machine.points]<br>"
+	if(istype(inserted_id))
+		dat += "You have [inserted_id.mining_points] mining points collected. <A href='?src=\ref[src];choice=eject'>Eject ID.</A><br>"
+		dat += "<A href='?src=\ref[src];choice=claim'>Claim points.</A><br>"
+	else
+		dat += "No ID inserted.  <A href='?src=\ref[src];choice=insert'>Insert ID.</A><br>"
+
+	dat += "<hr><table>"
+
+	for(var/ore in machine.ores_processing)
+
+		if(!machine.ores_stored[ore] && !show_all_ores) continue
+		var/ore/O = ore_data[ore]
+		if(!O) continue
+		dat += "<tr><td width = 40><b>[capitalize(O.display_name)]</b></td><td width = 30>[machine.ores_stored[ore]]</td><td width = 100>"
+		if(machine.ores_processing[ore])
+			switch(machine.ores_processing[ore])
+				if(PROCESS_NONE)
+					dat += "<font color='red'>not processing</font>"
+				if(PROCESS_SMELT)
+					dat += "<font color='orange'>smelting</font>"
+				if(PROCESS_COMPRESS)
+					dat += "<font color='blue'>compressing</font>"
+				if(PROCESS_ALLOY)
+					dat += "<font color='gray'>alloying</font>"
+		else
+			dat += "<font color='red'>not processing</font>"
+		dat += ".</td><td width = 30><a href='?src=\ref[src];toggle_smelting=[ore]'>\[change\]</a></td></tr>"
+
+	dat += "</table><hr>"
+	dat += "Currently displaying [show_all_ores ? "all ore types" : "only available ore types"]. <A href='?src=\ref[src];toggle_ores=1'>\[[show_all_ores ? "show less" : "show more"]\]</a></br>"
+	dat += "The ore processor is currently <A href='?src=\ref[src];toggle_power=1'>[(machine.active ? "<font color='green'>processing</font>" : "<font color='red'>disabled</font>")]</a>."
+	user << browse(dat, "window=processor_console;size=400x500")
+	onclose(user, "processor_console")
+	return
 
 /obj/machinery/mineral/processing_unit_console/Topic(href, href_list)
 	if(..())
-		return
+		return 1
 	usr.set_machine(src)
-	add_fingerprint(usr)
+	src.add_fingerprint(usr)
 
-	if(href_list["material"])
-		var/datum/material/new_material = locate(href_list["material"])
-		if(istype(new_material))
-			machine.selected_material = new_material
-			machine.selected_alloy = null
+	if(href_list["toggle_smelting"])
 
-	if(href_list["alloy"])
-		machine.selected_material = null
-		machine.selected_alloy = href_list["alloy"]
+		var/choice = input("What setting do you wish to use for processing [href_list["toggle_smelting"]]?") as null|anything in list("Smelting","Compressing","Alloying","Nothing")
+		if(!choice) return
 
-	if(href_list["set_on"])
-		machine.on = (href_list["set_on"] == "on")
+		switch(choice)
+			if("Nothing") choice = PROCESS_NONE
+			if("Smelting") choice = PROCESS_SMELT
+			if("Compressing") choice = PROCESS_COMPRESS
+			if("Alloying") choice = PROCESS_ALLOY
 
-	updateUsrDialog()
+		machine.ores_processing[href_list["toggle_smelting"]] = choice
+
+	if(href_list["toggle_power"])
+
+		machine.active = !machine.active
+
+	if(href_list["toggle_ores"])
+
+		show_all_ores = !show_all_ores
+
+	if(href_list["choice"])
+		if(istype(inserted_id))
+			if(href_list["choice"] == "eject")
+				usr.put_in_hands(inserted_id)
+				inserted_id = null
+			if(href_list["choice"] == "claim")
+				if(access_mining_station in inserted_id.access)
+					inserted_id.mining_points += machine.points
+					machine.points = 0
+				else
+					to_chat(usr, "<span class='warning'>Required access not found.</span>")
+		else if(href_list["choice"] == "insert")
+			var/obj/item/weapon/card/id/I = usr.get_active_hand()
+			if(istype(I))
+				usr.drop_item()
+				I.forceMove(src)
+				inserted_id = I
+			else
+				to_chat(usr, "<span class='warning'>No valid ID.</span>")
+
+	src.updateUsrDialog()
 	return
-
-/obj/machinery/mineral/processing_unit_console/Destroy()
-	machine = null
-	return ..()
-
 
 /**********************Mineral processing unit**************************/
 
 
 /obj/machinery/mineral/processing_unit
-	name = "furnace"
-	icon = 'icons/obj/machines/mining_machines.dmi'
+	name = "material processor" //This isn't actually a goddamn furnace, we're in space and it's processing platinum and flammable phoron...
+	icon = 'icons/obj/machines/mining_machines_vr.dmi' // VOREStation Edit
 	icon_state = "furnace"
 	density = TRUE
-	var/obj/machinery/mineral/CONSOLE = null
-	var/on = FALSE
-	var/datum/material/selected_material = null
-	var/selected_alloy = null
-	var/datum/techweb/stored_research
+	anchored = TRUE
+	light_range = 3
+	var/obj/machinery/mineral/input = null
+	var/obj/machinery/mineral/output = null
+	var/obj/machinery/mineral/console = null
+	var/sheets_per_tick = 10
+	var/list/ores_processing[0]
+	var/list/ores_stored[0]
+	var/static/list/alloy_data
+	var/active = FALSE
+
+	var/points = 0
+	var/static/list/ore_values = list(
+		"sand" = 1,
+		"hematite" = 1,
+		"carbon" = 1,
+		"phoron" = 15,
+		"silver" = 16,
+		"gold" = 18,
+		"marble" = 20,
+		"uranium" = 30,
+		"diamond" = 50,
+		"platinum" = 40,
+		"lead" = 40,
+		"mhydrogen" = 40,
+		"verdantium" = 60)
+
+/obj/machinery/mineral/processing_unit/New()
+	..()
+	// initialize static alloy_data list
+	if(!alloy_data)
+		alloy_data = list()
+		for(var/alloytype in typesof(/datum/alloy)-/datum/alloy)
+			alloy_data += new alloytype()
+
+	// TODO - Initializing this here is insane. Put it in global lists init or something. ~Leshana
+	if(!ore_data || !ore_data.len)
+		for(var/oretype in typesof(/ore)-/ore)
+			var/ore/OD = new oretype()
+			ore_data[OD.name] = OD
+			ores_processing[OD.name] = 0
+			ores_stored[OD.name] = 0
 
 /obj/machinery/mineral/processing_unit/Initialize()
 	. = ..()
-	proximity_monitor = new(src, 1)
-	AddComponent(/datum/component/material_container, list(/datum/material/iron, /datum/material/glass, /datum/material/silver, /datum/material/gold, /datum/material/diamond, /datum/material/plasma, /datum/material/uranium, /datum/material/bananium, /datum/material/titanium, /datum/material/bluespace), INFINITY, TRUE, /obj/item/stack)
-	stored_research = new /datum/techweb/specialized/autounlocking/smelter
-	selected_material = getmaterialref(/datum/material/iron)
-
-/obj/machinery/mineral/processing_unit/Destroy()
-	CONSOLE = null
-	QDEL_NULL(stored_research)
-	return ..()
-
-/obj/machinery/mineral/processing_unit/HasProximity(atom/movable/AM)
-	if(istype(AM, /obj/item/stack/ore) && AM.loc == get_step(src, input_dir))
-		process_ore(AM)
-
-/obj/machinery/mineral/processing_unit/proc/process_ore(obj/item/stack/ore/O)
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	var/material_amount = materials.get_item_material_amount(O)
-	if(!materials.has_space(material_amount))
-		unload_mineral(O)
-	else
-		materials.insert_item(O)
-		qdel(O)
-		if(CONSOLE)
-			CONSOLE.updateUsrDialog()
-
-/obj/machinery/mineral/processing_unit/proc/get_machine_data()
-	var/dat = "<b>Smelter control console</b><br><br>"
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	for(var/datum/material/M in materials.materials)
-		var/amount = materials.materials[M]
-		dat += "<span class=\"res_name\">[M.name]: </span>[amount] cm&sup3;"
-		if (selected_material == M)
-			dat += " <i>Smelting</i>"
-		else
-			dat += " <A href='?src=[REF(CONSOLE)];material=[REF(M)]'><b>Not Smelting</b></A> "
-		dat += "<br>"
-
-	dat += "<br><br>"
-	dat += "<b>Smelt Alloys</b><br>"
-
-	for(var/v in stored_research.researched_designs)
-		var/datum/design/D = SSresearch.techweb_design_by_id(v)
-		dat += "<span class=\"res_name\">[D.name] "
-		if (selected_alloy == D.id)
-			dat += " <i>Smelting</i>"
-		else
-			dat += " <A href='?src=[REF(CONSOLE)];alloy=[D.id]'><b>Not Smelting</b></A> "
-		dat += "<br>"
-
-	dat += "<br><br>"
-	//On or off
-	dat += "Machine is currently "
-	if (on)
-		dat += "<A href='?src=[REF(CONSOLE)];set_on=off'>On</A> "
-	else
-		dat += "<A href='?src=[REF(CONSOLE)];set_on=on'>Off</A> "
-
-	return dat
+	// TODO - Eschew input/output machinery and just use dirs ~Leshana
+	//Locate our output and input machinery.
+	for (var/dir in cardinal)
+		src.input = locate(/obj/machinery/mineral/input, get_step(src, dir))
+		if(src.input) break
+	for (var/dir in cardinal)
+		src.output = locate(/obj/machinery/mineral/output, get_step(src, dir))
+		if(src.output) break
+	return
 
 /obj/machinery/mineral/processing_unit/process()
-	if (on)
-		if(selected_material)
-			smelt_ore()
 
-		else if(selected_alloy)
-			smelt_alloy()
+	if (!src.output || !src.input)
+		return
 
+	if(panel_open || !powered())
+		return
 
-		if(CONSOLE)
-			CONSOLE.updateUsrDialog()
+	var/list/tick_alloys = list()
 
-/obj/machinery/mineral/processing_unit/proc/smelt_ore()
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	var/datum/material/mat = selected_material
-	if(mat)
-		var/sheets_to_remove = (materials.materials[mat] >= (MINERAL_MATERIAL_AMOUNT * SMELT_AMOUNT) ) ? SMELT_AMOUNT : round(materials.materials[mat] /  MINERAL_MATERIAL_AMOUNT)
-		if(!sheets_to_remove)
-			on = FALSE
+	//Grab some more ore to process this tick.
+	for(var/i = 0,i<sheets_per_tick,i++)
+		var/obj/item/weapon/ore/O = locate() in input.loc
+		if(!O) break
+		if(!isnull(ores_stored[O.material]))
+			ores_stored[O.material]++
+			points += ore_values[O.material] // Give Points!
+		qdel(O)
+
+	if(!active)
+		return
+
+	//Process our stored ores and spit out sheets.
+	var/sheets = 0
+	for(var/metal in ores_stored)
+
+		if(sheets >= sheets_per_tick) break
+
+		if(ores_stored[metal] > 0 && ores_processing[metal] != 0)
+
+			var/ore/O = ore_data[metal]
+
+			if(!O) continue
+
+			if(ores_processing[metal] == PROCESS_ALLOY && O.alloy) //Alloying.
+
+				for(var/datum/alloy/A in alloy_data)
+
+					if(A.metaltag in tick_alloys)
+						continue
+
+					tick_alloys += A.metaltag
+					var/enough_metal
+
+					if(!isnull(A.requires[metal]) && ores_stored[metal] >= A.requires[metal]) //We have enough of our first metal, we're off to a good start.
+
+						enough_metal = 1
+
+						for(var/needs_metal in A.requires)
+							//Check if we're alloying the needed metal and have it stored.
+							if(ores_processing[needs_metal] != PROCESS_ALLOY || ores_stored[needs_metal] < A.requires[needs_metal])
+								enough_metal = 0
+								break
+
+					if(!enough_metal)
+						continue
+					else
+						var/total
+						for(var/needs_metal in A.requires)
+							ores_stored[needs_metal] -= A.requires[needs_metal]
+							total += A.requires[needs_metal]
+							total = max(1,round(total*A.product_mod)) //Always get at least one sheet.
+							sheets += total-1
+
+						for(var/i=0,i<total,i++)
+							new A.product(output.loc)
+
+			else if(ores_processing[metal] == PROCESS_COMPRESS && O.compresses_to) //Compressing.
+
+				var/can_make = CLAMP(ores_stored[metal],0,sheets_per_tick-sheets)
+				if(can_make%2>0) can_make--
+
+				var/material/M = get_material_by_name(O.compresses_to)
+
+				if(!istype(M) || !can_make || ores_stored[metal] < 1)
+					continue
+
+				for(var/i=0,i<can_make,i+=2)
+					ores_stored[metal]-=2
+					sheets+=2
+					new M.stack_type(output.loc)
+
+			else if(ores_processing[metal] == PROCESS_SMELT && O.smelts_to) //Smelting.
+
+				var/can_make = CLAMP(ores_stored[metal],0,sheets_per_tick-sheets)
+
+				var/material/M = get_material_by_name(O.smelts_to)
+				if(!istype(M) || !can_make || ores_stored[metal] < 1)
+					continue
+
+				for(var/i=0,i<can_make,i++)
+					ores_stored[metal]--
+					sheets++
+					new M.stack_type(output.loc)
+			else
+				ores_stored[metal]--
+				sheets++
+				new /obj/item/weapon/ore/slag(output.loc)
 		else
-			var/out = get_step(src, output_dir)
-			materials.retrieve_sheets(sheets_to_remove, mat, out)
+			continue
 
+	console.updateUsrDialog()
 
-/obj/machinery/mineral/processing_unit/proc/smelt_alloy()
-	var/datum/design/alloy = stored_research.isDesignResearchedID(selected_alloy) //check if it's a valid design
-	if(!alloy)
-		on = FALSE
-		return
-
-	var/amount = can_smelt(alloy)
-
-	if(!amount)
-		on = FALSE
-		return
-
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	materials.use_materials(alloy.materials, amount)
-
-	generate_mineral(alloy.build_path)
-
-/obj/machinery/mineral/processing_unit/proc/can_smelt(datum/design/D)
-	if(D.make_reagents.len)
-		return FALSE
-
-	var/build_amount = SMELT_AMOUNT
-
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-
-	for(var/mat_cat in D.materials)
-		var/required_amount = D.materials[mat_cat]
-		var/amount = materials.materials[mat_cat]
-
-		build_amount = min(build_amount, round(amount / required_amount))
-
-	return build_amount
-
-/obj/machinery/mineral/processing_unit/proc/generate_mineral(P)
-	var/O = new P(src)
-	unload_mineral(O)
-
-/obj/machinery/mineral/processing_unit/on_deconstruction()
-	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
-	materials.retrieve_all()
-	..()
-
-#undef SMELT_AMOUNT
+#undef PROCESS_NONE
+#undef PROCESS_SMELT
+#undef PROCESS_COMPRESS
+#undef PROCESS_ALLOY

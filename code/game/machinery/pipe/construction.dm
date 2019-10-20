@@ -3,10 +3,6 @@ Buildable pipes
 Buildable meters
 */
 
-//construction defines are in __defines/pipe_construction.dm
-//update those defines ANY TIME an atmos path is changed...
-//...otherwise construction will stop working
-
 /obj/item/pipe
 	name = "pipe"
 	desc = "A pipe."
@@ -14,38 +10,40 @@ Buildable meters
 	var/pipename
 	force = 7
 	throwforce = 7
-	icon = 'icons/obj/atmospherics/pipes/pipe_item.dmi'
+	icon = 'icons/obj/pipe-item.dmi'
 	icon_state = "simple"
 	item_state = "buildpipe"
-	w_class = WEIGHT_CLASS_NORMAL
+	w_class = ITEMSIZE_NORMAL
 	level = 2
 	var/piping_layer = PIPING_LAYER_DEFAULT
-	var/RPD_type
+	var/dispenser_class // Tells the dispenser what orientations we support, so RPD can show previews.
 
+// One subtype for each way components connect to neighbors
 /obj/item/pipe/directional
-	RPD_type = PIPE_UNARY
+	dispenser_class = PIPE_DIRECTIONAL
 /obj/item/pipe/binary
-	RPD_type = PIPE_STRAIGHT
+	dispenser_class = PIPE_STRAIGHT
 /obj/item/pipe/binary/bendable
-	RPD_type = PIPE_BENDABLE
+	dispenser_class = PIPE_BENDABLE
 /obj/item/pipe/trinary
-	RPD_type = PIPE_TRINARY
+	dispenser_class = PIPE_TRINARY
 /obj/item/pipe/trinary/flippable
-	RPD_type = PIPE_TRIN_M
-	var/flipped = FALSE
+	dispenser_class = PIPE_TRIN_M
+	var/mirrored = FALSE
 /obj/item/pipe/quaternary
-	RPD_type = PIPE_ONEDIR
+	dispenser_class = PIPE_ONEDIR
 
-/obj/item/pipe/ComponentInitialize()
-	//Flipping handled manually due to custom handling for trinary pipes
-	AddComponent(/datum/component/simple_rotation, ROTATION_ALTCLICK | ROTATION_CLOCKWISE)
-
-/obj/item/pipe/Initialize(mapload, _pipe_type, _dir, obj/machinery/atmospherics/make_from)
+/**
+ * Call constructor with:
+ * @param loc Location
+ * @pipe_type
+ */
+/obj/item/pipe/Initialize(var/mapload, var/_pipe_type, var/_dir, var/obj/machinery/atmospherics/make_from)
 	if(make_from)
 		make_from_existing(make_from)
 	else
 		pipe_type = _pipe_type
-		setDir(_dir)
+		set_dir(_dir)
 
 	update()
 	pixel_x += rand(-5, 5)
@@ -53,14 +51,18 @@ Buildable meters
 	return ..()
 
 /obj/item/pipe/proc/make_from_existing(obj/machinery/atmospherics/make_from)
-	setDir(make_from.dir)
+	set_dir(make_from.dir)
 	pipename = make_from.name
-	add_atom_colour(make_from.color, FIXED_COLOUR_PRIORITY)
+	if(make_from.req_access)
+		src.req_access = make_from.req_access
+	if(make_from.req_one_access)
+		src.req_one_access = make_from.req_one_access
+	color = make_from.pipe_color
 	pipe_type = make_from.type
 
-/obj/item/pipe/trinary/flippable/make_from_existing(obj/machinery/atmospherics/components/trinary/make_from)
+/obj/item/pipe/trinary/flippable/make_from_existing(obj/machinery/atmospherics/trinary/make_from)
 	..()
-	if(make_from.flipped)
+	if(make_from.mirrored)
 		do_a_flip()
 
 /obj/item/pipe/dropped()
@@ -70,68 +72,110 @@ Buildable meters
 
 /obj/item/pipe/proc/setPipingLayer(new_layer = PIPING_LAYER_DEFAULT)
 	var/obj/machinery/atmospherics/fakeA = pipe_type
-
-	if(initial(fakeA.pipe_flags) & PIPING_ALL_LAYER)
+	if(initial(fakeA.pipe_flags) & (PIPING_ALL_LAYER|PIPING_DEFAULT_LAYER_ONLY))
 		new_layer = PIPING_LAYER_DEFAULT
 	piping_layer = new_layer
-
-	PIPING_LAYER_SHIFT(src, piping_layer)
-	layer = initial(layer) + ((piping_layer - PIPING_LAYER_DEFAULT) * PIPING_LAYER_LCHANGE)
+	// Do it the Polaris way
+	switch(piping_layer)
+		if(PIPING_LAYER_SCRUBBER)
+			color = PIPE_COLOR_RED
+			name = "[initial(fakeA.name)] scrubber fitting"
+		if(PIPING_LAYER_SUPPLY)
+			color = PIPE_COLOR_BLUE
+			name = "[initial(fakeA.name)] supply fitting"
+	// Or if we were to do it the TG way...
+	// pixel_x = PIPE_PIXEL_OFFSET_X(piping_layer)
+	// pixel_y = PIPE_PIXEL_OFFSET_Y(piping_layer)
+	// layer = initial(layer) + PIPE_LAYER_OFFSET(piping_layer)
 
 /obj/item/pipe/proc/update()
 	var/obj/machinery/atmospherics/fakeA = pipe_type
 	name = "[initial(fakeA.name)] fitting"
 	icon_state = initial(fakeA.pipe_state)
-	if(ispath(pipe_type,/obj/machinery/atmospherics/pipe/heat_exchanging))
-		resistance_flags |= FIRE_PROOF | LAVA_PROOF
 
 /obj/item/pipe/verb/flip()
 	set category = "Object"
 	set name = "Flip Pipe"
 	set src in view(1)
 
-	if ( usr.incapacitated() )
+	if ( usr.stat || usr.restrained() || !usr.canmove )
 		return
 
 	do_a_flip()
 
 /obj/item/pipe/proc/do_a_flip()
-	setDir(turn(dir, -180))
+	set_dir(turn(dir, -180))
+	fixdir()
 
 /obj/item/pipe/trinary/flippable/do_a_flip()
-	setDir(turn(dir, flipped ? 45 : -45))
-	flipped = !flipped
+	// set_dir(turn(dir, flipped ? 45 : -45))
+	// TG has a magic icon set with the flipped versions in the diagonals.
+	// We may switch to this later, but for now gotta do some magic.
+	mirrored = !mirrored
+	var/obj/machinery/atmospherics/fakeA = pipe_type
+	icon_state = "[initial(fakeA.pipe_state)][mirrored ? "m" : ""]"
 
-/obj/item/pipe/Move()
-	var/old_dir = dir
-	..()
-	setDir(old_dir) //pipes changing direction when moved is just annoying and buggy
+/obj/item/pipe/verb/rotate_clockwise()
+	set category = "Object"
+	set name = "Rotate Pipe Clockwise"
+	set src in view(1)
 
-// Convert dir of fitting into dir of built component
-/obj/item/pipe/proc/fixed_dir()
-	return dir
+	if ( usr.stat || usr.restrained() || !usr.canmove )
+		return
 
-/obj/item/pipe/binary/fixed_dir()
-	. = dir
+	src.set_dir(turn(src.dir, 270))
+	fixdir()
+
+// If you want to disable pipe dir changing when pulled, uncomment this
+// /obj/item/pipe/Move()
+// 	var/old_dir = dir
+// 	. = ..()
+// 	set_dir(old_dir) //pipes changing direction when moved is just annoying and buggy
+
+// Don't let pulling a pipe straighten it out.
+/obj/item/pipe/binary/bendable/Move()
+	var/old_bent = !IS_CARDINAL(dir)
+	. = ..()
+	if(old_bent && IS_CARDINAL(dir))
+		set_dir(turn(src.dir, -45))
+
+//Helper to clean up dir
+/obj/item/pipe/proc/fixdir()
+	return
+
+/obj/item/pipe/binary/fixdir()
 	if(dir == SOUTH)
-		. = NORTH
+		set_dir(NORTH)
 	else if(dir == WEST)
-		. = EAST
+		set_dir(EAST)
 
-/obj/item/pipe/trinary/flippable/fixed_dir()
-	. = dir
-	if(dir in GLOB.diagonals)
-		. = turn(dir, 45)
+/obj/item/pipe/trinary/flippable/fixdir()
+	if(dir in cornerdirs)
+		set_dir(turn(dir, 45))
 
 /obj/item/pipe/attack_self(mob/user)
-	setDir(turn(dir,-90))
+	set_dir(turn(dir,-90))
+	fixdir()
 
-/obj/item/pipe/wrench_act(mob/living/user, obj/item/wrench/W)
-	. = ..()
+//called when a turf is attacked with a pipe item
+/obj/item/pipe/afterattack(turf/simulated/floor/target, mob/user, proximity)
+	if(!proximity) return
+	if(istype(target) && user.canUnEquip(src))
+		user.drop_from_inventory(src, target)
+	else
+		return ..()
+
+/obj/item/pipe/attackby(var/obj/item/weapon/W as obj, var/mob/user as mob)
+	if(W.is_wrench())
+		return wrench_act(user, W)
+	return ..()
+
+/obj/item/pipe/proc/wrench_act(var/mob/living/user, var/obj/item/weapon/tool/wrench/W)
 	if(!isturf(loc))
 		return TRUE
 
 	add_fingerprint(user)
+	fixdir()
 
 	var/obj/machinery/atmospherics/fakeA = pipe_type
 	var/flags = initial(fakeA.pipe_flags)
@@ -139,65 +183,83 @@ Buildable meters
 		if((M.pipe_flags & flags & PIPING_ONE_PER_TURF))	//Only one dense/requires density object per tile, eg connectors/cryo/heater/coolers.
 			to_chat(user, "<span class='warning'>Something is hogging the tile!</span>")
 			return TRUE
-		if((M.piping_layer != piping_layer) && !((M.pipe_flags | flags) & PIPING_ALL_LAYER)) //don't continue if either pipe goes across all layers
+		if((M.piping_layer != piping_layer) && !((M.pipe_flags | flags) & PIPING_ALL_LAYER)) // Pipes on different layers can't block each other unless they are ALL_LAYER
 			continue
-		if(M.GetInitDirections() & SSair.get_init_dirs(pipe_type, fixed_dir()))	// matches at least one direction on either type of pipe
+		if(M.get_init_dirs() & SSmachines.get_init_dirs(pipe_type, dir))	// matches at least one direction on either type of pipe
 			to_chat(user, "<span class='warning'>There is already a pipe at that location!</span>")
 			return TRUE
 	// no conflicts found
 
 	var/obj/machinery/atmospherics/A = new pipe_type(loc)
 	build_pipe(A)
-	A.on_construction(color, piping_layer)
+	// TODO - Evaluate and remove the "need at least one thing to connect to" thing ~Leshana
+	// With how the pipe code works, at least one end needs to be connected to something, otherwise the game deletes the segment.
+	if (QDELETED(A))
+		to_chat(user, "<span class='warning'>There's nothing to connect this pipe section to!</span>")
+		return TRUE
 	transfer_fingerprints_to(A)
 
-	W.play_tool_sound(src)
+	playsound(src, W.usesound, 50, 1)
 	user.visible_message( \
 		"[user] fastens \the [src].", \
 		"<span class='notice'>You fasten \the [src].</span>", \
-		"<span class='hear'>You hear ratcheting.</span>")
+		"<span class='italics'>You hear ratcheting.</span>")
 
 	qdel(src)
 
 /obj/item/pipe/proc/build_pipe(obj/machinery/atmospherics/A)
-	A.setDir(fixed_dir())
-	A.SetInitDirections()
-
+	A.set_dir(dir)
+	A.init_dir()
 	if(pipename)
 		A.name = pipename
-	if(A.on)
-		// Certain pre-mapped subtypes are on by default, we want to preserve
-		// every other aspect of these subtypes (name, pre-set filters, etc.)
-		// but they shouldn't turn on automatically when wrenched.
-		A.on = FALSE
+	if(req_access)
+		A.req_access = req_access
+	if(req_one_access)
+		A.req_one_access = req_one_access
+	A.on_construction(color, piping_layer)
 
-/obj/item/pipe/trinary/flippable/build_pipe(obj/machinery/atmospherics/components/trinary/T)
-	..()
-	T.flipped = flipped
+/obj/item/pipe/trinary/flippable/build_pipe(obj/machinery/atmospherics/trinary/T)
+	T.mirrored = mirrored
+	. = ..()
 
-/obj/item/pipe/directional/suicide_act(mob/user)
-	user.visible_message("<span class='suicide'>[user] shoves [src] in [user.p_their()] mouth and turns it on! It looks like [user.p_theyre()] trying to commit suicide!</span>")
-	if(iscarbon(user))
-		var/mob/living/carbon/C = user
-		for(var/i=1 to 20)
-			C.vomit(0, TRUE, FALSE, 4, FALSE)
-			if(prob(20))
-				C.spew_organ()
-			sleep(5)
-		C.blood_volume = 0
-	return(OXYLOSS|BRUTELOSS)
+// Lookup the initialize_directions for a given atmos machinery instance facing dir.
+// TODO - Right now this determines the answer by instantiating an instance and checking!
+// There has to be a better way... ~Leshana
+/datum/controller/subsystem/machines/proc/get_init_dirs(type, dir)
+	var/static/list/pipe_init_dirs_cache = list()
+	if(!pipe_init_dirs_cache[type])
+		pipe_init_dirs_cache[type] = list()
+
+	if(!pipe_init_dirs_cache[type]["[dir]"])
+		var/obj/machinery/atmospherics/temp = new type(null, dir)
+		pipe_init_dirs_cache[type]["[dir]"] = temp.get_init_dirs()
+		qdel(temp)
+
+	return pipe_init_dirs_cache[type]["[dir]"]
+
+
+
+
+
+//
+// Meters are special - not like any other pipes or components
+//
 
 /obj/item/pipe_meter
 	name = "meter"
 	desc = "A meter that can be laid on pipes."
-	icon = 'icons/obj/atmospherics/pipes/pipe_item.dmi'
+	icon = 'icons/obj/pipe-item.dmi'
 	icon_state = "meter"
 	item_state = "buildpipe"
-	w_class = WEIGHT_CLASS_BULKY
+	w_class = ITEMSIZE_LARGE
 	var/piping_layer = PIPING_LAYER_DEFAULT
 
-/obj/item/pipe_meter/wrench_act(mob/living/user, obj/item/wrench/W)
-	. = ..()
+/obj/item/pipe_meter/attackby(var/obj/item/weapon/W as obj, var/mob/user as mob)
+	if(W.is_wrench())
+		return wrench_act(user, W)
+	return ..()
+
+/obj/item/pipe_meter/proc/wrench_act(var/mob/living/user, var/obj/item/weapon/tool/wrench/W)
 	var/obj/machinery/atmospherics/pipe/pipe
 	for(var/obj/machinery/atmospherics/pipe/P in loc)
 		if(P.piping_layer == piping_layer)
@@ -207,22 +269,8 @@ Buildable meters
 		to_chat(user, "<span class='warning'>You need to fasten it to a pipe!</span>")
 		return TRUE
 	new /obj/machinery/meter(loc, piping_layer)
-	W.play_tool_sound(src)
+	playsound(src, W.usesound, 50, 1)
 	to_chat(user, "<span class='notice'>You fasten the meter to the pipe.</span>")
-	qdel(src)
-
-/obj/item/pipe_meter/screwdriver_act(mob/living/user, obj/item/S)
-	. = ..()
-	if(.)
-		return TRUE
-
-	if(!isturf(loc))
-		to_chat(user, "<span class='warning'>You need to fasten it to the floor!</span>")
-		return TRUE
-
-	new /obj/machinery/meter/turf(loc, piping_layer)
-	S.play_tool_sound(src)
-	to_chat(user, "<span class='notice'>You fasten the meter to the [loc.name].</span>")
 	qdel(src)
 
 /obj/item/pipe_meter/dropped()
@@ -232,4 +280,3 @@ Buildable meters
 
 /obj/item/pipe_meter/proc/setAttachLayer(new_layer = PIPING_LAYER_DEFAULT)
 	piping_layer = new_layer
-	PIPING_LAYER_DOUBLE_SHIFT(src, piping_layer)

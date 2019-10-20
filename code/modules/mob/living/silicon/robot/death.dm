@@ -1,34 +1,22 @@
-
-/mob/living/silicon/robot/gib_animation()
-	new /obj/effect/temp_visual/gib_animation(loc, "gibbed-r")
-
-/mob/living/silicon/robot/dust(just_ash, drop_items, force)
+/mob/living/silicon/robot/dust()
+	//Delete the MMI first so that it won't go popping out.
 	if(mmi)
 		qdel(mmi)
 	..()
 
-/mob/living/silicon/robot/spawn_dust()
-	new /obj/effect/decal/remains/robot(loc)
-
-/mob/living/silicon/robot/dust_animation()
-	new /obj/effect/temp_visual/dust_animation(loc, "dust-r")
+/mob/living/silicon/robot/ash()
+	if(mmi)
+		qdel(mmi)
+	..()
 
 /mob/living/silicon/robot/death(gibbed)
-	if(stat == DEAD)
-		return
-
-	. = ..()
-
-	locked = FALSE //unlock cover
-
-	if(!QDELETED(builtInCamera) && builtInCamera.status)
-		builtInCamera.toggle_cam(src,0)
-	update_headlamp(1) //So borg lights are disabled when killed.
-
-	uneq_all() // particularly to ensure sight modes are cleared
-
-	update_icons()
-
-	unbuckle_all_mobs(TRUE)
-
-	SSblackbox.ReportDeath(src)
+	if(camera)
+		camera.status = 0
+	if(module)
+		var/obj/item/weapon/gripper/G = locate(/obj/item/weapon/gripper) in module
+		if(G) G.drop_item()
+		var/obj/item/device/dogborg/sleeper/S = locate(/obj/item/device/dogborg/sleeper) in module //VOREStation edit.
+		if(S) S.go_out() //VOREStation edit.
+	remove_robot_verbs()
+	sql_report_cyborg_death(src)
+	..(gibbed,"shudders violently for a moment, then becomes motionless, its eyes slowly darkening.")

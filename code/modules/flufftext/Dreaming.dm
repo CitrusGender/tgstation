@@ -1,69 +1,38 @@
-/mob/living/carbon/proc/handle_dreams()
-	if(prob(10) && !dreaming)
+
+var/list/dreams = list(
+	"an ID card","a bottle","a familiar face","a crewmember","a toolbox","a security officer","the Colony Director",
+	"voices from all around","deep space","a doctor","the engine","a traitor","an ally","darkness",
+	"light","a scientist","a monkey","a catastrophe","a loved one","a gun","warmth","freezing","the sun",
+	"a hat","the Luna","a ruined station","a planet","phoron","air","the medical bay","the bridge","blinking lights",
+	"a blue light","an abandoned laboratory","NanoTrasen","mercenaries","blood","healing","power","respect",
+	"riches","space","a crash","happiness","pride","a fall","water","flames","ice","melons","flying","the eggs","money",
+	"the head of personnel","the head of security","a chief engineer","a research director","a chief medical officer",
+	"the detective","the warden","a member of the internal affairs","a station engineer","the janitor","atmospheric technician",
+	"the quartermaster","a cargo technician","the botanist","a shaft miner","the psychologist","the chemist","the geneticist",
+	"the virologist","the roboticist","the chef","the bartender","the chaplain","the librarian","a mouse","an ert member",
+	"a beach","the holodeck","a smokey room","a voice","the cold","a mouse","an operating table","the bar","the rain","a skrell",
+	"an unathi","a tajaran","the ai core","the mining station","the research station","a beaker of strange liquid",
+	//VOREStation Additions after this
+	"slimey surroundings","a sexy squirrel","licking their lips","a gaping maw","an unlikely predator","sinking inside",
+	"vulpine assets","more dakka","churning guts","pools of fluid","an exceptional grip","mawing in faces","gaping throat",
+	"swallowed whole","a fox","a wolf","a cat","a tiger","a dog","a taur","a xenochimera"
+	)
+
+mob/living/carbon/proc/dream()
+	dreaming = 1
+
+	spawn(0)
+		for(var/i = rand(1,4),i > 0, i--)
+			src << "<font color='blue'><i>... [pick(dreams)] ...</i></font>"
+			sleep(rand(40,70))
+			if(paralysis <= 0)
+				dreaming = 0
+				return 0
+		dreaming = 0
+		return 1
+
+mob/living/carbon/proc/handle_dreams()
+	if(client && !dreaming && prob(5))
 		dream()
 
-/mob/living/carbon/proc/dream()
-	set waitfor = FALSE
-	var/list/dream_fragments = list()
-	var/list/custom_dream_nouns = list()
-	var/fragment = ""
-
-	for(var/obj/item/bedsheet/sheet in loc)
-		custom_dream_nouns += sheet.dream_messages
-
-	dream_fragments += "you see"
-
-	//Subject
-	if(custom_dream_nouns.len && prob(90))
-		fragment += pick(custom_dream_nouns)
-	else
-		fragment += pick(GLOB.dream_strings)
-
-	if(prob(50))
-		fragment = replacetext(fragment, "%ADJECTIVE%", pick(GLOB.adjectives))
-	else
-		fragment = replacetext(fragment, "%ADJECTIVE% ", "")
-	if(findtext(fragment, "%A% "))
-		fragment = "\a [replacetext(fragment, "%A% ", "")]"
-	dream_fragments += fragment
-
-	//Verb
-	fragment = ""
-	if(prob(50))
-		if(prob(35))
-			fragment += "[pick(GLOB.adverbs)] "
-		fragment += pick(GLOB.ing_verbs)
-	else
-		fragment += "will "
-		fragment += pick(GLOB.verbs)
-	dream_fragments += fragment
-
-	if(prob(25))
-		dream_sequence(dream_fragments)
-		return
-
-	//Object
-	fragment = ""
-	fragment += pick(GLOB.dream_strings)
-	if(prob(50))
-		fragment = replacetext(fragment, "%ADJECTIVE%", pick(GLOB.adjectives))
-	else
-		fragment = replacetext(fragment, "%ADJECTIVE% ", "")
-	if(findtext(fragment, "%A% "))
-		fragment = "\a [replacetext(fragment, "%A% ", "")]"
-	dream_fragments += fragment
-
-	dreaming = TRUE
-	dream_sequence(dream_fragments)
-
-/mob/living/carbon/proc/dream_sequence(list/dream_fragments)
-	if(stat != UNCONSCIOUS || InCritical())
-		dreaming = FALSE
-		return
-	var/next_message = dream_fragments[1]
-	dream_fragments.Cut(1,2)
-	to_chat(src, "<span class='notice'><i>... [next_message] ...</i></span>")
-	if(LAZYLEN(dream_fragments))
-		addtimer(CALLBACK(src, .proc/dream_sequence, dream_fragments), rand(10,30))
-	else
-		dreaming = FALSE
+mob/living/carbon/var/dreaming = 0

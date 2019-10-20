@@ -1,111 +1,66 @@
-/*ALL DEFINES RELATED TO CONSTRUCTION, CONSTRUCTING THINGS, OR CONSTRUCTED OBJECTS GO HERE*/
+//
+// Frame construction
+//
 
-//Defines for construction states
+// Frame construction states
+#define FRAME_PLACED 0		// Has been placed (can be anchored or not).
+#define FRAME_UNFASTENED 1	// Circuit added.
+#define FRAME_FASTENED 2	// Circuit fastened.
+#define FRAME_WIRED 3		// Frame wired.
+#define FRAME_PANELED 4		// Glass panel added.
 
-//girder construction states
-#define GIRDER_NORMAL 0
-#define GIRDER_REINF_STRUTS 1
-#define GIRDER_REINF 2
-#define GIRDER_DISPLACED 3
-#define GIRDER_DISASSEMBLED 4
+// The frame classes define a sequence of construction steps.
+#define FRAME_CLASS_ALARM "alarm"
+#define FRAME_CLASS_COMPUTER "computer"
+#define FRAME_CLASS_DISPLAY "display"
+#define FRAME_CLASS_MACHINE "machine"
 
-//rwall construction states
-#define INTACT 0
-#define SUPPORT_LINES 1
-#define COVER 2
-#define CUT_COVER 3
-#define ANCHOR_BOLTS 4
-#define SUPPORT_RODS 5
-#define SHEATH 6
+// Does the frame get built on the floor or a wall?
+#define FRAME_STYLE_FLOOR "floor"
+#define FRAME_STYLE_WALL "wall"
 
-//window construction states
-#define WINDOW_OUT_OF_FRAME 0
-#define WINDOW_IN_FRAME 1
-#define WINDOW_SCREWED_TO_FRAME 2
+//
+// Pipe Construction
+//
 
-//reinforced window construction states
-#define RWINDOW_FRAME_BOLTED 3
-#define RWINDOW_BARS_CUT 4
-#define RWINDOW_POPPED 5
-#define RWINDOW_BOLTS_OUT 6
-#define RWINDOW_BOLTS_HEATED 7
-#define RWINDOW_SECURE 8
+//Construction Orientation Types - Each of these categories has a different selection of how pipes can rotate and flip. Used for RPD.
+#define PIPE_STRAIGHT			0 //2 directions: N/S, E/W
+#define PIPE_BENDABLE			1 //6 directions: N/S, E/W, N/E, N/W, S/E, S/W
+#define PIPE_TRINARY			2 //4 directions: N/E/S, E/S/W, S/W/N, W/N/E
+#define PIPE_TRIN_M				3 //8 directions: N->S+E, S->N+E, N->S+W, S->N+W, E->W+S, W->E+S, E->W+N, W->E+N
+#define PIPE_DIRECTIONAL		4 //4 directions: N, S, E, W
+#define PIPE_ONEDIR				5 //1 direction: N/S/E/W
+#define PIPE_UNARY_FLIPPABLE	6 //8 directions: N, S, E, W, N-flipped, S-flipped, E-flipped, W-flipped
+#define PIPE_TRIN_T				7 //8 directions: N->S+E, S->N+E, N->S+W, S->N+W, E->W+S, W->E+S, E->W+N, W->E+N
 
-//airlock assembly construction states
-#define AIRLOCK_ASSEMBLY_NEEDS_WIRES 0
-#define AIRLOCK_ASSEMBLY_NEEDS_ELECTRONICS 1
-#define AIRLOCK_ASSEMBLY_NEEDS_SCREWDRIVER 2
+// Pipe connectivity bit flags
+#define CONNECT_TYPE_REGULAR	1
+#define CONNECT_TYPE_SUPPLY		2
+#define CONNECT_TYPE_SCRUBBER	4
+#define CONNECT_TYPE_HE			8
 
-//default_unfasten_wrench() return defines
-#define CANT_UNFASTEN 0
-#define FAILED_UNFASTEN 1
-#define SUCCESSFUL_UNFASTEN 2
+// We are based on the three named layers of supply, regular, and scrubber.
+#define PIPING_LAYER_SUPPLY		1
+#define PIPING_LAYER_REGULAR	2
+#define PIPING_LAYER_SCRUBBER	3
+#define PIPING_LAYER_DEFAULT	PIPING_LAYER_REGULAR
 
-//ai core defines
-#define EMPTY_CORE 0
-#define CIRCUIT_CORE 1
-#define SCREWED_CORE 2
-#define CABLED_CORE 3
-#define GLASS_CORE 4
-#define AI_READY_CORE 5
+// We offset the layer values of the different pipe types to ensure they look nice
+#define PIPES_SCRUBBER_LAYER	(PIPES_LAYER - 0.02)
+#define PIPES_SUPPLY_LAYER		(PIPES_LAYER - 0.01)
+#define PIPES_HE_LAYER			(PIPES_LAYER + 0.01)
 
-//Construction defines for the pinion airlock
-#define GEAR_SECURE 1
-#define GEAR_LOOSE 2
+// Pipe flags
+#define PIPING_ALL_LAYER 1					//intended to connect with all layers, check for all instead of just one.
+#define PIPING_ONE_PER_TURF 2 				//can only be built if nothing else with this flag is on the tile already.
+#define PIPING_DEFAULT_LAYER_ONLY 4			//can only exist at PIPING_LAYER_DEFAULT
+#define PIPING_CARDINAL_AUTONORMALIZE 8		//north/south east/west doesn't matter, auto normalize on build.
 
-//floodlights because apparently we use defines now
-#define FLOODLIGHT_NEEDS_WIRES 0
-#define FLOODLIGHT_NEEDS_LIGHTS 1
-#define FLOODLIGHT_NEEDS_SECURING 2
-#define FLOODLIGHT_NEEDS_WRENCHING 3
-
-//other construction-related things
-
-//windows affected by Nar'Sie turn this color.
-#define NARSIE_WINDOW_COLOUR "#7D1919"
-
-//let's just pretend fulltile windows being children of border windows is fine
-#define FULLTILE_WINDOW_DIR NORTHEAST
-
-//The amount of materials you get from a sheet of mineral like iron/diamond/glass etc
-#define MINERAL_MATERIAL_AMOUNT 2000
-//The maximum size of a stack object.
-#define MAX_STACK_SIZE 50
-//maximum amount of cable in a coil
-#define MAXCOIL 30
-
-//tablecrafting defines
-#define CAT_NONE	""
-#define CAT_WEAPONRY	"Weaponry"
-#define CAT_WEAPON	"Weapons"
-#define CAT_AMMO	"Ammunition"
-#define CAT_ROBOT	"Robots"
-#define CAT_MISC	"Misc"
-#define CAT_PRIMAL  "Tribal"
-#define CAT_CLOTHING	"Clothing"
-#define CAT_FOOD	"Foods"
-#define CAT_BREAD	"Breads"
-#define CAT_BURGER	"Burgers"
-#define CAT_CAKE	"Cakes"
-#define CAT_EGG	"Egg-Based Food"
-#define CAT_MEAT	"Meats"
-#define CAT_MISCFOOD	"Misc. Food"
-#define CAT_PASTRY	"Pastries"
-#define CAT_PIE	"Pies"
-#define CAT_PIZZA	"Pizzas"
-#define CAT_SALAD	"Salads"
-#define CAT_SANDWICH	"Sandwiches"
-#define CAT_SOUP	"Soups"
-#define CAT_SPAGHETTI	"Spaghettis"
-#define CAT_ICE	"Frozen"
-
-#define RCD_FLOORWALL 1
-#define RCD_AIRLOCK 2
-#define RCD_DECONSTRUCT 3
-#define RCD_WINDOWGRILLE 4
-#define RCD_MACHINE 8
-#define RCD_COMPUTER 16
-
-#define RCD_UPGRADE_FRAMES	1
-#define RCD_UPGRADE_SIMPLE_CIRCUITS	2
-#define RCD_UPGRADE_SILO_LINK	4
+// Macro for easy use of boilerplate code for searching for a valid node connection.
+#define STANDARD_ATMOS_CHOOSE_NODE(node_num, direction) \
+	for(var/obj/machinery/atmospherics/target in get_step(src, direction)) { \
+		if(can_be_node(target, node_num)) { \
+			node##node_num = target; \
+			break; \
+		} \
+	}

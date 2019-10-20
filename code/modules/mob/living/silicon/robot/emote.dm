@@ -1,62 +1,248 @@
-/datum/emote/silicon
-	mob_type_allowed_typecache = list(/mob/living/silicon)
-	emote_type = EMOTE_AUDIBLE
+/mob/living/silicon/robot/emote(var/act,var/m_type=1,var/message = null)
+	var/param = null
+	if (findtext(act, "-", 1, null))
+		var/t1 = findtext(act, "-", 1, null)
+		param = copytext(act, t1 + 1, length(act) + 1)
+		act = copytext(act, 1, t1)
 
-/datum/emote/silicon/boop
-	key = "boop"
-	key_third_person = "boops"
-	message = "boops."
+	if(findtext(act,"s",-1) && !findtext(act,"_",-2))//Removes ending s's unless they are prefixed with a '_'
+		act = copytext(act,1,length(act))
 
-/datum/emote/silicon/buzz
-	key = "buzz"
-	key_third_person = "buzzes"
-	message = "buzzes."
-	message_param = "buzzes at %t."
-	sound = 'sound/machines/buzz-sigh.ogg'
+	switch(act)
+		if ("me")
+			if (src.client)
+				if(client.prefs.muted & MUTE_IC)
+					src << "You cannot send IC messages (muted)."
+					return
+			if (stat)
+				return
+			if(!(message))
+				return
+			else
+				return custom_emote(m_type, message)
 
-/datum/emote/silicon/buzz2
-	key = "buzz2"
-	message = "buzzes twice."
-	sound = 'sound/machines/buzz-two.ogg'
+		if ("custom")
+			return custom_emote(m_type, message)
 
-/datum/emote/silicon/chime
-	key = "chime"
-	key_third_person = "chimes"
-	message = "chimes."
-	sound = 'sound/machines/chime.ogg'
+		if ("salute")
+			if (!src.buckled)
+				var/M = null
+				if (param)
+					for (var/mob/A in view(null, null))
+						if (param == A.name)
+							M = A
+							break
+				if (!M)
+					param = null
 
-/datum/emote/silicon/honk
-	key = "honk"
-	key_third_person = "honks"
-	message = "honks."
-	vary = TRUE
-	sound = 'sound/items/bikehorn.ogg'
+				if (param)
+					message = "salutes to [param]."
+				else
+					message = "salutes."
+			m_type = 1
+		if ("bow")
+			if (!src.buckled)
+				var/M = null
+				if (param)
+					for (var/mob/A in view(null, null))
+						if (param == A.name)
+							M = A
+							break
+				if (!M)
+					param = null
 
-/datum/emote/silicon/ping
-	key = "ping"
-	key_third_person = "pings"
-	message = "pings."
-	message_param = "pings at %t."
-	sound = 'sound/machines/ping.ogg'
+				if (param)
+					message = "bows to [param]."
+				else
+					message = "bows."
+			m_type = 1
 
-/datum/emote/silicon/sad
-	key = "sad"
-	message = "plays a sad trombone..."
-	sound = 'sound/misc/sadtrombone.ogg'
+		if ("clap")
+			if (!src.restrained())
+				message = "claps."
+				m_type = 2
+		if ("flap")
+			if (!src.restrained())
+				message = "flaps its wings."
+				m_type = 2
 
-/datum/emote/silicon/warn
-	key = "warn"
-	message = "blares an alarm!"
-	sound = 'sound/machines/warning-buzzer.ogg'
+		if ("aflap")
+			if (!src.restrained())
+				message = "flaps its wings ANGRILY!"
+				m_type = 2
 
-/mob/living/silicon/robot/verb/powerwarn()
-	set category = "Robot Commands"
-	set name = "Power Warning"
+		if ("twitch")
+			message = "twitches."
+			m_type = 1
 
-	if(stat == CONSCIOUS)
-		if(!cell || !cell.charge)
-			visible_message("<span class='notice'>The power warning light on <span class='name'>[src]</span> flashes urgently.</span>", \
-							"You announce you are operating in low power mode.")
-			playsound(loc, 'sound/machines/buzz-two.ogg', 50, FALSE)
+		if ("twitch_v")
+			message = "twitches violently."
+			m_type = 1
+
+		if ("nod")
+			message = "nods."
+			m_type = 1
+
+		if ("deathgasp")
+			message = "shudders violently for a moment, then becomes motionless, its eyes slowly darkening."
+			m_type = 1
+
+		if ("glare")
+			var/M = null
+			if (param)
+				for (var/mob/A in view(null, null))
+					if (param == A.name)
+						M = A
+						break
+			if (!M)
+				param = null
+
+			if (param)
+				message = "glares at [param]."
+			else
+				message = "glares."
+
+		if ("stare")
+			var/M = null
+			if (param)
+				for (var/mob/A in view(null, null))
+					if (param == A.name)
+						M = A
+						break
+			if (!M)
+				param = null
+
+			if (param)
+				message = "stares at [param]."
+			else
+				message = "stares."
+
+		if ("look")
+			var/M = null
+			if (param)
+				for (var/mob/A in view(null, null))
+					if (param == A.name)
+						M = A
+						break
+
+			if (!M)
+				param = null
+
+			if (param)
+				message = "looks at [param]."
+			else
+				message = "looks."
+			m_type = 1
+
+		if("beep")
+			var/M = null
+			if(param)
+				for (var/mob/A in view(null, null))
+					if (param == A.name)
+						M = A
+						break
+			if(!M)
+				param = null
+
+			if (param)
+				message = "beeps at [param]."
+			else
+				message = "beeps."
+			playsound(src.loc, 'sound/machines/twobeep.ogg', 50, 0)
+			m_type = 1
+
+		if("ping")
+			var/M = null
+			if(param)
+				for (var/mob/A in view(null, null))
+					if (param == A.name)
+						M = A
+						break
+			if(!M)
+				param = null
+
+			if (param)
+				message = "pings at [param]."
+			else
+				message = "pings."
+			playsound(src.loc, 'sound/machines/ping.ogg', 50, 0)
+			m_type = 1
+
+		if("buzz")
+			var/M = null
+			if(param)
+				for (var/mob/A in view(null, null))
+					if (param == A.name)
+						M = A
+						break
+			if(!M)
+				param = null
+
+			if (param)
+				message = "buzzes at [param]."
+			else
+				message = "buzzes."
+			playsound(src.loc, 'sound/machines/buzz-sigh.ogg', 50, 0)
+			m_type = 1
+
+		if("yes", "ye")
+			var/M = null
+			if(param)
+				for (var/mob/A in view(null, null))
+					if (param == A.name)
+						M = A
+						break
+			if(!M)
+				param = null
+
+			if (param)
+				message = "emits an affirmative blip at [param]."
+			else
+				message = "emits an affirmative blip."
+			playsound(src.loc, 'sound/machines/synth_yes.ogg', 50, 0)
+			m_type = 1
+
+		if("no")
+			var/M = null
+			if(param)
+				for (var/mob/A in view(null, null))
+					if (param == A.name)
+						M = A
+						break
+			if(!M)
+				param = null
+
+			if (param)
+				message = "emits a negative blip at [param]."
+			else
+				message = "emits a negative blip."
+			playsound(src.loc, 'sound/machines/synth_no.ogg', 50, 0)
+			m_type = 1
+
+		if("law")
+			if (istype(module,/obj/item/weapon/robot_module/robot/security) || istype(module,/obj/item/weapon/robot_module/robot/knine)) //VOREStation Add - K9
+				message = "shows its legal authorization barcode."
+
+				playsound(src.loc, 'sound/voice/biamthelaw.ogg', 50, 0)
+				m_type = 2
+			else
+				src << "You are not THE LAW, pal."
+
+		if("halt")
+			if (istype(module,/obj/item/weapon/robot_module/robot/security) || istype(module,/obj/item/weapon/robot_module/robot/knine)) //VOREStation Add - K9
+				message = "<B>'s</B> speakers skreech, \"Halt! Security!\"."
+
+				playsound(src.loc, 'sound/voice/halt.ogg', 50, 0)
+				m_type = 2
+			else
+				src << "You are not security."
+
+		if ("help")
+			src << "salute, bow-(none)/mob, clap, flap, aflap, twitch, twitch_s, nod, deathgasp, glare-(none)/mob, stare-(none)/mob, look, beep, ping, \nbuzz, law, halt, yes, no"
 		else
-			to_chat(src, "<span class='warning'>You can only use this emote when you're out of charge.</span>")
+			src << "<font color='blue'>Unusable emote '[act]'. Say *help for a list.</font>"
+
+	if ((message && src.stat == 0))
+		custom_emote(m_type,message)
+
+	return

@@ -1,601 +1,292 @@
-/mob/living/carbon/proc/monkeyize(tr_flags = (TR_KEEPITEMS | TR_KEEPVIRUS | TR_KEEPSTUNS | TR_KEEPREAGENTS | TR_DEFAULTMSG))
-	if (notransform)
+/mob/living/carbon/human/proc/monkeyize()
+	if (transforming)
 		return
-	//Handle items on mob
-
-	//first implants & organs
-	var/list/stored_implants = list()
-	var/list/int_organs = list()
-
-	if (tr_flags & TR_KEEPIMPLANTS)
-		for(var/X in implants)
-			var/obj/item/implant/IMP = X
-			stored_implants += IMP
-			IMP.removed(src, 1, 1)
-
-	var/list/missing_bodyparts_zones = get_missing_limbs()
-
-	var/obj/item/cavity_object
-
-	var/obj/item/bodypart/chest/CH = get_bodypart(BODY_ZONE_CHEST)
-	if(CH.cavity_item)
-		cavity_object = CH.cavity_item
-		CH.cavity_item = null
-
-	if(tr_flags & TR_KEEPITEMS)
-		var/Itemlist = get_equipped_items(TRUE)
-		Itemlist += held_items
-		for(var/obj/item/W in Itemlist)
-			dropItemToGround(W)
-
-	//Make mob invisible and spawn animation
-	notransform = TRUE
-	Paralyze(22, ignore_canstun = TRUE)
-	icon = null
-	cut_overlays()
-	invisibility = INVISIBILITY_MAXIMUM
-
-	new /obj/effect/temp_visual/monkeyify(loc)
-	sleep(22)
-	var/mob/living/carbon/monkey/O = new /mob/living/carbon/monkey( loc )
-
-	// hash the original name?
-	if(tr_flags & TR_HASHNAME)
-		O.name = "monkey ([copytext(md5(real_name), 2, 6)])"
-		O.real_name = "monkey ([copytext(md5(real_name), 2, 6)])"
-
-	//handle DNA and other attributes
-	dna.transfer_identity(O)
-	O.updateappearance(icon_update=0)
-
-	if(tr_flags & TR_KEEPSE)
-		O.dna.mutation_index = dna.mutation_index
-		O.dna.set_se(1, GET_INITIALIZED_MUTATION(RACEMUT))
-
-	if(suiciding)
-		O.set_suicide(suiciding)
-	if(hellbound)
-		O.hellbound = hellbound
-	O.a_intent = INTENT_HARM
-
-	//keep viruses?
-	if (tr_flags & TR_KEEPVIRUS)
-		O.diseases = diseases
-		diseases = list()
-		for(var/thing in O.diseases)
-			var/datum/disease/D = thing
-			D.affected_mob = O
-
-	//keep damage?
-	if (tr_flags & TR_KEEPDAMAGE)
-		O.setToxLoss(getToxLoss(), 0)
-		O.adjustBruteLoss(getBruteLoss(), 0)
-		O.setOxyLoss(getOxyLoss(), 0)
-		O.setCloneLoss(getCloneLoss(), 0)
-		O.adjustFireLoss(getFireLoss(), 0)
-		O.setOrganLoss(ORGAN_SLOT_BRAIN, getOrganLoss(ORGAN_SLOT_BRAIN))
-		O.updatehealth()
-		O.radiation = radiation
-
-	//re-add implants to new mob
-	if (tr_flags & TR_KEEPIMPLANTS)
-		for(var/Y in implants)
-			var/obj/item/implant/IMP = Y
-			IMP.implant(O, null, 1)
-
-	//re-add organs to new mob. this order prevents moving the mind to a brain at any point
-	if(tr_flags & TR_KEEPORGANS)
-		for(var/X in O.internal_organs)
-			var/obj/item/organ/I = X
-			I.Remove(O, 1)
-
-		if(mind)
-			mind.transfer_to(O)
-			var/datum/antagonist/changeling/changeling = O.mind.has_antag_datum(/datum/antagonist/changeling)
-			if(changeling)
-				var/datum/action/changeling/humanform/hf = new
-				changeling.purchasedpowers += hf
-				changeling.regain_powers()
-
-		for(var/X in internal_organs)
-			var/obj/item/organ/I = X
-			int_organs += I
-			I.Remove(src, 1)
-
-		for(var/X in int_organs)
-			var/obj/item/organ/I = X
-			I.Insert(O, 1)
-
-	var/obj/item/bodypart/chest/torso = O.get_bodypart(BODY_ZONE_CHEST)
-	if(cavity_object)
-		torso.cavity_item = cavity_object //cavity item is given to the new chest
-		cavity_object.forceMove(O)
-
-	for(var/missing_zone in missing_bodyparts_zones)
-		var/obj/item/bodypart/BP = O.get_bodypart(missing_zone)
-		BP.drop_limb(1)
-		if(!(tr_flags & TR_KEEPORGANS)) //we didn't already get rid of the organs of the newly spawned mob
-			for(var/X in O.internal_organs)
-				var/obj/item/organ/G = X
-				if(BP.body_zone == check_zone(G.zone))
-					if(mind && mind.has_antag_datum(/datum/antagonist/changeling) && istype(G, /obj/item/organ/brain))
-						continue //so headless changelings don't lose their brain when transforming
-					qdel(G) //we lose the organs in the missing limbs
-		qdel(BP)
-
-	//transfer stuns
-	if(tr_flags & TR_KEEPSTUNS)
-		O.Stun(AmountStun(), ignore_canstun = TRUE)
-		O.Knockdown(AmountKnockdown(), ignore_canstun = TRUE)
-		O.Immobilize(AmountImmobilized(), ignore_canstun = TRUE)
-		O.Paralyze(AmountParalyzed(), ignore_canstun = TRUE)
-		O.Unconscious(AmountUnconscious(), ignore_canstun = TRUE)
-		O.Sleeping(AmountSleeping(), ignore_canstun = TRUE)
-
-	//transfer reagents
-	if(tr_flags & TR_KEEPREAGENTS)
-		reagents.trans_to(O, reagents.total_volume)
-
-	//transfer mind if we didn't yet
-	if(mind)
-		mind.transfer_to(O)
-		var/datum/antagonist/changeling/changeling = O.mind.has_antag_datum(/datum/antagonist/changeling)
-		if(changeling)
-			var/datum/action/changeling/humanform/hf = new
-			changeling.purchasedpowers += hf
-			changeling.regain_powers()
-
-
-	if (tr_flags & TR_DEFAULTMSG)
-		to_chat(O, "<B>You are now a monkey.</B>")
-
-	for(var/A in loc.vars)
-		if(loc.vars[A] == src)
-			loc.vars[A] = O
-
-	transfer_observers_to(O)
-
-	. = O
-
-	qdel(src)
-
-//////////////////////////           Humanize               //////////////////////////////
-//Could probably be merged with monkeyize but other transformations got their own procs, too
-
-/mob/living/carbon/proc/humanize(tr_flags = (TR_KEEPITEMS | TR_KEEPVIRUS | TR_KEEPSTUNS | TR_KEEPREAGENTS | TR_DEFAULTMSG))
-	if (notransform)
-		return
-	//Handle items on mob
-
-	//first implants & organs
-	var/list/stored_implants = list()
-	var/list/int_organs = list()
-
-	if (tr_flags & TR_KEEPIMPLANTS)
-		for(var/X in implants)
-			var/obj/item/implant/IMP = X
-			stored_implants += IMP
-			IMP.removed(src, 1, 1)
-
-	var/list/missing_bodyparts_zones = get_missing_limbs()
-
-	var/obj/item/cavity_object
-
-	var/obj/item/bodypart/chest/CH = get_bodypart(BODY_ZONE_CHEST)
-	if(CH.cavity_item)
-		cavity_object = CH.cavity_item
-		CH.cavity_item = null
-
-	//now the rest
-	if (tr_flags & TR_KEEPITEMS)
-		var/Itemlist = get_equipped_items(TRUE)
-		Itemlist += held_items
-		for(var/obj/item/W in Itemlist)
-			dropItemToGround(W, TRUE)
-			if (client)
-				client.screen -= W
-
-
-
-	//Make mob invisible and spawn animation
-	notransform = TRUE
-	Paralyze(22, ignore_canstun = TRUE)
-
-	icon = null
-	cut_overlays()
-	invisibility = INVISIBILITY_MAXIMUM
-	new /obj/effect/temp_visual/monkeyify/humanify(loc)
-	sleep(22)
-	var/mob/living/carbon/human/O = new( loc )
-	for(var/obj/item/C in O.loc)
-		O.equip_to_appropriate_slot(C)
-
-	dna.transfer_identity(O)
-	O.updateappearance(mutcolor_update=1)
-
-	if(cmptext("monkey",copytext(O.dna.real_name,1,7)))
-		O.real_name = random_unique_name(O.gender)
-		O.dna.generate_unique_enzymes(O)
-	else
-		O.real_name = O.dna.real_name
-	O.name = O.real_name
-
-	if(tr_flags & TR_KEEPSE)
-		O.dna.mutation_index = dna.mutation_index
-		O.dna.set_se(0, GET_INITIALIZED_MUTATION(RACEMUT))
-		O.domutcheck()
-
-	if(suiciding)
-		O.set_suicide(suiciding)
-	if(hellbound)
-		O.hellbound = hellbound
-
-	//keep viruses?
-	if (tr_flags & TR_KEEPVIRUS)
-		O.diseases = diseases
-		diseases = list()
-		for(var/thing in O.diseases)
-			var/datum/disease/D = thing
-			D.affected_mob = O
-		O.med_hud_set_status()
-
-	//keep damage?
-	if (tr_flags & TR_KEEPDAMAGE)
-		O.setToxLoss(getToxLoss(), 0)
-		O.adjustBruteLoss(getBruteLoss(), 0)
-		O.setOxyLoss(getOxyLoss(), 0)
-		O.setCloneLoss(getCloneLoss(), 0)
-		O.adjustFireLoss(getFireLoss(), 0)
-		O.adjustOrganLoss(ORGAN_SLOT_BRAIN, getOrganLoss(ORGAN_SLOT_BRAIN))
-		O.updatehealth()
-		O.radiation = radiation
-
-	//re-add implants to new mob
-	if (tr_flags & TR_KEEPIMPLANTS)
-		for(var/Y in implants)
-			var/obj/item/implant/IMP = Y
-			IMP.implant(O, null, 1)
-
-	if(tr_flags & TR_KEEPORGANS)
-		for(var/X in O.internal_organs)
-			var/obj/item/organ/I = X
-			I.Remove(O, 1)
-
-		if(mind)
-			mind.transfer_to(O)
-			var/datum/antagonist/changeling/changeling = O.mind.has_antag_datum(/datum/antagonist/changeling)
-			if(changeling)
-				for(var/datum/action/changeling/humanform/HF in changeling.purchasedpowers)
-					changeling.purchasedpowers -= HF
-					changeling.regain_powers()
-
-		for(var/X in internal_organs)
-			var/obj/item/organ/I = X
-			int_organs += I
-			I.Remove(src, 1)
-
-		for(var/X in int_organs)
-			var/obj/item/organ/I = X
-			I.Insert(O, 1)
-
-
-	var/obj/item/bodypart/chest/torso = get_bodypart(BODY_ZONE_CHEST)
-	if(cavity_object)
-		torso.cavity_item = cavity_object //cavity item is given to the new chest
-		cavity_object.forceMove(O)
-
-	for(var/missing_zone in missing_bodyparts_zones)
-		var/obj/item/bodypart/BP = O.get_bodypart(missing_zone)
-		BP.drop_limb(1)
-		if(!(tr_flags & TR_KEEPORGANS)) //we didn't already get rid of the organs of the newly spawned mob
-			for(var/X in O.internal_organs)
-				var/obj/item/organ/G = X
-				if(BP.body_zone == check_zone(G.zone))
-					if(mind && mind.has_antag_datum(/datum/antagonist/changeling) && istype(G, /obj/item/organ/brain))
-						continue //so headless changelings don't lose their brain when transforming
-					qdel(G) //we lose the organs in the missing limbs
-		qdel(BP)
-
-	//transfer stuns
-	if(tr_flags & TR_KEEPSTUNS)
-		O.Stun(AmountStun(), ignore_canstun = TRUE)
-		O.Knockdown(AmountKnockdown(), ignore_canstun = TRUE)
-		O.Immobilize(AmountImmobilized(), ignore_canstun = TRUE)
-		O.Paralyze(AmountParalyzed(), ignore_canstun = TRUE)
-		O.Unconscious(AmountUnconscious(), ignore_canstun = TRUE)
-		O.Sleeping(AmountSleeping(), ignore_canstun = TRUE)
-
-	//transfer reagents
-	if(tr_flags & TR_KEEPREAGENTS)
-		reagents.trans_to(O, reagents.total_volume)
-
-	if(mind)
-		mind.transfer_to(O)
-		var/datum/antagonist/changeling/changeling = O.mind.has_antag_datum(/datum/antagonist/changeling)
-		if(changeling)
-			for(var/datum/action/changeling/humanform/HF in changeling.purchasedpowers)
-				changeling.purchasedpowers -= HF
-				changeling.regain_powers()
-
-	O.a_intent = INTENT_HELP
-	if (tr_flags & TR_DEFAULTMSG)
-		to_chat(O, "<B>You are now a human.</B>")
-
-	transfer_observers_to(O)
-
-	. = O
-
-	for(var/A in loc.vars)
-		if(loc.vars[A] == src)
-			loc.vars[A] = O
-
-	qdel(src)
-
-/mob/living/carbon/human/AIize(transfer_after = TRUE, client/preference_source)
-	if (notransform)
-		return
-	for(var/t in bodyparts)
-		qdel(t)
-
-	return ..()
-
-/mob/living/carbon/AIize(transfer_after = TRUE, client/preference_source)
-	if (notransform)
-		return
-	notransform = TRUE
-	Paralyze(1, ignore_canstun = TRUE)
 	for(var/obj/item/W in src)
-		dropItemToGround(W)
-	regenerate_icons()
-	icon = null
-	invisibility = INVISIBILITY_MAXIMUM
-	return ..()
-
-/mob/proc/AIize(transfer_after = TRUE, client/preference_source)
-	var/list/turf/landmark_loc = list()
-	for(var/obj/effect/landmark/start/ai/sloc in GLOB.landmarks_list)
-		if(locate(/mob/living/silicon/ai) in sloc.loc)
+		if (W==w_uniform) // will be torn
 			continue
-		if(sloc.primary_ai)
-			LAZYCLEARLIST(landmark_loc)
-			landmark_loc += sloc.loc
-			break
-		landmark_loc += sloc.loc
-	if(!landmark_loc.len)
-		to_chat(src, "Oh god sorry we can't find an unoccupied AI spawn location, so we're spawning you on top of someone.")
-		for(var/obj/effect/landmark/start/ai/sloc in GLOB.landmarks_list)
-			landmark_loc += sloc.loc
+		drop_from_inventory(W)
+	regenerate_icons()
+	transforming = 1
+	canmove = 0
+	stunned = 1
+	icon = null
+	invisibility = 101
+	for(var/t in organs)
+		qdel(t)
+	var/atom/movable/overlay/animation = new /atom/movable/overlay( loc )
+	animation.icon_state = "blank"
+	animation.icon = 'icons/mob/mob.dmi'
+	animation.master = src
+	flick("h2monkey", animation)
+	sleep(48)
+	//animation = null
 
-	if(!landmark_loc.len)
-		message_admins("Could not find ai landmark for [src]. Yell at a mapper! We are spawning them at their current location.")
-		landmark_loc += loc
+	transforming = 0
+	stunned = 0
+	update_canmove()
+	invisibility = initial(invisibility)
 
-	if(client)
-		stop_sound_channel(CHANNEL_LOBBYMUSIC)
-
-	if(!transfer_after)
-		mind.active = FALSE
-
-	. = new /mob/living/silicon/ai(pick(landmark_loc), null, src)
-
-	if(preference_source)
-		apply_pref_name("ai",preference_source)
-
-	qdel(src)
-
-/mob/living/carbon/human/proc/Robotize(delete_items = 0, transfer_after = TRUE)
-	if (notransform)
+	if(!species.primitive_form) //If the creature in question has no primitive set, this is going to be messy.
+		gib()
 		return
-	notransform = TRUE
-	Paralyze(1, ignore_canstun = TRUE)
 
 	for(var/obj/item/W in src)
-		if(delete_items)
-			qdel(W)
-		else
-			dropItemToGround(W)
-	regenerate_icons()
-	icon = null
-	invisibility = INVISIBILITY_MAXIMUM
-	for(var/t in bodyparts)
+		drop_from_inventory(W)
+	set_species(species.primitive_form)
+	dna.SetSEState(MONKEYBLOCK,1)
+	dna.SetSEValueRange(MONKEYBLOCK,0xDAC, 0xFFF)
+
+	src << "<B>You are now [species.name]. </B>"
+	qdel(animation)
+
+	return src
+
+/mob/new_player/AIize()
+	spawning = 1
+	return ..()
+
+/mob/living/carbon/human/AIize(move=1) // 'move' argument needs defining here too because BYOND is dumb
+	if (transforming)
+		return
+	for(var/t in organs)
 		qdel(t)
 
-	var/mob/living/silicon/robot/R = new /mob/living/silicon/robot(loc)
+	return ..(move)
 
-	R.gender = gender
-	R.invisibility = 0
+/mob/living/carbon/AIize()
+	if (transforming)
+		return
+	for(var/obj/item/W in src)
+		drop_from_inventory(W)
+	transforming = 1
+	canmove = 0
+	icon = null
+	invisibility = 101
+	return ..()
 
+/mob/proc/AIize(move=1)
 	if(client)
-		R.updatename(client)
+		src << sound(null, repeat = 0, wait = 0, volume = 85, channel = 1) // stop the jams for AIs
+	var/mob/living/silicon/ai/O = new (loc, using_map.default_law_type,,1)//No MMI but safety is in effect.
+	O.invisibility = 0
+	O.aiRestorePowerRoutine = 0
+
+	if(mind)
+		mind.transfer_to(O)
+		O.mind.original = O
+	else
+		O.key = key
+
+	//Languages
+	add_language("Robot Talk", 1)
+	add_language(LANGUAGE_GALCOM, 1)
+	add_language(LANGUAGE_SOL_COMMON, 1)
+	add_language(LANGUAGE_UNATHI, 1)
+	add_language(LANGUAGE_SIIK, 1)
+	add_language(LANGUAGE_AKHANI, 1)
+	add_language(LANGUAGE_SKRELLIAN, 1)
+	add_language(LANGUAGE_TRADEBAND, 1)
+	add_language(LANGUAGE_GUTTER, 1)
+	add_language(LANGUAGE_EAL, 1)
+	add_language(LANGUAGE_SCHECHI, 1)
+	add_language(LANGUAGE_SIGN, 1)
+	add_language(LANGUAGE_TERMINUS, 1)
+	add_language(LANGUAGE_ZADDAT, 0)
+
+	// Lorefolks say it may be so.
+	if(O.client && O.client.prefs)
+		var/datum/preferences/B = O.client.prefs
+		if(LANGUAGE_ROOTGLOBAL in B.alternate_languages)
+			O.add_language(LANGUAGE_ROOTGLOBAL, 1)
+		if(LANGUAGE_ROOTLOCAL in B.alternate_languages)
+			O.add_language(LANGUAGE_ROOTLOCAL, 1)
+
+	if(move)
+		var/obj/loc_landmark
+		for(var/obj/effect/landmark/start/sloc in landmarks_list)
+			if (sloc.name != "AI")
+				continue
+			if ((locate(/mob/living) in sloc.loc) || (locate(/obj/structure/AIcore) in sloc.loc))
+				continue
+			loc_landmark = sloc
+		if (!loc_landmark)
+			for(var/obj/effect/landmark/tripai in landmarks_list)
+				if (tripai.name == "tripai")
+					if((locate(/mob/living) in tripai.loc) || (locate(/obj/structure/AIcore) in tripai.loc))
+						continue
+					loc_landmark = tripai
+		if (!loc_landmark)
+			O << "Oh god sorry we can't find an unoccupied AI spawn location, so we're spawning you on top of someone."
+			for(var/obj/effect/landmark/start/sloc in landmarks_list)
+				if (sloc.name == "AI")
+					loc_landmark = sloc
+
+		O.loc = loc_landmark.loc
+
+	O.on_mob_init()
+
+	O.add_ai_verbs()
+
+	O.rename_self("ai",1)
+	spawn(0)	// Mobs still instantly del themselves, thus we need to spawn or O will never be returned
+		qdel(src)
+	return O
+
+//human -> robot
+/mob/living/carbon/human/proc/Robotize()
+	if (transforming)
+		return
+	for(var/obj/item/W in src)
+		drop_from_inventory(W)
+	regenerate_icons()
+	transforming = 1
+	canmove = 0
+	icon = null
+	invisibility = 101
+	for(var/t in organs)
+		qdel(t)
+
+	var/mob/living/silicon/robot/O = new /mob/living/silicon/robot( loc )
+
+	// cyborgs produced by Robotize get an automatic power cell
+	O.cell = new(O)
+	O.cell.maxcharge = 7500
+	O.cell.charge = 7500
+
+
+	O.gender = gender
+	O.invisibility = 0
 
 	if(mind)		//TODO
-		if(!transfer_after)
-			mind.active = FALSE
-		mind.transfer_to(R)
-	else if(transfer_after)
-		R.key = key
+		mind.transfer_to(O)
+		if(O.mind.assigned_role == "Cyborg")
+			O.mind.original = O
+		else if(mind && mind.special_role)
+			O.mind.store_memory("In case you look at this after being borged, the objectives are only here until I find a way to make them not show up for you, as I can't simply delete them without screwing up round-end reporting. --NeoFite")
+	else
+		O.key = key
 
-	if(R.mmi)
-		R.mmi.name = "[initial(R.mmi.name)]: [real_name]"
-		if(R.mmi.brain)
-			R.mmi.brain.name = "[real_name]'s brain"
-		if(R.mmi.brainmob)
-			R.mmi.brainmob.real_name = real_name //the name of the brain inside the cyborg is the robotized human's name.
-			R.mmi.brainmob.name = real_name
+	O.loc = loc
+	O.job = "Cyborg"
+	if(O.mind.assigned_role == "Cyborg")
+		if(O.mind.role_alt_title == "Robot")
+			O.mmi = new /obj/item/device/mmi/digital/posibrain(O)
+		else if(O.mind.role_alt_title == "Drone")
+			O.mmi = new /obj/item/device/mmi/digital/robot(O)
+		else
+			O.mmi = new /obj/item/device/mmi(O)
 
-	R.job = "Cyborg"
-	R.notify_ai(NEW_BORG)
+		O.mmi.transfer_identity(src)
 
-	. = R
-	qdel(src)
+	if(O.client && O.client.prefs)
+		var/datum/preferences/B = O.client.prefs
+		for(var/language in B.alternate_languages)
+			O.add_language(language)
+		O.resize(B.size_multiplier, animate = TRUE)		//VOREStation Addition: add size prefs to borgs
+		O.fuzzy = B.fuzzy								//VOREStation Addition: add size prefs to borgs
+
+	callHook("borgify", list(O))
+	O.Namepick()
+
+	spawn(0)	// Mobs still instantly del themselves, thus we need to spawn or O will never be returned
+		qdel(src)
+	return O
 
 //human -> alien
 /mob/living/carbon/human/proc/Alienize()
-	if (notransform)
+	if (transforming)
 		return
-	notransform = TRUE
-	mobility_flags = NONE
 	for(var/obj/item/W in src)
-		dropItemToGround(W)
+		drop_from_inventory(W)
 	regenerate_icons()
+	transforming = 1
+	canmove = 0
 	icon = null
-	invisibility = INVISIBILITY_MAXIMUM
-	for(var/t in bodyparts)
+	invisibility = 101
+	for(var/t in organs)
 		qdel(t)
 
 	var/alien_caste = pick("Hunter","Sentinel","Drone")
-	var/mob/living/carbon/alien/humanoid/new_xeno
-	switch(alien_caste)
-		if("Hunter")
-			new_xeno = new /mob/living/carbon/alien/humanoid/hunter(loc)
-		if("Sentinel")
-			new_xeno = new /mob/living/carbon/alien/humanoid/sentinel(loc)
-		if("Drone")
-			new_xeno = new /mob/living/carbon/alien/humanoid/drone(loc)
+	var/mob/living/carbon/human/new_xeno = create_new_xenomorph(alien_caste,loc)
 
-	new_xeno.a_intent = INTENT_HARM
+	new_xeno.a_intent = I_HURT
 	new_xeno.key = key
 
-	to_chat(new_xeno, "<B>You are now an alien.</B>")
-	. = new_xeno
+	new_xeno << "<B>You are now an alien.</B>"
 	qdel(src)
-
-/mob/living/carbon/human/proc/slimeize(reproduce as num)
-	if (notransform)
-		return
-	notransform = TRUE
-	mobility_flags = NONE
-	for(var/obj/item/W in src)
-		dropItemToGround(W)
-	regenerate_icons()
-	icon = null
-	invisibility = INVISIBILITY_MAXIMUM
-	for(var/t in bodyparts)
-		qdel(t)
-
-	var/mob/living/simple_animal/slime/new_slime
-	if(reproduce)
-		var/number = pick(14;2,3,4)	//reproduce (has a small chance of producing 3 or 4 offspring)
-		var/list/babies = list()
-		for(var/i=1,i<=number,i++)
-			var/mob/living/simple_animal/slime/M = new/mob/living/simple_animal/slime(loc)
-			M.set_nutrition(round(nutrition/number))
-			step_away(M,src)
-			babies += M
-		new_slime = pick(babies)
-	else
-		new_slime = new /mob/living/simple_animal/slime(loc)
-	new_slime.a_intent = INTENT_HARM
-	new_slime.key = key
-
-	to_chat(new_slime, "<B>You are now a slime. Skreee!</B>")
-	. = new_slime
-	qdel(src)
-
-/mob/proc/become_overmind(starting_points = 60)
-	var/mob/camera/blob/B = new /mob/camera/blob(get_turf(src), starting_points)
-	B.key = key
-	. = B
-	qdel(src)
+	return
 
 
 /mob/living/carbon/human/proc/corgize()
-	if (notransform)
+	if (transforming)
 		return
-	notransform = TRUE
-	Paralyze(1, ignore_canstun = TRUE)
 	for(var/obj/item/W in src)
-		dropItemToGround(W)
+		drop_from_inventory(W)
 	regenerate_icons()
+	transforming = 1
+	canmove = 0
 	icon = null
-	invisibility = INVISIBILITY_MAXIMUM
-	for(var/t in bodyparts)	//this really should not be necessary
+	invisibility = 101
+	for(var/t in organs)	//this really should not be necessary
 		qdel(t)
 
-	var/mob/living/simple_animal/pet/dog/corgi/new_corgi = new /mob/living/simple_animal/pet/dog/corgi (loc)
-	new_corgi.a_intent = INTENT_HARM
+	var/mob/living/simple_mob/animal/passive/dog/corgi/new_corgi = new /mob/living/simple_mob/animal/passive/dog/corgi (loc)
+	new_corgi.a_intent = I_HURT
 	new_corgi.key = key
 
-	to_chat(new_corgi, "<B>You are now a Corgi. Yap Yap!</B>")
-	. = new_corgi
+	new_corgi << "<B>You are now a Corgi. Yap Yap!</B>"
 	qdel(src)
-
-/mob/living/carbon/proc/gorillize()
-	if(notransform)
-		return
-	notransform = TRUE
-	Paralyze(1, ignore_canstun = TRUE)
-
-	SSblackbox.record_feedback("amount", "gorillas_created", 1)
-
-	var/Itemlist = get_equipped_items(TRUE)
-	Itemlist += held_items
-	for(var/obj/item/W in Itemlist)
-		dropItemToGround(W, TRUE)
-
-	regenerate_icons()
-	icon = null
-	invisibility = INVISIBILITY_MAXIMUM
-	var/mob/living/simple_animal/hostile/gorilla/new_gorilla = new (get_turf(src))
-	new_gorilla.a_intent = INTENT_HARM
-	if(mind)
-		mind.transfer_to(new_gorilla)
-	else
-		new_gorilla.key = key
-	to_chat(new_gorilla, "<B>You are now a gorilla. Ooga ooga!</B>")
-	. = new_gorilla
-	qdel(src)
+	return
 
 /mob/living/carbon/human/Animalize()
 
-	var/list/mobtypes = typesof(/mob/living/simple_animal)
+	var/list/mobtypes = typesof(/mob/living/simple_mob)
 	var/mobpath = input("Which type of mob should [src] turn into?", "Choose a type") in mobtypes
 
 	if(!safe_animal(mobpath))
-		to_chat(usr, "<span class='danger'>Sorry but this mob type is currently unavailable.</span>")
+		usr << "<font color='red'>Sorry but this mob type is currently unavailable.</font>"
 		return
 
-	if(notransform)
+	if(transforming)
 		return
-	notransform = TRUE
-	Paralyze(1, ignore_canstun = TRUE)
-
 	for(var/obj/item/W in src)
-		dropItemToGround(W)
+		drop_from_inventory(W)
 
 	regenerate_icons()
+	transforming = 1
+	canmove = 0
 	icon = null
-	invisibility = INVISIBILITY_MAXIMUM
+	invisibility = 101
 
-	for(var/t in bodyparts)
+	for(var/t in organs)
 		qdel(t)
 
 	var/mob/new_mob = new mobpath(src.loc)
 
 	new_mob.key = key
-	new_mob.a_intent = INTENT_HARM
+	new_mob.a_intent = I_HURT
 
 
-	to_chat(new_mob, "You suddenly feel more... animalistic.")
-	. = new_mob
-	qdel(src)
+	new_mob << "You suddenly feel more... animalistic."
+	spawn()
+		qdel(src)
+	return
 
 /mob/proc/Animalize()
 
-	var/list/mobtypes = typesof(/mob/living/simple_animal)
+	var/list/mobtypes = typesof(/mob/living/simple_mob)
 	var/mobpath = input("Which type of mob should [src] turn into?", "Choose a type") in mobtypes
 
 	if(!safe_animal(mobpath))
-		to_chat(usr, "<span class='danger'>Sorry but this mob type is currently unavailable.</span>")
+		usr << "<font color='red'>Sorry but this mob type is currently unavailable.</font>"
 		return
 
 	var/mob/new_mob = new mobpath(src.loc)
 
 	new_mob.key = key
-	new_mob.a_intent = INTENT_HARM
-	to_chat(new_mob, "You feel more... animalistic")
+	new_mob.a_intent = I_HURT
+	new_mob << "You feel more... animalistic"
 
-	. = new_mob
 	qdel(src)
 
 /* Certain mob types have problems and should not be allowed to be controlled by players.
@@ -603,36 +294,39 @@
  * This proc is here to force coders to manually place their mob in this list, hopefully tested.
  * This also gives a place to explain -why- players shouldnt be turn into certain mobs and hopefully someone can fix them.
  */
-/mob/proc/safe_animal(MP)
+/mob/proc/safe_animal(var/MP)
 
 //Bad mobs! - Remember to add a comment explaining what's wrong with the mob
 	if(!MP)
 		return 0	//Sanity, this should never happen.
 
-	if(ispath(MP, /mob/living/simple_animal/hostile/construct))
-		return 0 //Verbs do not appear for players.
+/*
+	if(ispath(MP, /mob/living/simple_mob/space_worm))
+		return 0 //Unfinished. Very buggy, they seem to just spawn additional space worms everywhere and eating your own tail results in new worms spawning.
+*/
 
 //Good mobs!
-	if(ispath(MP, /mob/living/simple_animal/pet/cat))
+	if(ispath(MP, /mob/living/simple_mob/animal/passive/cat))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/pet/dog/corgi))
+	if(ispath(MP, /mob/living/simple_mob/animal/passive/dog))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/crab))
+	if(ispath(MP, /mob/living/simple_mob/animal/passive/crab))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/hostile/carp))
+	if(ispath(MP, /mob/living/simple_mob/animal/space/carp))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/hostile/mushroom))
+	if(ispath(MP, /mob/living/simple_mob/construct))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/shade))
+	if(ispath(MP, /mob/living/simple_mob/tomato))
 		return 1
-	if(ispath(MP, /mob/living/simple_animal/hostile/killertomato))
-		return 1
-	if(ispath(MP, /mob/living/simple_animal/mouse))
+	if(ispath(MP, /mob/living/simple_mob/animal/passive/mouse))
 		return 1 //It is impossible to pull up the player panel for mice (Fixed! - Nodrak)
-	if(ispath(MP, /mob/living/simple_animal/hostile/bear))
+	if(ispath(MP, /mob/living/simple_mob/animal/space/bear))
 		return 1 //Bears will auto-attack mobs, even if they're player controlled (Fixed! - Nodrak)
-	if(ispath(MP, /mob/living/simple_animal/parrot))
+	if(ispath(MP, /mob/living/simple_mob/animal/passive/bird/parrot))
 		return 1 //Parrots are no longer unfinished! -Nodrak
 
 	//Not in here? Must be untested!
 	return 0
+
+
+

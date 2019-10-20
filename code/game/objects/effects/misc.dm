@@ -2,93 +2,65 @@
 /obj/effect/spresent
 	name = "strange present"
 	desc = "It's a ... present?"
-	icon = 'icons/obj/items_and_weapons.dmi'
+	icon = 'icons/obj/items.dmi'
 	icon_state = "strangepresent"
-	density = TRUE
-	anchored = FALSE
+	density = 1
+	anchored = 0
 
-/obj/effect/beam
-	name = "beam"
-	var/def_zone
-	pass_flags = PASSTABLE
-
-/obj/effect/beam/singularity_act()
-	return
-
-/obj/effect/beam/singularity_pull()
-	return
-
-/obj/effect/spawner
-	name = "object spawner"
-
-/obj/effect/list_container
-	name = "list container"
-
-/obj/effect/list_container/mobl
-	name = "mobl"
-	var/master = null
-
-	var/list/container = list(  )
-
-/obj/effect/overlay/thermite
-	name = "thermite"
-	desc = "Looks hot."
-	icon = 'icons/effects/fire.dmi'
-	icon_state = "2" //what?
-	anchored = TRUE
-	opacity = TRUE
-	density = TRUE
-	layer = FLY_LAYER
-
-/obj/effect/supplypod_selector
-	icon_state = "supplypod_selector"
-	layer = FLY_LAYER
-
-//Makes a tile fully lit no matter what
-/obj/effect/fullbright
-	icon = 'icons/effects/alphacolors.dmi'
-	icon_state = "white"
-	plane = LIGHTING_PLANE
-	layer = LIGHTING_LAYER
-	blend_mode = BLEND_ADD
-
-/obj/effect/abstract/marker
-	name = "marker"
+/obj/effect/temporary_effect
+	name = "self deleting effect"
+	desc = "How are you examining what which cannot be seen?"
 	icon = 'icons/effects/effects.dmi'
-	anchored = TRUE
-	icon_state = "wave3"
-	layer = RIPPLE_LAYER
+	invisibility = 0
+	var/time_to_die = 10 SECONDS // Afer which, it will delete itself.
 
-/obj/effect/abstract/marker/Initialize(mapload)
+/obj/effect/temporary_effect/New()
+	..()
+	if(time_to_die)
+		spawn(time_to_die)
+			qdel(src)
+
+// Shown really briefly when attacking with axes.
+/obj/effect/temporary_effect/cleave_attack
+	name = "cleaving attack"
+	desc = "Something swinging really wide."
+	icon = 'icons/effects/96x96.dmi'
+	icon_state = "cleave"
+	plane = MOB_PLANE
+	layer = ABOVE_MOB_LAYER
+	time_to_die = 6
+	alpha = 140
+	mouse_opacity = 0
+	pixel_x = -32
+	pixel_y = -32
+
+/obj/effect/temporary_effect/cleave_attack/Initialize() // Makes the slash fade smoothly. When completely transparent it should qdel itself.
 	. = ..()
-	GLOB.all_abstract_markers += src
+	animate(src, alpha = 0, time = time_to_die - 1)
 
-/obj/effect/abstract/marker/Destroy()
-	GLOB.all_abstract_markers -= src
+/obj/effect/temporary_effect/shuttle_landing
+	name = "shuttle landing"
+	desc = "You better move if you don't want to go splat!"
+	icon_state = "shuttle_warning_still"
+	time_to_die = 4.9 SECONDS
+
+/obj/effect/temporary_effect/shuttle_landing/Initialize()
+	flick("shuttle_warning", src) // flick() forces the animation to always begin at the start.
 	. = ..()
 
-/obj/effect/abstract/marker/at
-	name = "active turf marker"
+// The manifestation of Zeus's might. Or just a really unlucky day.
+// This is purely a visual effect, this isn't the part of the code that hurts things.
+/obj/effect/temporary_effect/lightning_strike
+	name = "lightning"
+	desc = "How <i>shocked</i> you must be, to see this text. You must have <i>lightning</i> reflexes. \
+	The humor in this description is just so <i>electrifying</i>."
+	icon = 'icons/effects/96x256.dmi'
+	icon_state = "lightning_strike"
+	plane = PLANE_LIGHTING_ABOVE
+	time_to_die = 1 SECOND
+	pixel_x = -32
 
-
-/obj/effect/dummy/lighting_obj
-	name = "lighting fx obj"
-	desc = "Tell a coder if you're seeing this."
-	icon_state = "nothing"
-	light_color = "#FFFFFF"
-	light_range = MINIMUM_USEFUL_LIGHT_RANGE
-	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
-
-/obj/effect/dummy/lighting_obj/Initialize(mapload, _color, _range, _power, _duration)
+/obj/effect/temporary_effect/lightning_strike/Initialize()
+	icon_state += "[rand(1,2)]" // To have two variants of lightning sprites.
+	animate(src, alpha = 0, time = time_to_die - 1)
 	. = ..()
-	set_light(_range ? _range : light_range, _power ? _power : light_power, _color ? _color : light_color)
-	if(_duration)
-		QDEL_IN(src, _duration)
-
-/obj/effect/dummy/lighting_obj/moblight
-	name = "mob lighting fx"
-
-/obj/effect/dummy/lighting_obj/moblight/Initialize(mapload, _color, _range, _power, _duration)
-	. = ..()
-	if(!ismob(loc))
-		return INITIALIZE_HINT_QDEL

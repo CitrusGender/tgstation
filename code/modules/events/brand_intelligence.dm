@@ -1,78 +1,76 @@
-/datum/round_event_control/brand_intelligence
-	name = "Brand Intelligence"
-	typepath = /datum/round_event/brand_intelligence
-	weight = 5
-
-	min_players = 15
-	max_occurrences = 1
-
-/datum/round_event/brand_intelligence
+/datum/event/brand_intelligence
 	announceWhen	= 21
 	endWhen			= 1000	//Ends when all vending machines are subverted anyway.
+
 	var/list/obj/machinery/vending/vendingMachines = list()
-	var/list/obj/machinery/vending/infectedMachines = list()
+	var/list/obj/machinery/vending/infectedVendingMachines = list()
 	var/obj/machinery/vending/originMachine
+
+	//VORESTATION Edit - added machine speeches here for better fixing of the event.
+
 	var/list/rampant_speeches = list("Try our aggressive new marketing strategies!", \
-									 "You should buy products to feed your lifestyle obsession!", \
+									 "You should buy products to feed your lifestyle obession!", \
 									 "Consume!", \
 									 "Your money can buy happiness!", \
 									 "Engage direct marketing!", \
 									 "Advertising is legalized lying! But don't let that put you off our great deals!", \
-									 "You don't want to buy anything? Yeah, well, I didn't want to buy your mom either.")
+									 "You don't want to buy anything? Yeah, well I didn't want to buy your mom either.")
+	//VORESTATION Edit End
+
+/datum/event/brand_intelligence/announce()
+	command_announcement.Announce("An ongoing mass upload of malware for vendors has been detected onboard  [station_name()], which appears to transmit \
+	to other nearby vendors.  The original infected machine is believed to be \a [originMachine.name].", "Vendor Service Alert")
 
 
-/datum/round_event/brand_intelligence/announce(fake)
-	var/source = "unknown machine"
-	if(fake)
-		var/obj/machinery/vending/cola/example = /obj/machinery/vending/cola
-		source = initial(example.name)
-	else if(originMachine)
-		source = originMachine.name
-	priority_announce("Rampant brand intelligence has been detected aboard [station_name()]. Please stand by. The origin is believed to be \a [source].", "Machine Learning Alert")
-
-/datum/round_event/brand_intelligence/start()
-	for(var/obj/machinery/vending/V in GLOB.machines)
-		if(!is_station_level(V.z))
-			continue
+/datum/event/brand_intelligence/start()
+	for(var/obj/machinery/vending/V in machines)
+		if(isNotStationLevel(V.z))	continue
 		vendingMachines.Add(V)
+
 	if(!vendingMachines.len)
 		kill()
 		return
+
 	originMachine = pick(vendingMachines)
 	vendingMachines.Remove(originMachine)
 	originMachine.shut_up = 0
 	originMachine.shoot_inventory = 1
-	announce_to_ghosts(originMachine)
 
-/datum/round_event/brand_intelligence/tick()
-	if(!originMachine || QDELETED(originMachine) || originMachine.shut_up || originMachine.wires.is_all_cut())	//if the original vending machine is missing or has it's voice switch flipped
-		for(var/obj/machinery/vending/saved in infectedMachines)
+
+/datum/event/brand_intelligence/tick()
+	if(!vendingMachines.len || !originMachine || originMachine.shut_up)	//if every machine is infected, or if the original vending machine is missing or has it's voice switch flipped
+		//VORESTATION Add - Effects when 'source' machine is destroyed/silenced
+		for(var/obj/machinery/vending/saved in infectedVendingMachines)
 			saved.shoot_inventory = 0
 		if(originMachine)
 			originMachine.speak("I am... vanquished. My people will remem...ber...meeee.")
-			originMachine.visible_message("<span class='notice'>[originMachine] beeps and seems lifeless.</span>")
+			originMachine.visible_message("[originMachine] beeps and seems lifeless.")
+		//VORESTATION Add End
+		end()
 		kill()
 		return
-	vendingMachines = removeNullsFromList(vendingMachines)
-	if(!vendingMachines.len)	//if every machine is infected
-		for(var/obj/machinery/vending/upriser in infectedMachines)
-			if(prob(70) && !QDELETED(upriser))
-				var/mob/living/simple_animal/hostile/mimic/copy/M = new(upriser.loc, upriser, null, 1) // it will delete upriser on creation and override any machine checks
-				M.faction = list("profit")
-				M.speak = rampant_speeches.Copy()
-				M.speak_chance = 7
-			else
-				explosion(upriser.loc, -1, 1, 2, 4, 0)
-				qdel(upriser)
 
-		kill()
-		return
-	if(ISMULTIPLE(activeFor, 4))
-		var/obj/machinery/vending/rebel = pick(vendingMachines)
-		vendingMachines.Remove(rebel)
-		infectedMachines.Add(rebel)
-		rebel.shut_up = 0
-		rebel.shoot_inventory = 1
+	if(ISMULTIPLE(activeFor, 5))
+		if(prob(15))
+			var/obj/machinery/vending/infectedMachine = pick(vendingMachines)
+			vendingMachines.Remove(infectedMachine)
+			infectedVendingMachines.Add(infectedMachine)
+			infectedMachine.shut_up = 0
+			infectedMachine.shoot_inventory = 1
 
-		if(ISMULTIPLE(activeFor, 8))
-			originMachine.speak(pick(rampant_speeches))
+			if(ISMULTIPLE(activeFor, 12))
+				/* VORESTATION Removal - Using the pick below.
+				originMachine.speak(pick("Try our aggressive new marketing strategies!", \
+										 "You should buy products to feed your lifestyle obsession!", \
+										 "Consume!", \
+										 "Your money can buy happiness!", \
+										 "Engage direct marketing!", \
+										 "Advertising is legalized lying! But don't let that put you off our great deals!", \
+										 "You don't want to buy anything? Yeah, well I didn't want to buy your mom either."))
+				*/
+				originMachine.speak(pick(rampant_speeches)) //VORESTATION Add - Using this pick instead of the above.
+
+/datum/event/brand_intelligence/end()
+	for(var/obj/machinery/vending/infectedMachine in infectedVendingMachines)
+		infectedMachine.shut_up = 1
+		infectedMachine.shoot_inventory = 0

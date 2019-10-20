@@ -1,38 +1,63 @@
-/mob/dead/observer/say(message, bubble_type, list/spans = list(), sanitize = TRUE, datum/language/language = null, ignore_spam = FALSE, forced = null)
-	message = trim(copytext(sanitize(message), 1, MAX_MESSAGE_LEN))
+/mob/observer/dead/say(var/message)
+	message = sanitize(message)
+
 	if (!message)
 		return
 
-	var/message_mode = get_message_mode(message)
-	if(client && (message_mode == MODE_ADMIN || message_mode == MODE_DEADMIN))
-		message = copytext(message, 3)
-		if(findtext(message, " ", 1, 2))
-			message = copytext(message, 2)
+	log_ghostsay(message, src)
 
-		if(message_mode == MODE_ADMIN)
-			client.cmd_admin_say(message)
-		else if(message_mode == MODE_DEADMIN)
-			client.dsay(message)
+	if (src.client)
+		if(message)
+			client.handle_spam_prevention(MUTE_DEADCHAT)
+			if(src.client.prefs.muted & MUTE_DEADCHAT)
+				src << "<font color='red'>You cannot talk in deadchat (muted).</font>"
+				return
+
+	. = src.say_dead(message)
+
+
+/mob/observer/dead/emote(var/act, var/type, var/message)
+	//message = sanitize(message) - already sanitized in verb/me_verb()
+
+	if(!message)
 		return
 
-	if(check_emote(message, forced))
+	if(act != "me")
 		return
 
-	. = say_dead(message)
+	log_ghostemote(message, src)
 
-/mob/dead/observer/Hear(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, message_mode)
-	. = ..()
-	var/atom/movable/to_follow = speaker
-	if(radio_freq)
-		var/atom/movable/virtualspeaker/V = speaker
+	if(src.client)
+		if(message)
+			client.handle_spam_prevention(MUTE_DEADCHAT)
+			if(src.client.prefs.muted & MUTE_DEADCHAT)
+				src << "<font color='red'>You cannot emote in deadchat (muted).</font>"
+				return
 
-		if(isAI(V.source))
-			var/mob/living/silicon/ai/S = V.source
-			to_follow = S.eyeobj
-		else
-			to_follow = V.source
-	var/link = FOLLOW_LINK(src, to_follow)
-	// Recompose the message, because it's scrambled by default
-	message = compose_message(speaker, message_language, raw_message, radio_freq, spans, message_mode)
-	to_chat(src, "[link] [message]")
+	. = src.emote_dead(message)
 
+/*
+	for (var/mob/M in hearers(null, null))
+		if (!M.stat)
+			if(M.job == "Chaplain")
+				if (prob (49))
+					M.show_message("<span class='game'><i>You hear muffled speech... but nothing is there...</i></span>", 2)
+					if(prob(20))
+						playsound(src.loc, pick('sound/effects/ghost.ogg','sound/effects/ghost2.ogg'), 10, 1)
+				else
+					M.show_message("<span class='game'><i>You hear muffled speech... you can almost make out some words...</i></span>", 2)
+//				M.show_message("<span class='game'><i>[stutter(message)]</i></span>", 2)
+					if(prob(30))
+						playsound(src.loc, pick('sound/effects/ghost.ogg','sound/effects/ghost2.ogg'), 10, 1)
+			else
+				if (prob(50))
+					return
+				else if (prob (95))
+					M.show_message("<span class='game'><i>You hear muffled speech... but nothing is there...</i></span>", 2)
+					if(prob(20))
+						playsound(src.loc, pick('sound/effects/ghost.ogg','sound/effects/ghost2.ogg'), 10, 1)
+				else
+					M.show_message("<span class='game'><i>You hear muffled speech... you can almost make out some words...</i></span>", 2)
+//				M.show_message("<span class='game'><i>[stutter(message)]</i></span>", 2)
+					playsound(src.loc, pick('sound/effects/ghost.ogg','sound/effects/ghost2.ogg'), 10, 1)
+*/
