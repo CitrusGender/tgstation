@@ -55,3 +55,11 @@
 	pass_flags = PASSMOB
 	mob_size = MOB_SIZE_SMALL
 	butcher_results = list(/obj/item/organ/ears/penguin = 1, /obj/item/reagent_containers/food/snacks/meat/slab/penguin = 1)
+
+/mob/living/simple_animal/pet/penguin/emperor/dmca
+	name = "Strange penguin"
+	desc = "Waddle on, nothing to see here."
+	icon = 'icons/mob/penguin.dmi'
+	icon_state = "penguin"
+	icon_living = "penguin"
+	del_on_death = TRUE
