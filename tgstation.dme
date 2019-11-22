@@ -2494,6 +2494,7 @@
 #include "code\modules\projectiles\boxes_magazines\internal\shotgun.dm"
 #include "code\modules\projectiles\boxes_magazines\internal\toy.dm"
 #include "code\modules\projectiles\guns\ballistic.dm"
+#include "code\modules\projectiles\guns\beyblade.dm"
 #include "code\modules\projectiles\guns\energy.dm"
 #include "code\modules\projectiles\guns\magic.dm"
 #include "code\modules\projectiles\guns\ballistic\automatic.dm"
