@@ -578,7 +578,7 @@
 	hitsound = 'sound/weapons/chainhit.ogg'
 
 /obj/item/nullrod/fedora
-	name = "atheist's fedora"
+	name = "Atheist's Fedora"
 	desc = "The brim of the hat is as sharp as your wit. The edge would hurt almost as much as disproving the existence of God."
 	icon_state = "fedora"
 	inhand_icon_state = "fedora"
