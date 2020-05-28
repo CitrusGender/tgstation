@@ -13,7 +13,7 @@
 
 	var/list/current_setup_text //Redable list of roles in current game
 
-	var/game_id //Used to sync all parts - signup boards, spawns, night curtains
+	var/game_id //Used to sync all parts - signup boards, spawns, night curtains, defaults to "mafia"
 	var/list/signed_up = list()
 
 	var/player_outfit = /datum/outfit/mafia //todo some fluffy outfit
@@ -312,7 +312,6 @@
 				else
 					if(!user_role.targeted_actions.Find(params["atype"]))
 						return
-					//validate_action_target here
 					if(!user_role.validate_action_target(src,params["atype"],target))
 						return
 					user_role.handle_action(src,params["atype"],target)
@@ -352,7 +351,7 @@
 	for(var/key in signed_up)
 		if(GLOB.directory[key])
 			filtered_keys += key
-	filtered_keys = signed_up.Copy() //DEBUG ONLY REMOVE LATER
+	//filtered_keys = signed_up.Copy() //DEBUG ONLY REMOVE LATER
 	var/list/setup = find_best_setup(filtered_keys)
 	var/req_players = assoc_value_sum(setup)
 	while(length(filtered_keys) > req_players)
@@ -370,14 +369,7 @@
 	if(signed_up.len >= min_players)
 		basic_setup()
 
-GLOBAL_LIST_INIT(mafia_setups,generate_mafia_setups())
-/proc/generate_mafia_setups()
-	. = list()
-	for(var/T in subtypesof(/datum/mafia_setup))
-		var/datum/mafia_setup/N = new T
-		. += list(N.roles)
-
-GLOBAL_LIST_EMPTY(mafia_games)
+/*
 /mob
 	var/landmarks_made = FALSE
 
@@ -392,6 +384,7 @@ GLOBAL_LIST_EMPTY(mafia_games)
 	signup_board.name = "CLICK HERE"
 	var/datum/mafia_controller/MF = create_mafia_game("mafia")
 	MF.signed_up |= list("debug_guy_key","the_other_guy","third_loser")
+*/
 
 /datum/action/innate/mafia_panel
 	name = "Mafia Panel"

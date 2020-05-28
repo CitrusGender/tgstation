@@ -22,11 +22,23 @@
 #define COMSIG_MAFIA_NIGHT_ACTION_PHASE "night_actions"
 #define COMSIG_MAFIA_NIGHT_KILL_PHASE "night_kill"
 
+GLOBAL_LIST_EMPTY(mafia_games)
+GLOBAL_LIST_INIT(mafia_setups,generate_mafia_setups())
+/proc/generate_mafia_setups()
+	. = list()
+	for(var/T in subtypesof(/datum/mafia_setup))
+		var/datum/mafia_setup/N = new T
+		. += list(N.roles)
 
 /datum/mafia_setup
 	var/name = "Make subtypes with the list and a name, more readable than list(list(),list()) etc"
 	var/list/roles
 
+/datum/mafia_setup/basic_ten
+	name = "Basic 10 Player Setup"
+	roles = list(/datum/mafia_role=5,/datum/mafia_role/security=1,/datum/mafia_role/detective=1,/datum/mafia_role/mafia=3)
+
+/*
 /datum/mafia_setup/example_one
 	name = "4 Player Debug Setup (KILL THIS LIVE)"
 	roles = list(/datum/mafia_role/clown=1,/datum/mafia_role/security=1,/datum/mafia_role/detective=1,/datum/mafia_role/mafia=1)
@@ -34,3 +46,4 @@
 /datum/mafia_setup/example_two
 	name = "13 Player Example setup (same thing)"
 	roles = list(/datum/mafia_role=9,/datum/mafia_role/detective=1,/datum/mafia_role/mafia=3)
+*/
