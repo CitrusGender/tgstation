@@ -22,6 +22,8 @@
 	var/list/votes = list()
 	var/next_phase_timer
 
+	var/debug = FALSE
+
 /datum/mafia_controller/New(game_id = "mafia")
 	. = ..()
 	src.game_id = game_id
@@ -45,7 +47,10 @@
 	var/list/spawnpoints = landmarks.Copy()
 	for(var/datum/mafia_role/role in all_roles)
 		role.assigned_landmark = pick_n_take(spawnpoints)
-		role.player_key = pick_n_take(ready_players)
+		if(!debug)
+			role.player_key = pick_n_take(ready_players)
+		else
+			role.player_key = pop(ready_players)
 
 /datum/mafia_controller/proc/send_message(msg,team)
 	for(var/datum/mafia_role/R in all_roles)
@@ -142,6 +147,7 @@
 
 /datum/mafia_controller/proc/resolve_night()
 	SEND_SIGNAL(src,COMSIG_MAFIA_NIGHT_START)
+	SEND_SIGNAL(src,COMSIG_MAFIA_NIGHT_ACTION_PHASE)
 	//resolve mafia kill, todo unsnowflake this
 	var/datum/mafia_role/R = get_vote_winner("Mafia")
 	if(R)
@@ -263,6 +269,7 @@
 		player_info["actions"] = actions
 		player_data += list(player_info)
 	.["players"] = player_data
+	.["timeleft"] = next_phase_timer ? timeleft(next_phase_timer) : 0
 
 	//Not sure on this, should this info be visible
 	.["all_roles"] = current_setup_text
@@ -351,7 +358,8 @@
 	for(var/key in signed_up)
 		if(GLOB.directory[key])
 			filtered_keys += key
-	//filtered_keys = signed_up.Copy() //DEBUG ONLY REMOVE LATER
+	if(debug)
+		filtered_keys = signed_up.Copy() //DEBUG ONLY
 	var/list/setup = find_best_setup(filtered_keys)
 	var/req_players = assoc_value_sum(setup)
 	while(length(filtered_keys) > req_players)
@@ -368,23 +376,6 @@
 		min_players = min(min_players,assoc_value_sum(setup))
 	if(signed_up.len >= min_players)
 		basic_setup()
-
-/*
-/mob
-	var/landmarks_made = FALSE
-
-/mob/verb/debug_mafia_game()
-	if(!landmarks_made)
-		new /obj/effect/landmark/mafia(get_step(get_turf(usr),EAST))
-		new /obj/effect/landmark/mafia(get_step(get_turf(usr),WEST))
-		new /obj/effect/landmark/mafia(get_step(get_turf(usr),NORTH))
-		new /obj/effect/landmark/mafia(get_step(get_turf(usr),SOUTH))
-		landmarks_made = TRUE
-	var/obj/mafia_game_signup/signup_board = new(get_turf(src))
-	signup_board.name = "CLICK HERE"
-	var/datum/mafia_controller/MF = create_mafia_game("mafia")
-	MF.signed_up |= list("debug_guy_key","the_other_guy","third_loser")
-*/
 
 /datum/action/innate/mafia_panel
 	name = "Mafia Panel"
@@ -421,5 +412,5 @@
 
 /datum/outfit/mafia
 	name = "Mafia Game Outfit"
-	uniform = /obj/item/clothing/under/color/random
+	uniform = /obj/item/clothing/under/color/grey
 	shoes = /obj/item/clothing/shoes/sneakers/black

@@ -1,5 +1,5 @@
 import { useBackend } from '../backend';
-import { Flex, Button, LabeledList, Section, Box, Table } from '../components';
+import { Flex, Button, LabeledList, Section, Box, Table, TimeDisplay } from '../components';
 import { Fragment } from 'inferno';
 import { Window } from '../layouts';
 import { FlexItem } from '../components/Flex';
@@ -12,6 +12,7 @@ export const MafiaPanel = (props, context) => {
     phase,
     role_info,
     admin_controls,
+    timeleft,
     all_roles } = data;
   return (
     <Window resizable>
@@ -21,10 +22,15 @@ export const MafiaPanel = (props, context) => {
             <Table>
               <Table.Row>
                 <Table.Cell>
-                  You are a {role_info.role}
+                  <TimeDisplay auto="down" value={timeleft} />
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
+                <Table.Cell bold>
+                  You are a {role_info.role}
+                </Table.Cell>
+              </Table.Row>
+              <Table.Row bold>
                 <Table.Cell>
                   {role_info.desc}
                 </Table.Cell>

@@ -34,16 +34,108 @@ GLOBAL_LIST_INIT(mafia_setups,generate_mafia_setups())
 	var/name = "Make subtypes with the list and a name, more readable than list(list(),list()) etc"
 	var/list/roles
 
-/datum/mafia_setup/basic_ten
-	name = "Basic 10 Player Setup"
-	roles = list(/datum/mafia_role=5,/datum/mafia_role/security=1,/datum/mafia_role/detective=1,/datum/mafia_role/mafia=3)
+// 12 Player
+/datum/mafia_setup/twelve_vanilla
+	name = "12 Player Setup Vanilla"
+	roles = list(
+		/datum/mafia_role=9,
+		/datum/mafia_role/mafia=3
+	)
 
-/*
-/datum/mafia_setup/example_one
-	name = "4 Player Debug Setup (KILL THIS LIVE)"
-	roles = list(/datum/mafia_role/clown=1,/datum/mafia_role/security=1,/datum/mafia_role/detective=1,/datum/mafia_role/mafia=1)
+/datum/mafia_setup/twelve_basic
+	name = "12 Player Setup Basic"
+	roles = list(
+		/datum/mafia_role=6,
+		/datum/mafia_role/md=1,
+		/datum/mafia_role/detective=1,
+		/datum/mafia_role/clown=1,
+		/datum/mafia_role/mafia=3
+	)
 
-/datum/mafia_setup/example_two
-	name = "13 Player Example setup (same thing)"
-	roles = list(/datum/mafia_role=9,/datum/mafia_role/detective=1,/datum/mafia_role/mafia=3)
-*/
+/datum/mafia_setup/twelve_md
+	name = "12 Player Setup MD"
+	roles = list(
+		/datum/mafia_role=6,
+		/datum/mafia_role/md=3,
+		/datum/mafia_role/mafia=4
+	)
+
+/datum/mafia_setup/twelve_all
+	name = "12 Player Setup All"
+	roles = list(
+		/datum/mafia_role=4,
+		/datum/mafia_role/md=1,
+		/datum/mafia_role/detective=1,
+		/datum/mafia_role/clown=1,
+		/datum/mafia_role/chaplain=1,
+		/datum/mafia_role/warden=1,
+		/datum/mafia_role/traitor=1,
+		/datum/mafia_role/mafia=3
+	)
+
+/datum/mafia_setup/twelve_joke
+	name = "12 Player Setup Funny"
+	roles = list(
+		/datum/mafia_role=5,
+		/datum/mafia_role/detective=2,
+		/datum/mafia_role/clown=2,
+		/datum/mafia_role/mafia=3
+	)
+
+/datum/mafia_setup/twelve_lockdown
+	name = "12 Player Setup Lockdown"
+	roles = list(
+		/datum/mafia_role=4,
+		/datum/mafia_role/chaplain=1,
+		/datum/mafia_role/warden=2,
+		/datum/mafia_role/mafia=3
+	)
+
+/datum/mafia_setup/twelve_rip
+	name = "12 Player Setup rip"
+	roles = list(
+		/datum/mafia_role=8,
+		/datum/mafia_role/traitor=1,
+		/datum/mafia_role/mafia=3
+	)
+
+// 10 Player
+/datum/mafia_setup/ten_A
+	name = "10 Player Setup A"
+	roles = list(
+		/datum/mafia_role=6,
+		/datum/mafia_role/detective=1,
+		/datum/mafia_role/clown=1,/datum/mafia_role/mafia=3
+		)
+
+/datum/mafia_setup/ten_B
+	name = "10 Player Setup B"
+	roles = list(
+		/datum/mafia_role=3,
+		/datum/mafia_role/warden=1,
+		/datum/mafia_role/md=1,
+		/datum/mafia_role/detective=1,
+		/datum/mafia_role/chaplain=1,
+		/datum/mafia_role/mafia=3
+	)
+
+/datum/mafia_setup/ten_C
+	name = "10 Player Setup C"
+	roles = list(
+		/datum/mafia_role=5,
+		/datum/mafia_role/warden=1,
+		/datum/mafia_role/md=1,
+		/datum/mafia_role/traitor=1,
+		/datum/mafia_role/mafia=2)
+
+
+/datum/mafia_setup/nine
+	name = "9 Player Setup"
+	roles = list(
+		/datum/mafia_role=3,
+		/datum/mafia_role/md=1,
+		/datum/mafia_role/detective=1,
+		/datum/mafia_role/chaplain=1,
+		/datum/mafia_role/mafia=3
+	)
+

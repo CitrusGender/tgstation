@@ -89,42 +89,42 @@
 		add_note("N[game.turn] - [R.body.real_name] - [team_text]")
 	current_investigation = null
 
-/datum/mafia_role/security
-	name = "Security"
+/datum/mafia_role/md
+	name = "Medical Doctor"
 	desc = "You can protect a single person each night from killing."
 
 	targeted_actions = list("Protect")
 
 	var/datum/mafia_role/current_protected
 
-/datum/mafia_role/security/New(datum/mafia_controller/game)
+/datum/mafia_role/md/New(datum/mafia_controller/game)
 	. = ..()
 	RegisterSignal(game,COMSIG_MAFIA_NIGHT_ACTION_PHASE,.proc/protect)
 	RegisterSignal(game,COMSIG_MAFIA_NIGHT_END,.proc/end_protection)
 
-/datum/mafia_role/security/validate_action_target(datum/mafia_controller/game,action,datum/mafia_role/target)
+/datum/mafia_role/md/validate_action_target(datum/mafia_controller/game,action,datum/mafia_role/target)
 	. = ..()
 	if(!.)
 		return
 	return game.phase == MAFIA_PHASE_NIGHT && target.game_status == MAFIA_ALIVE && target != src
 
-/datum/mafia_role/security/handle_action(datum/mafia_controller/game,action,datum/mafia_role/target)
+/datum/mafia_role/md/handle_action(datum/mafia_controller/game,action,datum/mafia_role/target)
 	if(!target || target.game_status != MAFIA_ALIVE)
 		to_chat(body,"<span class='warning'>You can only protect alive people.</span>")
 		return
 	to_chat(body,"<span class='warning'>You will protect [target.body.real_name] tonight.</span>")
 	current_protected = target
 
-/datum/mafia_role/security/proc/protect(datum/mafia_controller/game)
+/datum/mafia_role/md/proc/protect(datum/mafia_controller/game)
 	if(current_protected)
 		RegisterSignal(current_protected,COMSIG_MAFIA_ON_KILL,.proc/prevent_kill)
 		add_note("N[game.turn] - Protected [current_protected.body.real_name]")
 
-/datum/mafia_role/security/proc/prevent_kill(datum/source)
+/datum/mafia_role/md/proc/prevent_kill(datum/source)
 	to_chat(body,"<span class='warning'>The person you protected tonight was attacked!</span>")
 	return MAFIA_PREVENT_KILL
 
-/datum/mafia_role/security/proc/end_protection(datum/mafia_controller/game)
+/datum/mafia_role/md/proc/end_protection(datum/mafia_controller/game)
 	if(current_protected)
 		UnregisterSignal(current_protected,COMSIG_MAFIA_ON_KILL)
 		current_protected = null
@@ -159,7 +159,7 @@
 
 /datum/mafia_role/clown
 	name = "Clown"
-	desc = "If you are lynched you take down one of your voters with you. HONK"
+	desc = "If you are lynched you take down one of your voters with you and win. HONK"
 
 /datum/mafia_role/clown/New(datum/mafia_controller/game)
 	. = ..()
@@ -200,7 +200,7 @@
 	current_imprison_target = target
 
 /datum/mafia_role/warden/proc/try_to_imprison(datum/mafia_controller/game)
-	if(game_status != MAFIA_ALIVE) //Got lynched
+	if(SEND_SIGNAL(src,COMSIG_MAFIA_CAN_PERFORM_ACTION,game,"imprison",current_imprison_target) & MAFIA_PREVENT_ACTION || game_status != MAFIA_ALIVE) //Got lynched or imprisoned by another warden.
 		current_imprison_target = null
 	if(current_imprison_target)
 		RegisterSignal(current_imprison_target,COMSIG_MAFIA_CAN_PERFORM_ACTION, .proc/prevent_action)
@@ -255,3 +255,4 @@
 		if(!current_victim.kill(source))
 			to_chat(body,"<span class='danger'>Your attempt at killing [current_victim.body] was prevented!</span>")
 	current_victim = null
+

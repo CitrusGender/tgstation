@@ -52,4 +52,18 @@
 		MF = create_mafia_game(game_id)
 	MF.ui_interact(user)
 
+/obj/mafia_game_signup/debug
+	var/datum/mafia_controller/MF
+	var/list/debug_setup = list(/datum/mafia_role/md=1,/datum/mafia_role/clown=1,/datum/mafia_role/detective=1,/datum/mafia_role/mafia=1)
+
+/obj/mafia_game_signup/debug/Initialize()
+	. = ..()
+	new /obj/effect/landmark/mafia(get_step(get_turf(src),EAST))
+	new /obj/effect/landmark/mafia(get_step(get_turf(src),WEST))
+	new /obj/effect/landmark/mafia(get_step(get_turf(src),NORTH))
+	new /obj/effect/landmark/mafia(get_step(get_turf(src),SOUTH))
+	MF = create_mafia_game("mafia")
+	MF.debug = TRUE
+	MF.signed_up |= list("debug_guy_key","the_other_guy","third_loser")
+	GLOB.mafia_setups = list(debug_setup)
 
