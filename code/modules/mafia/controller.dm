@@ -65,9 +65,11 @@
 /datum/mafia_controller/proc/start_day()
 	turn += 1
 	phase = MAFIA_PHASE_DAY
-	next_phase_timer = addtimer(CALLBACK(src,.proc/start_voting_phase),day_phase_period,TIMER_STOPPABLE)
-	send_message("<span class='big'>Day [turn] started! Voting will start in 4 minutes.</span>")
+	if(!check_victory())
+		next_phase_timer = addtimer(CALLBACK(src,.proc/start_voting_phase),day_phase_period,TIMER_STOPPABLE)
+		send_message("<span class='big'>Day [turn] started! Voting will start in 4 minutes.</span>")
 	SStgui.update_uis(src)
+
 
 /datum/mafia_controller/proc/start_voting_phase()
 	phase = MAFIA_PHASE_VOTING
@@ -163,11 +165,19 @@
 	if(!votes[vt])
 		votes[vt] = list()
 	var/old_vote = votes[vt][voter]
-	votes[vt][voter] = target
-	target.body.update_icon() //Update the vote display
-	if(old_vote)
-		var/datum/mafia_role/old = old_vote
-		old.body.update_icon()
+	if(old_vote && old_vote == target)
+		votes[vt] -= voter
+	else
+		votes[vt][voter] = target
+	if(vt=="Day")
+		if(old_vote && old_vote == target)
+			send_message("<span class='notice'>[voter.body.real_name] retracts their vote for [target.body.real_name]!</span>")
+		else
+			send_message("<span class='notice'>[voter.body.real_name] voted for [target.body.real_name]!</span>")
+			target.body.update_icon() //Update the vote display
+		if(old_vote)
+			var/datum/mafia_role/old = old_vote
+			old.body.update_icon()
 
 /datum/mafia_controller/proc/reset_votes(vt)
 	var/list/bodies_to_update = list()
@@ -310,7 +320,6 @@
 					if(phase != MAFIA_PHASE_VOTING)
 						return
 					vote_for(user_role,target,vt="Day")
-					to_chat(user_role.body,"You will vote for [target.body.real_name] for todays lynching.")
 				if("Kill Vote")
 					if(phase != MAFIA_PHASE_NIGHT || user_role.team != MAFIA_TEAM_MAFIA)
 						return
