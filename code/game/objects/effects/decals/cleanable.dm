@@ -20,6 +20,9 @@
 
 	#ifdef EVENTMODE
 	///AUTO CLEAN
+	if(mapload) // except if it's intentionally filthy
+		return .
+
 	QDEL_IN(src, 30)
 	return . //skip disease handling
 	#endif
