@@ -192,7 +192,6 @@
 	var/obj/effect/dummy/luminescent_glow/glowth //shamelessly copied from luminescents
 	var/glow = 2.5
 	var/range = 2.5
-	var/glow_color
 	power_coeff = 1
 	conflicts = list(/datum/mutation/human/glow/anti)
 
@@ -200,7 +199,6 @@
 	. = ..()
 	if(.)
 		return
-	glow_color = glow_color()
 	glowth = new(owner)
 	modify()
 
@@ -208,12 +206,7 @@
 	if(!glowth)
 		return
 	var/power = GET_MUTATION_POWER(src)
-
-	glowth.set_light(range * power, glow, glow_color)
-
-/// Returns the color for the glow effect
-/datum/mutation/human/glow/proc/glow_color()
-	return pick(COLOR_RED, COLOR_BLUE, COLOR_YELLOW, COLOR_GREEN, COLOR_PURPLE, COLOR_ORANGE)
+	glowth.set_light(range * power, glow, "#[dna.features["mcolor"]]")
 
 /datum/mutation/human/glow/on_losing(mob/living/carbon/human/owner)
 	. = ..()
@@ -225,12 +218,9 @@
 	name = "Anti-Glow"
 	desc = "Your skin seems to attract and absorb nearby light creating 'darkness' around you."
 	text_gain_indication = "<span class='notice'>Your light around you seems to disappear.</span>"
-	glow = -1.5
+	glow = -3.5 //Slightly stronger, since negating light tends to be harder than making it.
 	conflicts = list(/datum/mutation/human/glow)
 	locked = TRUE
-
-/datum/mutation/human/glow/anti/glow_color()
-	return COLOR_WHITE
 
 /datum/mutation/human/strong
 	name = "Strength"
