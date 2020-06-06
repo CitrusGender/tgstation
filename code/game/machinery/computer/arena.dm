@@ -21,6 +21,7 @@
 /// Controller for admin event arenas
 /obj/machinery/computer/arena
 	name = "arena controller"
+	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | UNACIDABLE | ACID_PROOF
 	/// Arena ID
 	var/arena_id = ARENA_DEFAULT_ID
 	/// Enables/disables spawning
@@ -61,6 +62,10 @@
 	//Sound played when the fight starts.
 	var/start_sound = 'sound/items/airhorn2.ogg'
 	var/start_sound_volume = 50
+
+	var/objects_delete_on_leaving_arena = FALSE
+	var/list/mv_trackers = list()
+	var/list/turf_lookup = list()
 
 /obj/machinery/computer/arena/Initialize(mapload, obj/item/circuitboard/C)
 	. = ..()
@@ -108,6 +113,7 @@
 	return block(lp,hp)
 
 /obj/machinery/computer/arena/proc/clear_arena()
+	QDEL_LIST(mv_trackers)
 	for(var/turf/T in get_arena_turfs())
 		T.empty(turf_type = /turf/open/indestructible)
 	current_arena_template = "None"
@@ -131,12 +137,23 @@
 	var/bd = M.load(get_load_point())
 	if(bd)
 		current_arena_template = arena_template
+
+	if(objects_delete_on_leaving_arena)
+		turf_lookup = list()
+		for(var/turf/T in get_arena_turfs())
+			turf_lookup[T] = TRUE
+			for(var/O in T.GetAllContents(/obj))
+				var/datum/movement_detector/tracker = new(O, CALLBACK(src, .proc/delete_out_of_bounds))
+				mv_trackers += tracker
+
 	loading = FALSE
 
 	message_admins("[key_name_admin(user)] loaded [arena_template] event arena for [arena_id] arena.")
 	log_admin("[key_name(user)] loaded [arena_template] event arena for [arena_id] arena.")
 
-
+/obj/machinery/computer/arena/proc/delete_out_of_bounds(atom/movable/mover)
+	if(!turf_lookup[get_turf(mover)])
+		qdel(mover)
 
 /obj/machinery/computer/arena/proc/add_new_arena_template(user,fname,friendly_name)
 	if(!fname)
