@@ -6,9 +6,9 @@
 "dt" = (/obj/effect/decal/cleanable/dirt,/obj/structure/urinal{dir = 4; pixel_x = -32},/turf/open/floor/plasteel,/area/space)
 "dP" = (/obj/item/kirbyplants/random,/turf/open/floor/plasteel,/area/space)
 "dW" = (/obj/structure/table/wood/fancy/orange,/obj/item/clothing/mask/cigarette/cigar{pixel_x = -1; pixel_y = -2},/obj/item/clothing/mask/cigarette/cigar{pixel_x = -4; pixel_y = 1},/obj/item/clothing/mask/cigarette/cigar{pixel_x = -6; pixel_y = 6},/obj/item/storage/wallet{pixel_x = -3; pixel_y = 10},/obj/item/gps{gpstag = "QM0"; pixel_x = 10; pixel_y = 12},/obj/item/lighter{pixel_x = 11; pixel_y = -7},/obj/item/coin/gold{pixel_x = 9; pixel_y = 9},/turf/open/floor/carpet/red,/area/space)
-"eR" = (/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
+"eR" = (/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/obj/item/trash/raisins,/turf/open/floor/plasteel/dark,/area/space)
 "eT" = (/obj/structure/rack,/obj/effect/spawner/lootdrop/techstorage/AI,/turf/open/floor/plasteel/dark,/area/space)
-"fr" = (/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/space)
+"fr" = (/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/decal/cleanable/dirt,/obj/item/trash/pistachios{pixel_y = -3; pixel_x = -4},/obj/item/trash/pistachios,/turf/open/floor/plasteel,/area/space)
 "fM" = (/obj/machinery/door/airlock/command,/obj/effect/decal/cleanable/dirt,/obj/effect/decal/cleanable/dirt,/turf/open/floor/wood,/area/space)
 "fZ" = (/obj/structure/sink/kitchen{desc = "A sink used for washing one's hands and face. It looks rusty and home-made"; name = "old sink"; pixel_y = 28},/obj/item/cigbutt,/obj/item/cigbutt{pixel_x = -7; pixel_y = 4},/turf/open/floor/plating,/area/space)
 "gH" = (/obj/item/kirbyplants/random,/turf/open/floor/wood,/area/space)
@@ -26,12 +26,14 @@
 "nb" = (/obj/structure/table/wood,/obj/item/folder/blue,/obj/item/clothing/head/collectable/HoP{name = "novelty HoP hat"},/turf/open/floor/carpet,/area/space)
 "ne" = (/obj/item/cigbutt,/turf/open/floor/wood,/area/space)
 "nr" = (/turf/open/floor/carpet/red,/area/space)
+"pr" = (/obj/effect/turf_decal/tile/neutral,/obj/item/trash/cheesie,/turf/open/floor/plasteel,/area/space)
 "ps" = (/obj/structure/table/wood,/obj/item/phone{desc = "Supposedly a direct line to Nanotrasen Central Command. It's not even plugged in."; pixel_x = -3; pixel_y = 3},/obj/item/cigbutt/cigarbutt{pixel_x = 5; pixel_y = -1},/obj/item/radio/intercom{pixel_y = 21},/turf/open/floor/wood,/area/space)
 "pu" = (/obj/structure/showcase/machinery/cloning_pod{layer = 4; pixel_x = 2; pixel_y = 5},/turf/open/floor/carpet,/area/space)
 "pR" = (/obj/structure/extinguisher_cabinet{pixel_x = 27},/obj/effect/turf_decal/tile/neutral,/turf/open/floor/plasteel,/area/space)
 "qj" = (/obj/structure/showcase/machinery/microwave{dir = 1; pixel_y = 2},/obj/structure/table/wood,/turf/open/floor/carpet,/area/space)
 "qH" = (/obj/structure/table/wood,/obj/machinery/newscaster{pixel_y = 32},/obj/item/flashlight/lamp,/turf/open/floor/wood,/area/space)
 "rX" = (/obj/effect/turf_decal/tile/neutral,/turf/open/floor/plasteel,/area/space)
+"td" = (/obj/effect/decal/cleanable/dirt,/obj/item/trash/boritos,/turf/open/floor/wood,/area/space)
 "tG" = (/obj/structure/table,/obj/item/stack/packageWrap{pixel_x = 2; pixel_y = -3},/obj/item/hand_labeler{pixel_y = 11},/obj/item/hand_labeler_refill{pixel_x = -8; pixel_y = 3},/obj/item/stack/packageWrap{pixel_x = 2; pixel_y = -3},/turf/open/floor/wood,/area/space)
 "tK" = (/obj/structure/chair/comfy/black{dir = 4},/turf/open/floor/carpet,/area/space)
 "tZ" = (/obj/structure/toilet{pixel_y = 8},/obj/machinery/newscaster{pixel_y = -32},/turf/open/floor/plasteel,/area/space)
@@ -65,8 +67,12 @@
 "JH" = (/turf/open/floor/wood{icon_state = "wood-broken6"},/area/space)
 "Kn" = (/obj/structure/table/wood,/obj/item/storage/secure/briefcase{desc = "A large briefcase with a digital locking system, and the Nanotrasen logo emblazoned on the sides."; name = "\improper Nanotrasen-brand secure briefcase exhibit"; pixel_y = 2},/turf/open/floor/carpet,/area/space)
 "KF" = (/obj/effect/decal/cleanable/dirt,/turf/open/floor/wood,/area/space)
+"KO" = (/obj/effect/decal/cleanable/dirt,/obj/item/trash/raisins,/turf/open/floor/wood,/area/space)
 "KX" = (/obj/item/disk/data{pixel_x = 9; pixel_y = -1},/obj/item/disk/tech_disk{pixel_x = -2; pixel_y = -3},/obj/item/disk/design_disk{name = "component design disk"; pixel_y = 6},/obj/structure/table/wood,/obj/item/toy/talking/AI{name = "\improper Nanotrasen-brand toy AI"; pixel_y = 6},/turf/open/floor/carpet,/area/space)
+"LY" = (/obj/effect/decal/cleanable/dirt,/obj/item/trash/can,/turf/open/floor/wood,/area/space)
+"Mw" = (/obj/item/trash/chips,/turf/open/floor/wood,/area/space)
 "MY" = (/obj/item/trash/candy,/turf/open/floor/wood{icon_state = "wood-broken3"},/area/space)
+"Nk" = (/obj/item/trash/sosjerky,/obj/item/trash/sosjerky{pixel_y = 7; pixel_x = 5},/turf/open/floor/carpet/red,/area/space)
 "Pc" = (/obj/machinery/door/airlock{id_tag = "AuxToilet1"; name = "Unit 1"},/turf/open/floor/plasteel,/area/space)
 "PD" = (/obj/machinery/light/small{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
 "PG" = (/obj/item/folder/white{pixel_x = 4; pixel_y = -3},/obj/structure/table/wood,/turf/open/floor/carpet,/area/space)
@@ -74,24 +80,26 @@
 "RT" = (/obj/effect/spawner/structure/window/reinforced/tinted,/turf/open/floor/plating,/area/space)
 "RY" = (/turf/open/space/basic,/area/space)
 "SD" = (/obj/structure/mirror{pixel_x = 28},/turf/open/floor/plating,/area/space)
+"SQ" = (/obj/effect/turf_decal/tile/neutral,/obj/item/trash/semki,/turf/open/floor/plasteel,/area/space)
 "Tf" = (/obj/machinery/door/airlock,/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/space)
 "Tx" = (/obj/item/reagent_containers/food/drinks/bottle/whiskey{pixel_x = -5; pixel_y = 4},/obj/item/reagent_containers/food/drinks/drinkingglass/shotglass{pixel_x = 2; pixel_y = -4},/obj/item/reagent_containers/food/drinks/drinkingglass/shotglass{pixel_x = -9; pixel_y = -4},/obj/item/coin/gold{pixel_x = 9; pixel_y = 9},/obj/structure/table/wood/fancy/orange,/turf/open/floor/carpet/red,/area/space)
+"US" = (/obj/item/trash/cheesie,/turf/open/floor/wood,/area/space)
 "YZ" = (/obj/structure/showcase/mecha/ripley,/obj/effect/decal/cleanable/cobweb,/turf/open/floor/carpet,/area/space)
 "Zz" = (/obj/structure/rack,/obj/item/book/manual/wiki/security_space_law{pixel_y = 2; pixel_x = 1},/turf/open/floor/wood,/area/space)
 "ZE" = (/obj/structure/table/wood,/obj/item/camera_film{pixel_x = 4; pixel_y = 5},/obj/item/camera_film{pixel_x = -3; pixel_y = 2},/turf/open/floor/wood,/area/space)
 
 (1,1,1) = {"
 TxdWREFExRHFaMrXAmuMfZcrxR
-nrnryeyeDHHsaMrXxRdtSDxRxR
-nrnrtGJDxRhAdPELxRidkDPctZ
+nrnryeyeDHHsaMSQxRdtSDxRxR
+nrNktGJDxRhAdPELxRidkDPctZ
 itititititTfRTTfxRxRxRxRxR
 RYiteTIjitfrdPELxRxaZzqHZE
-RYkJwgeRHRHFaMrXiVyetKPGus
-RYitFMPDitHFkDpRxRyelylyly
+RYkJwgeRHRHFaMpriVyetKPGus
+RYitFMPDitHFkDpRxRUSlylyly
 ititititititfMitititititit
 YZalAkgHxapsdrCExagHpugLky
-yeahyeyeKFyeyeKFyeyeJHyeKF
-KFhfyeKFyeKFhfyeyeahKFKFne
-ujKFKFyeMYAPJpDZKFyeyeyeFk
-nbKnyeyeqjDrHKwtBAyeKFKXkV
+yeahyeMwKFyeyeKFyeyeJHyeKF
+KFhfMwKFyeKFhfyeyeahKFLYne
+ujKFKFyeMYAPJpDZKOyeyeyeFk
+nbKnyeyeqjDrHKwtBAyetdKXkV
 "}
