@@ -1,5 +1,6 @@
 "aB" = (/obj/machinery/computer/security{dir = 4},/turf/open/floor/plasteel/showroomfloor,/area/space)
-"bR" = (/obj/structure/table,/turf/open/floor/plasteel/dark,/area/space)
+"aI" = (/obj/structure/table,/obj/item/storage/fancy/cigarettes/cigpack_syndicate,/turf/open/floor/plasteel/dark,/area/space)
+"bR" = (/obj/structure/table,/obj/effect/fun_balloon,/turf/open/floor/plasteel/dark,/area/space)
 "cq" = (/turf/open/floor/plasteel,/area/space)
 "cu" = (/obj/effect/turf_decal/tile/red,/obj/effect/turf_decal/tile/red{dir = 8},/turf/open/floor/plasteel,/area/space)
 "dz" = (/obj/structure/filingcabinet,/obj/machinery/requests_console{department = "Security"; departmentType = 5; pixel_y = 30},/obj/effect/turf_decal/tile/red{dir = 1},/obj/effect/turf_decal/tile/red{dir = 4},/turf/open/floor/plasteel,/area/space)
@@ -9,6 +10,7 @@
 "gE" = (/obj/structure/chair/office{dir = 1},/turf/open/floor/plasteel,/area/space)
 "ix" = (/obj/machinery/door/firedoor,/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
 "kp" = (/obj/structure/punching_bag,/turf/open/floor/plasteel,/area/space)
+"le" = (/obj/structure/table/wood,/obj/machinery/recharger,/obj/item/reagent_containers/food/drinks/mug{pixel_x = 11; pixel_y = 11},/turf/open/floor/plasteel,/area/space)
 "mF" = (/obj/machinery/newscaster{pixel_x = -32},/obj/effect/turf_decal/tile/red{dir = 1},/obj/effect/turf_decal/tile/red{dir = 4},/obj/effect/turf_decal/tile/red{dir = 8},/turf/open/floor/plasteel,/area/space)
 "mG" = (/obj/effect/spawner/structure/window/reinforced,/turf/open/floor/plating,/area/space)
 "oG" = (/obj/machinery/door/firedoor,/obj/effect/turf_decal/delivery,/obj/machinery/door/airlock/security{name = "Equipment Room"; req_access_txt = "1"},/turf/open/floor/plasteel,/area/space)
@@ -18,6 +20,7 @@
 "ry" = (/obj/structure/rack,/obj/structure/sign/warning/nosmoking{pixel_x = 32},/turf/open/floor/plasteel/dark,/area/space)
 "rL" = (/obj/structure/filingcabinet/chestdrawer,/turf/open/floor/plasteel/showroomfloor,/area/space)
 "sm" = (/obj/structure/table,/obj/item/laser_pointer/red,/obj/item/wrench,/obj/item/crowbar,/turf/open/floor/plasteel/showroomfloor,/area/space)
+"sn" = (/obj/structure/table,/obj/item/stack/spacecash/c20,/obj/item/stack/spacecash/c20{pixel_y = 10},/obj/item/stack/spacecash/c20{pixel_y = 6; pixel_x = 4},/obj/item/stack/spacecash/c20{pixel_x = -4; pixel_y = 4},/obj/item/stack/spacecash/c20{pixel_x = 4; pixel_y = -2},/turf/open/floor/plasteel/dark,/area/space)
 "tc" = (/obj/structure/lattice,/turf/open/space,/area/space)
 "ue" = (/obj/structure/closet/bombcloset/security,/obj/effect/turf_decal/delivery,/turf/open/floor/plasteel/showroomfloor,/area/space)
 "uu" = (/obj/machinery/computer/secure_data,/turf/open/floor/plasteel,/area/space)
@@ -45,24 +48,30 @@
 "MC" = (/turf/closed/wall,/area/space)
 "MO" = (/obj/structure/table,/obj/item/storage/fancy/donut_box{pixel_y = 2},/obj/structure/noticeboard{pixel_y = 32},/obj/effect/turf_decal/tile/red{dir = 1},/obj/effect/turf_decal/tile/red{dir = 4},/turf/open/floor/plasteel,/area/space)
 "Nq" = (/obj/structure/weightmachine/weightlifter,/turf/open/floor/plasteel/showroomfloor,/area/space)
+"OG" = (/obj/structure/rack,/obj/item/clothing/suit/armor/vest/alt,/obj/item/clothing/suit/armor/vest/alt{pixel_x = 4; pixel_y = 2},/obj/item/clothing/suit/armor/vest/alt{pixel_x = -3; pixel_y = -3},/turf/open/floor/plasteel/dark,/area/space)
+"PG" = (/obj/structure/rack,/obj/item/card/emagfake,/turf/open/floor/plasteel/dark,/area/space)
 "Qo" = (/obj/machinery/camera/motion{c_tag = "Armory Motion Sensor"},/obj/structure/closet{name = "Evidence Closet"},/turf/open/floor/plasteel/dark,/area/space)
 "QA" = (/obj/structure/table/wood,/obj/item/flashlight/lamp/green{pixel_x = -4; pixel_y = 12},/obj/item/pen,/obj/item/folder/red{layer = 2.9; pixel_x = 8},/turf/open/floor/plasteel,/area/space)
+"QJ" = (/obj/structure/rack,/obj/item/melee/baton{pixel_y = -3; pixel_x = 5},/obj/item/melee/baton{pixel_x = -5; pixel_y = 2},/obj/item/melee/baton,/turf/open/floor/plasteel/dark,/area/space)
 "Sz" = (/obj/machinery/light_switch{dir = 9; pixel_x = -22},/obj/effect/turf_decal/tile/red{dir = 1},/obj/effect/turf_decal/tile/red{dir = 8},/turf/open/floor/plasteel,/area/space)
+"SZ" = (/obj/structure/table/wood,/obj/item/flashlight/lamp/green{pixel_x = -4; pixel_y = 12},/obj/item/pen,/obj/item/folder/red{layer = 2.9; pixel_x = 8},/obj/item/reagent_containers/food/drinks/mug{pixel_y = -5; pixel_x = -7},/turf/open/floor/plasteel,/area/space)
 "Tn" = (/obj/machinery/door/airlock/security{name = "Brig Control"; req_access_txt = "3"},/obj/machinery/door/firedoor,/turf/open/floor/plasteel/showroomfloor,/area/space)
 "VZ" = (/obj/effect/turf_decal/tile/red,/obj/effect/turf_decal/tile/red{dir = 4},/turf/open/floor/plasteel,/area/space)
+"Ws" = (/obj/structure/rack,/obj/item/clothing/head/helmet/riot,/obj/item/clothing/head/helmet/riot{pixel_x = 3; pixel_y = 2},/obj/item/clothing/head/helmet/riot{pixel_x = -3; pixel_y = 2},/obj/item/clothing/suit/armor/riot,/obj/item/clothing/suit/armor/riot{pixel_x = 3; pixel_y = 2},/obj/item/clothing/suit/armor/riot{pixel_x = -3; pixel_y = 2},/obj/item/shield/riot,/obj/item/shield/riot{pixel_x = -3; pixel_y = 3},/obj/item/shield/riot{pixel_x = 3; pixel_y = -3},/turf/open/floor/plasteel/dark,/area/space)
+"Yt" = (/obj/structure/rack,/obj/item/gun/ballistic/shotgun/riot,/obj/item/gun/ballistic/shotgun/riot{pixel_y = 6},/obj/item/gun/ballistic/shotgun/riot{pixel_y = 3},/turf/open/floor/plasteel/dark,/area/space)
 "Zx" = (/obj/structure/chair/stool,/turf/open/floor/plasteel,/area/space)
 
 (1,1,1) = {"
 GIdBtcyVtcmGFOFONqFONqFOFO
 GIgqgqgqgqgqFOFOFOFOFOFOFO
 GIGIQoGIbRgqwNLWvsvsvsueFO
-bRGIGIGIbRgqoGMCMCMCMCMCoG
-CaGICaGIrygqzkdzMOzWIlyMvm
-CaGICaGICagqzjcqZxZxcqcqVZ
-CaGICaGICagqmFcqcqcqcqcqFR
-efGIGIGIefgqpsQAuucqQAHoVZ
+snGIGIGIaIgqoGMCMCMCMCMCoG
+CaGIPGGIrygqzkdzMOzWIlyMvm
+CaGIWsGIOGgqzjcqZxZxcqcqVZ
+CaGIYtGIQJgqmFcqcqcqcqcqFR
+efGIGIGIefgqpsQAuucqSZHoVZ
 mGixmGixmGgqBTcqgELacqgEVZ
-LDFOFOFOxWgqSzQAzfcqQAzfVZ
+LDFOFOFOxWgqSzQAlecqQAzfVZ
 aBFOFOFOxWmGpVcqgEcqcqgEpX
 CpFOFOFOFOTnpscqcqcqcqcqVZ
 smCpFOFOrLmGzkcucukpcucuzk
