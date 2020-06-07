@@ -5,84 +5,51 @@
 	flags_1 = 0
 	hidden = TRUE
 
-	var/obj/machinery/computer/prophunt/linked
-	var/restricted = 0 // if true, program goes on emag list
-
-/*
-	Power tracking: Use the prophunt computer's power grid
-	Asserts are to avoid the inevitable infinite loops
-*/
-
-/area/prophunt/powered(var/chan)
-	if(!requires_power)
-		return 1
-	if(always_unpowered)
-		return 0
-	if(!linked)
-		return 0
-	var/area/A = get_area(linked)
-	ASSERT(!istype(A, /area/prophunt))
-	return A.powered(chan)
-
-/area/prophunt/addStaticPower(value, powerchannel)
-	if(!linked)
-		return
-	var/area/A = get_area(linked)
-	ASSERT(!istype(A, /area/prophunt))
-	return ..()
-
-/area/prophunt/use_power(amount, chan)
-	if(!linked)
-		return 0
-	var/area/A = get_area(linked)
-	ASSERT(!istype(A, /area/prophunt))
-	return ..()
-
-
-/*
-	This is the standard prophunt.  It is intended to allow you to
-	blow off steam by doing stupid things like laying down, throwing
-	spheres at holes, or bludgeoning people.
-*/
 /area/prophunt/mg2
-	name = "\improper Recreational prophunt"
+	name = "\improper PropHunt Area"
 
 /area/prophunt/mg2/offline
 	name = "PropHunt - Offline"
 
-/area/prophunt/mg2/00
+/area/prophunt/mg2/alpha
 	name = "PropHunt - Maintanence"
 
-/area/prophunt/mg2/01
+/area/prophunt/mg2/bravo
 	name = "PropHunt - Crused Meta Showroom"
 
-/area/prophunt/mg2/02
+/area/prophunt/mg2/charlie
 	name = "PropHunt - AI Sat I"
 
-/area/prophunt/mg2/03
+/area/prophunt/mg2/delta
 	name = "PropHunt - Bridge/Port Primary"
 
-/area/prophunt/mg2/04
+/area/prophunt/mg2/echo
 	name = "PropHunt - Engineering/Atmos Aux"
 
-/area/prophunt/mg2/05
+/area/prophunt/mg2/foxtrot
 	name = "PropHunt - Delta Brig"
 
-/area/prophunt/mg2/06
+/area/prophunt/mg2/golf
 	name = "PropHunt - Pubby Brig"
 
-/area/prophunt/mg2/07
+/area/prophunt/mg2/hotel
 	name = "PropHunt - Cursed Pubby Dorms"
 
-/area/prophunt/mg2/08
+/area/prophunt/mg2/india
 	name = "PropHunt - Cargo Mashup"
 
-/area/prophunt/mg2/09
+/area/prophunt/mg2/juliett
 	name = "PropHunt - Medbay Mishap"
 
+/area/prophunt/mg2/kilo
+	name = "PropHunt - ???"
+/** Kilo doesn't even real **/
 
-// Bad programs
+/area/prophunt/mg2/ligma
+	name = "PropHunt - AI Sat II"
 
-/area/prophunt/mg2/medical
-	name = "PropHunt - Emergency Medical"
-	restricted = 1
+/area/prophunt/mg2/mike
+	name = "PropHunt - Dereliction"
+
+/area/prophunt/mg2/november
+	name = "PropHunt - Into The Engine"
