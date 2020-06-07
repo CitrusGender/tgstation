@@ -1142,7 +1142,7 @@
 "Uc" = (/obj/structure/bed,/obj/item/bedsheet/rd{desc = "A truly regal sheet to sleep under."; dream_messages = list("gambling","cards","chips","poker","roulette","dice"); name = "casino bedsheet"},/turf/open/floor/carpet/purple,/area/crew_quarters/dorms)
 "Uf" = (/obj/item/cardboard_cutout/adaptive{icon_state = "cutout_ian"; name = "White Knight"},/turf/open/floor/plasteel/dark,/area/space)
 "Uh" = (/obj/structure/stone_tile/slab/cracked,/turf/open/floor/plasteel/cult,/area/space)
-"Uj" = (/obj/structure/table/wood,/obj/item/radio/headset/heads/captain/alt{tag = "pharena"},/obj/machinery/door_timer{desc = "The game timer for each round in PropHunt."; id = "PropHunt"; name = "PropHunt Timer"; pixel_y = -32; tag = "pharena"},/turf/open/floor/carpet,/area/prophunt)
+"Uj" = (/obj/structure/table/wood,/obj/item/radio/headset/heads/captain/alt{tag = "pharena"},/obj/machinery/door_timer{desc = "The game timer for each round in PropHunt."; id = "PropHunt"; name = "PropHunt Timer"; pixel_y = -32; tag = "pharena"},/obj/item/dnainjector/xraymut,/turf/open/floor/carpet,/area/prophunt)
 "Um" = (/obj/machinery/vending/cola/shamblers,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Up" = (/obj/structure/stone_tile/surrounding_tile,/obj/structure/stone_tile/surrounding_tile{dir = 8},/turf/open/water,/area/space)
 "Uq" = (/obj/effect/turf_decal/trimline/red/filled/corner{dir = 1},/obj/structure/fluff/hedge/opaque,/turf/open/floor/plasteel/dark/corner{dir = 1},/area/security/brig/upper)
