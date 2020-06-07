@@ -1229,6 +1229,7 @@
 "yb" = (/obj/structure/stone_tile/surrounding_tile,/obj/structure/stone_tile/surrounding_tile{dir = 1},/turf/open/water,/area/ruin/unpowered/ash_walkers)
 "yf" = (/turf/open/floor/carpet/purple,/area/crew_quarters/dorms)
 "yg" = (/obj/machinery/vending/clothing,/turf/open/floor/carpet/red,/area/space)
+"yi" = (/obj/item/paper{name = "Please find a way to link the door timer to the status display"},/obj/effect/turf_decal/stripes/line{dir = 8},/obj/effect/turf_decal/bot,/obj/machinery/vending/snack,/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/prophunt)
 "yo" = (/obj/item/cardboard_cutout/adaptive{icon_state = "cutout_lusty"; name = "White Bishop"},/turf/open/floor/plasteel/dark,/area/space)
 "yq" = (/turf/open/floor/light/colour_cycle/dancefloor_a,/area/crew_quarters/theatre)
 "ys" = (/obj/structure/railing,/turf/open/floor/wood,/area/crew_quarters/fitness/recreation)
@@ -1238,11 +1239,13 @@
 "yA" = (/obj/item/cardboard_cutout/adaptive{icon_state = "cutout_viva"; name = "White Rook"},/turf/open/floor/plasteel/white,/area/space)
 "yD" = (/turf/open/floor/plasteel/rockvault,/area/space)
 "yE" = (/turf/open/floor/plasteel/stairs/left,/area/ruin/unpowered/ash_walkers)
+"yH" = (/obj/effect/turf_decal/delivery,/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/prophunt)
 "yJ" = (/obj/structure/chair/sofa/left,/turf/open/floor/plasteel/dark,/area/space)
 "yK" = (/obj/effect/turf_decal/tile/blue,/obj/effect/turf_decal/tile/blue{dir = 1},/obj/effect/turf_decal/tile/blue{dir = 4},/obj/effect/turf_decal/tile/blue{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
 "yL" = (/obj/structure/chair/sofa/right,/turf/open/floor/carpet/red,/area/crew_quarters/theatre)
 "yP" = (/obj/item/toy/figure/wizard,/obj/item/toy/figure/chaplain{pixel_x = 9; pixel_y = 9},/obj/item/toy/figure/detective{pixel_x = -9; pixel_y = 9},/obj/structure/table/wood/fancy/green{desc = "It's for RPGs. No, not that kind of RPG."; max_integrity = 99999; name = "top table"},/turf/open/floor/plasteel/elevatorshaft,/area/crew_quarters/abandoned_gambling_den)
 "yR" = (/obj/item/kirbyplants{icon_state = "plant-22"},/turf/open/floor/plasteel/dark,/area/crew_quarters/dorms)
+"yT" = (/turf/open/floor/plasteel/dark,/area/prophunt)
 "yX" = (/obj/effect/turf_decal/stripes/line{dir = 10},/obj/effect/turf_decal/stripes/red/line{color = "#000000"; dir = 5},/turf/open/floor/wood,/area/crew_quarters/theatre)
 "yY" = (/obj/machinery/vending/cola/pwr_game,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "za" = (/obj/structure/chair/sofa/right{dir = 1},/turf/open/floor/carpet/red,/area/crew_quarters/theatre)
@@ -1258,6 +1261,8 @@
 "zB" = (/turf/open/floor/plasteel/white,/area/space)
 "zE" = (/turf/open/floor/plasteel/dark/side{dir = 4},/area/space)
 "zF" = (/obj/structure/sink{dir = 1; pixel_y = -9},/turf/open/floor/plasteel/showroomfloor,/area/crew_quarters/dorms)
+"zG" = (/obj/structure/table/wood,/obj/machinery/button/door{desc = "A remote control switch for the medbay foyer."; id = "pharena"; name = "PropHunt Arena Control"; normaldoorcontrol = 1; pixel_y = 5; req_access_txt = "63"},/obj/machinery/button/door{desc = "A remote control switch for the medbay foyer."; id = "phentrance"; name = "PropHunt Entrance Control"; normaldoorcontrol = 1; pixel_y = -5; req_access_txt = "63"},/turf/open/floor/carpet,/area/prophunt)
+"zI" = (/obj/effect/turf_decal/bot,/obj/machinery/vending/cola,/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/prophunt)
 "zK" = (/obj/structure/closet/crate/freezer,/obj/item/storage/cans/sixbeer,/turf/open/floor/wood,/area/space)
 "zN" = (/obj/structure/chair/comfy/brown{color = "#66b266"; desc = "Not to be confused with messaging other people."; dir = 2; max_integrity = 9999; name = "DM Chair"},/obj/item/clothing/head/wizard{desc = "DnD swag, 20 d20s in my dicebag."; name = "Hat of Dungeon Mastery +3"; pixel_y = 12},/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
 "zU" = (/turf/open/transparent/openspace,/area/crew_quarters/abandoned_gambling_den)
@@ -1268,8 +1273,10 @@
 "Ae" = (/turf/open/floor/plasteel/dark/side{dir = 1},/area/space)
 "Ag" = (/obj/machinery/door/airlock{name = "Bathroom"},/turf/open/floor/plasteel/showroomfloor,/area/crew_quarters/theatre)
 "Aj" = (/obj/machinery/door/airlock{name = "High Roller Suite"},/turf/open/floor/carpet/purple,/area/crew_quarters/dorms)
+"Am" = (/obj/effect/turf_decal/stripes/line{dir = 8},/obj/effect/turf_decal/bot,/obj/machinery/vending/coffee,/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/prophunt)
 "An" = (/obj/structure/shuttle/engine/huge{dir = 4},/turf/open/floor/plating/beach/water,/area/space)
 "Aq" = (/obj/structure/chair/sofa/left{dir = 4},/turf/open/floor/plasteel/dark,/area/space)
+"At" = (/obj/machinery/door/airlock/grunge{id_tag = "PropHunt"; name = "Prop Hunt"},/turf/open/floor/plasteel/bluespace,/area/prophunt)
 "Aw" = (/obj/machinery/vending/games,/obj/structure/sign/poster/official/dick_gum{pixel_x = 32},/turf/open/floor/plasteel/elevatorshaft,/area/crew_quarters/abandoned_gambling_den)
 "Ax" = (/obj/structure/chair/office,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Az" = (/turf/open/floor/plasteel/stairs/right,/area/crew_quarters/abandoned_gambling_den)
@@ -1281,11 +1288,13 @@
 "AG" = (/obj/machinery/vending/games,/obj/structure/sign/poster/official/the_owl{pixel_x = 32},/turf/open/floor/plasteel/elevatorshaft,/area/crew_quarters/abandoned_gambling_den)
 "AH" = (/turf/closed/wall,/area/crew_quarters/dorms)
 "AM" = (/obj/item/kirbyplants,/obj/effect/turf_decal/tile/blue,/obj/effect/turf_decal/tile/blue{dir = 1},/obj/effect/turf_decal/tile/blue{dir = 4},/obj/effect/turf_decal/tile/blue{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
+"AP" = (/obj/structure/table/wood,/obj/item/storage/fancy/donut_box,/turf/open/floor/plasteel/dark,/area/prophunt)
 "AQ" = (/obj/machinery/fat_sucker,/turf/open/floor/plasteel/showroomfloor,/area/crew_quarters/abandoned_gambling_den)
 "Bb" = (/turf/open/floor/wood,/area/crew_quarters/fitness/recreation)
 "Bf" = (/turf/open/floor/plasteel/dark,/area/crew_quarters/fitness/recreation)
 "Bg" = (/obj/structure/table/glass,/obj/item/coin/thunderdome,/obj/item/coin/thunderdome,/obj/item/coin/thunderdome,/obj/item/coin/thunderdome,/obj/item/coin/thunderdome,/obj/item/coin/thunderdome,/obj/item/coin/thunderdome,/obj/item/coin/thunderdome,/obj/item/coin/thunderdome,/obj/item/coin/thunderdome,/turf/open/floor/plasteel/dark,/area/space)
 "Bh" = (/obj/structure/window/reinforced/tinted/fulltile,/obj/structure/grille,/turf/open/floor/plating,/area/crew_quarters/abandoned_gambling_den)
+"Bj" = (/obj/machinery/door/airlock/maintenance,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Bn" = (/obj/machinery/vending/coffee,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Bs" = (/obj/structure/railing{dir = 4},/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Bt" = (/turf/open/floor/plasteel/dark/side{dir = 8},/area/space)
@@ -1301,6 +1310,7 @@
 "BN" = (/obj/structure/stone_tile/surrounding,/turf/open/water,/area/space)
 "BO" = (/obj/structure/stone_tile{dir = 1},/turf/open/water,/area/space)
 "BQ" = (/obj/item/kirbyplants{icon_state = "plant-02"},/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
+"BT" = (/turf/open/floor/plasteel/bluespace,/area/prophunt/mg2)
 "BW" = (/obj/machinery/vending/wardrobe/engi_wardrobe,/turf/open/floor/carpet/red,/area/space)
 "BX" = (/turf/open/floor/holofloor/wood,/area/crew_quarters/abandoned_gambling_den)
 "BY" = (/obj/structure/stone_tile/block{dir = 4},/turf/open/floor/plasteel/cult,/area/ruin/unpowered/ash_walkers)
@@ -1312,7 +1322,9 @@
 "Cg" = (/obj/structure/stone_tile/surrounding,/turf/open/floor/plasteel/cult,/area/ruin/unpowered/ash_walkers)
 "Ck" = (/obj/machinery/vending/wardrobe/sec_wardrobe,/turf/open/floor/carpet/red,/area/space)
 "Cn" = (/obj/structure/curtain/cloth,/obj/machinery/shower{pixel_y = 12},/turf/open/floor/plasteel/showroomfloor,/area/crew_quarters/dorms)
+"Cp" = (/obj/structure/table/reinforced,/obj/machinery/door/window/northleft{dir = 8; name = "Reception Window"},/obj/machinery/door/window/brigdoor{name = "Secure Window"; dir = 4},/turf/open/floor/plasteel,/area/prophunt)
 "Cq" = (/obj/structure/chair/comfy{color = "#596479"; dir = 1},/obj/effect/landmark/start/assistant,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
+"Ct" = (/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Cu" = (/obj/structure/railing{dir = 9},/turf/open/transparent/openspace,/area/crew_quarters/abandoned_gambling_den)
 "Cx" = (/obj/structure/stone_tile/slab/cracked{dir = 4},/obj/structure/stone_tile/slab/cracked{dir = 1},/turf/open/floor/plasteel/cult,/area/space)
 "Cz" = (/obj/structure/stone_tile/block,/obj/structure/stone_tile/cracked{dir = 1},/obj/structure/stone_tile{dir = 4},/turf/open/floor/plasteel/cult,/area/space)
@@ -1333,8 +1345,10 @@
 "Db" = (/obj/structure/curtain/cloth{pixel_y = -32},/turf/open/floor/wood,/area/space)
 "Dc" = (/obj/machinery/door/airlock/wood{id_tag = "cabin12"; name = "Cabin 12"},/turf/open/floor/wood,/area/space)
 "Dd" = (/obj/effect/spawner/structure/window/reinforced/tinted,/turf/open/floor/plating,/area/crew_quarters/fitness/recreation)
+"Df" = (/obj/effect/decal/cleanable/dirt/dust,/obj/structure/closet/crate/bin,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Dg" = (/turf/open/floor/light/colour_cycle/dancefloor_b,/area/crew_quarters/theatre)
 "Di" = (/obj/structure/stone_tile/block{dir = 1},/obj/structure/stone_tile/cracked{dir = 8},/obj/structure/stone_tile,/turf/open/floor/plasteel/cult,/area/space)
+"Dl" = (/obj/item/paper{name = "Please find a way to link the door timer to the status display"},/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/prophunt)
 "Do" = (/obj/structure/chair/comfy/brown{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
 "Dp" = (/obj/structure/stone_tile/block{dir = 8},/turf/open/floor/plasteel/cult,/area/ruin/unpowered/ash_walkers)
 "Dr" = (/obj/structure/stone_tile/block{dir = 8},/obj/structure/stone_tile,/obj/structure/stone_tile/cracked{dir = 1},/turf/open/floor/plasteel/cult,/area/space)
@@ -1343,6 +1357,7 @@
 "DJ" = (/obj/structure/stone_tile/surrounding/cracked{dir = 6},/turf/open/floor/plating/dirt,/area/space)
 "DK" = (/obj/structure/mineral_door/wood,/turf/open/floor/wood,/area/crew_quarters/fitness/recreation)
 "DL" = (/obj/structure/toilet{dir = 4},/turf/open/floor/plasteel/showroomfloor,/area/crew_quarters/abandoned_gambling_den)
+"DM" = (/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "DO" = (/obj/structure/flora/grass/jungle,/turf/open/floor/plating/dirt,/area/space)
 "DQ" = (/obj/structure/table/wood/bar,/obj/item/kirbyplants{icon_state = "plant-18"; pixel_y = 11},/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "DR" = (/obj/machinery/vending/cigarette,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
@@ -1352,12 +1367,14 @@
 "DV" = (/obj/structure/chair/stool/bar{pixel_x = 6},/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
 "DW" = (/obj/structure/stone_tile/block,/obj/structure/stone_tile{dir = 1},/obj/structure/stone_tile{dir = 4},/turf/open/floor/plasteel/cult,/area/space)
 "DZ" = (/obj/structure/table/wood,/obj/item/storage/cans/sixbeer,/obj/item/storage/cans/sixbeer,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
+"Eb" = (/obj/machinery/door/airlock/maintenance,/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Ec" = (/obj/effect/turf_decal/trimline/red/filled/line{dir = 5},/turf/open/floor/plasteel/dark,/area/security/brig/upper)
 "Eg" = (/obj/structure/table/wood/poker,/turf/open/floor/carpet/red,/area/crew_quarters/abandoned_gambling_den)
 "Eh" = (/obj/structure/stone_tile/surrounding,/turf/open/water,/area/ruin/unpowered/ash_walkers)
 "Ej" = (/obj/structure/stone_tile/block{dir = 8},/obj/structure/stone_tile/block{dir = 4},/turf/open/water,/area/space)
 "Ek" = (/obj/structure/table/wood/fancy/green{desc = "It's for RPGs. No, not that kind of RPG."; max_integrity = 99999; name = "top table"},/obj/item/dice/d1,/obj/item/dice/d2,/obj/item/dice/d4{pixel_y = 5},/obj/item/dice/d6{pixel_y = 5},/obj/item/dice/d8{pixel_y = 5},/obj/item/dice/d00{pixel_y = 5},/obj/item/dice/d10{pixel_y = 5},/obj/item/dice/d12{pixel_y = 5},/obj/item/dice/d20{pixel_y = 5},/obj/item/dice/d100{pixel_y = 5},/turf/open/floor/plasteel/elevatorshaft,/area/crew_quarters/abandoned_gambling_den)
 "Eo" = (/obj/structure/chair/stool/bar{pixel_y = 10},/turf/open/floor/carpet/red,/area/crew_quarters/abandoned_gambling_den)
+"Eq" = (/obj/structure/chair/stool,/turf/open/floor/wood{icon_state = "wood-broken4"},/area/crew_quarters/abandoned_gambling_den)
 "Er" = (/obj/structure/table/wood,/obj/item/reagent_containers/glass/maunamug{pixel_x = 8; pixel_y = 8},/obj/item/reagent_containers/glass/maunamug{pixel_x = 8},/obj/item/reagent_containers/food/drinks/coffee{pixel_x = -4; pixel_y = 9},/obj/item/reagent_containers/food/drinks/coffee{pixel_x = -4; pixel_y = 5},/obj/item/reagent_containers/food/drinks/coffee{pixel_x = -4; pixel_y = 1},/turf/open/floor/carpet/purple,/area/crew_quarters/dorms)
 "Ew" = (/obj/structure/showcase/cyborg/old,/turf/open/floor/carpet/red,/area/crew_quarters/abandoned_gambling_den)
 "Ez" = (/obj/effect/turf_decal/weather/dirt{dir = 4},/turf/open/floor/plating/dirt{icon_state = "oldsmoothdirt"},/area/space)
@@ -1410,6 +1427,7 @@
 "Gn" = (/turf/closed/indestructible/riveted/boss,/area/space)
 "Gt" = (/obj/effect/turf_decal/weather/dirt{dir = 8},/turf/open/water,/area/space)
 "Gv" = (/turf/open/transparent/openspace,/area/ruin/unpowered/ash_walkers)
+"Gz" = (/turf/closed/wall,/area/prophunt)
 "GC" = (/obj/structure/chair/sofa{dir = 4},/turf/open/floor/plasteel/dark,/area/space)
 "GD" = (/turf/open/floor/plasteel/dark,/area/security/brig)
 "GF" = (/obj/structure/stone_tile{dir = 1},/obj/structure/stone_tile{dir = 8},/obj/structure/stone_tile/cracked{dir = 4},/turf/open/water,/area/space)
@@ -1431,10 +1449,12 @@
 "Hh" = (/obj/item/cardboard_cutout/adaptive{color = "#9999BB"; icon_state = "cutout_ian"; name = "Black Knight"},/turf/open/floor/plasteel/dark,/area/space)
 "Hj" = (/obj/structure/window/reinforced/fulltile,/turf/open/floor/plating,/area/space)
 "Hm" = (/obj/structure/holobox/statue/ranger,/turf/open/floor/plasteel/cult,/area/space)
+"Hn" = (/obj/structure/rack,/obj/item/reagent_containers/food/drinks/bottle/vodka{pixel_x = 3; pixel_y = 2},/obj/item/reagent_containers/food/drinks/bottle/vermouth{pixel_x = -4; pixel_y = 3},/obj/item/reagent_containers/food/drinks/bottle/whiskey,/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "Hq" = (/obj/structure/sign/logo{icon_state = "nanotrasen_sign5"},/turf/open/floor/carpet/royalblue,/area/crew_quarters/abandoned_gambling_den)
 "Hv" = (/obj/structure/stone_tile/block{dir = 1},/turf/open/water,/area/space)
 "Hw" = (/obj/structure/flora/tree/jungle{icon_state = "tree2"},/turf/open/floor/plating/dirt,/area/space)
 "Hz" = (/obj/structure/table/wood,/turf/open/floor/plasteel/dark,/area/crew_quarters/dorms)
+"HC" = (/obj/structure/table/wood,/obj/item/megaphone/command,/obj/structure/window/reinforced{dir = 4},/obj/machinery/status_display{desc = "This mirror display of the minigame timer for spectators and players seems to be broken!"; name = "PropHunt Countdown"; pixel_y = -32},/turf/open/floor/carpet,/area/prophunt)
 "HD" = (/obj/effect/turf_decal/weather/dirt,/obj/structure/stone_tile/block{dir = 8},/turf/open/water,/area/space)
 "HH" = (/obj/structure/stairs/south,/turf/open/floor/plating/grass,/area/crew_quarters/abandoned_gambling_den)
 "HK" = (/obj/structure/stone_tile/block,/obj/structure/stone_tile{dir = 1},/obj/structure/stone_tile/cracked{dir = 4},/turf/open/floor/plasteel/cult,/area/space)
@@ -1473,12 +1493,15 @@
 "IR" = (/obj/effect/turf_decal/stripes/line,/obj/effect/turf_decal/stripes/red/line{color = "#000000"},/obj/structure/curtain/cloth/fancy,/turf/open/floor/wood,/area/crew_quarters/theatre)
 "IT" = (/obj/structure/stone_tile{dir = 4},/obj/structure/stone_tile/block{dir = 4},/turf/open/floor/plasteel/cult,/area/space)
 "IU" = (/obj/structure/chair/stool/bar,/turf/open/floor/wood,/area/space)
+"IV" = (/obj/structure/chair/stool,/turf/open/floor/plating{icon_state = "platingdmg3"},/area/crew_quarters/abandoned_gambling_den)
 "IW" = (/obj/item/instrument/trombone,/turf/open/floor/wood,/area/crew_quarters/theatre)
 "IX" = (/obj/structure/chair/sofa/right{dir = 8},/turf/open/transparent/glass,/area/space)
 "IZ" = (/obj/structure/stone_tile/block{dir = 4},/obj/structure/stone_tile/cracked{dir = 4},/obj/structure/stone_tile{dir = 8},/turf/open/water,/area/space)
+"Ja" = (/obj/structure/closet/crate/bin,/obj/effect/decal/cleanable/dirt,/turf/open/floor/wood,/area/prophunt)
 "Jc" = (/obj/machinery/computer/arcade/battle,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Je" = (/obj/structure/chair/stool/bar{pixel_y = 10},/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
 "Jg" = (/obj/structure/stone_tile/slab,/obj/structure/fluff/drake_statue{pixel_y = 10},/turf/open/floor/plasteel/cult,/area/space)
+"Jh" = (/obj/machinery/vending/boozeomat/all_access,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Ji" = (/obj/structure/flora/grass/jungle,/obj/structure/flora/rock/jungle{name = "jungle rock"},/turf/open/floor/plating/dirt,/area/space)
 "Jj" = (/obj/structure/stone_tile/block{dir = 1},/obj/structure/stone_tile,/turf/open/floor/plasteel/cult,/area/space)
 "Jl" = (/turf/closed/indestructible/riveted/boss/see_through,/area/space)
@@ -1511,6 +1534,7 @@
 "Ki" = (/obj/effect/turf_decal/trimline/red/filled/corner{dir = 4},/obj/structure/fluff/hedge/opaque,/turf/open/floor/plasteel/dark/corner{dir = 4},/area/security/brig/upper)
 "Kj" = (/obj/structure/table/glass,/obj/item/storage/pill_bottle/dice,/turf/open/floor/plasteel/dark,/area/space)
 "Km" = (/obj/structure/stone_tile/block/cracked{dir = 8},/obj/structure/stone_tile,/turf/open/floor/plasteel/cult,/area/space)
+"Kn" = (/obj/item/reagent_containers/food/drinks/ale,/obj/structure/table/wood,/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "Ko" = (/obj/effect/spawner/structure/window/reinforced,/turf/open/floor/plating,/area/security/brig/upper)
 "Kp" = (/obj/item/cardboard_cutout/adaptive{icon_state = "cutout_ian"; name = "White Knight"},/turf/open/floor/plasteel/white,/area/space)
 "Kr" = (/obj/structure/chair/stool/bar,/turf/open/floor/carpet/red,/area/crew_quarters/abandoned_gambling_den)
@@ -1518,6 +1542,7 @@
 "Kv" = (/turf/open/floor/carpet/red,/area/crew_quarters/abandoned_gambling_den)
 "Kw" = (/obj/structure/chair/stool/bar{pixel_x = -6},/turf/open/floor/carpet/red,/area/crew_quarters/abandoned_gambling_den)
 "KB" = (/obj/item/kirbyplants{icon_state = "plant-16"},/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
+"KC" = (/obj/structure/chair/office{dir = 8},/turf/open/floor/carpet,/area/prophunt)
 "KE" = (/obj/structure/sign/logo{icon_state = "nanotrasen_sign2"},/turf/open/floor/plasteel,/area/space)
 "KF" = (/obj/structure/chair/wood{dir = 4},/turf/open/floor/carpet/red,/area/crew_quarters/abandoned_gambling_den)
 "KI" = (/obj/structure/stone_tile/block{dir = 4},/obj/structure/stone_tile{dir = 8},/turf/open/floor/plasteel/cult,/area/space)
@@ -1525,6 +1550,7 @@
 "KM" = (/obj/structure/stone_tile/surrounding_tile{dir = 8},/obj/structure/stone_tile/surrounding_tile{dir = 4},/turf/open/floor/plating/dirt,/area/space)
 "KN" = (/obj/structure/chair/stool/bar,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "KO" = (/obj/structure/table/wood,/turf/open/floor/carpet/purple,/area/crew_quarters/dorms)
+"KP" = (/obj/effect/spawner/structure/window/reinforced,/turf/open/floor/plating,/area/prophunt)
 "KU" = (/obj/structure/stone_tile{dir = 1},/obj/structure/stone_tile/block/cracked{dir = 8},/turf/open/floor/plasteel/cult,/area/space)
 "KV" = (/obj/structure/chair/comfy{color = "#596479"; dir = 4},/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "KY" = (/turf/open/water{color = "#7fff00"; density = 1; desc = "A sickly green pool of acid. No way I am crossing that."; name = "acid"},/area/space)
@@ -1540,6 +1566,7 @@
 "Lm" = (/turf/open/floor/plasteel/stairs/left{dir = 4},/area/crew_quarters/fitness/recreation)
 "Ln" = (/obj/structure/window/reinforced/fulltile,/obj/structure/curtain/cloth,/turf/open/floor/plating,/area/crew_quarters/dorms)
 "Lp" = (/obj/effect/turf_decal/trimline/red/filled/line,/obj/structure/table,/turf/open/floor/plasteel/dark,/area/security/brig)
+"Lr" = (/obj/item/chameleon,/obj/item/chameleon{pixel_y = 6; pixel_x = 7},/obj/item/chameleon{pixel_y = -7; pixel_x = -6},/obj/item/chameleon{pixel_y = -5; pixel_x = 4},/obj/item/chameleon{pixel_y = 4; pixel_x = -4},/obj/structure/closet/crate{icon_state = "crateopen"},/turf/open/floor/plasteel/dark,/area/prophunt)
 "Ls" = (/obj/structure/table/wood/poker,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Lt" = (/obj/machinery/vending/games,/obj/structure/sign/poster/contraband/pwr_game{pixel_x = -32},/turf/open/floor/plasteel/elevatorshaft,/area/crew_quarters/abandoned_gambling_den)
 "Lu" = (/obj/structure/closet/secure_closet/hos,/turf/open/floor/plasteel/dark,/area/security/brig/upper)
@@ -1565,6 +1592,7 @@
 "Mh" = (/obj/structure/stone_tile/slab,/turf/open/floor/plating/dirt,/area/space)
 "Mi" = (/turf/open/water,/area/space)
 "Mj" = (/obj/structure/stone_tile/slab/cracked,/turf/open/floor/plating/dirt,/area/space)
+"Ml" = (/obj/effect/turf_decal/bot,/obj/machinery/vending/cola,/turf/open/floor/plasteel,/area/prophunt)
 "Mm" = (/obj/machinery/vending/boozeomat/all_access{name = "\improper Minibar"},/turf/closed/wall,/area/space)
 "Mo" = (/obj/item/cardboard_cutout/adaptive{color = "#9999BB"; icon_state = "cutout_viva"; name = "Black Rook"},/turf/open/floor/plasteel/white,/area/space)
 "Mv" = (/obj/machinery/button{id = "cabin1"; pixel_y = -22},/turf/open/floor/wood,/area/space)
@@ -1576,6 +1604,7 @@
 "MF" = (/obj/structure/stone_tile/block,/obj/structure/stone_tile{dir = 4},/obj/structure/stone_tile{dir = 1},/turf/open/floor/plasteel/cult,/area/space)
 "MG" = (/obj/structure/chair/sofa/left{color = "#596479"; dir = 8},/turf/open/floor/carpet/purple,/area/crew_quarters/dorms)
 "MI" = (/obj/item/kirbyplants{icon_state = "plant-17"},/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
+"MJ" = (/obj/item/paper{name = "Please find a way to link the door timer to the status display"},/turf/open/floor/wood,/area/prophunt)
 "MK" = (/obj/structure/showcase/cyborg/old,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "MM" = (/turf/closed/wall/r_wall,/area/security/brig)
 "MN" = (/obj/structure/chair/sofa/corner{dir = 4},/turf/open/floor/carpet/red,/area/crew_quarters/theatre)
@@ -1593,11 +1622,13 @@
 "Nj" = (/turf/closed/wall,/area/crew_quarters/theatre)
 "Ns" = (/obj/structure/holobox/statue/summoner,/turf/open/floor/plasteel/cult,/area/space)
 "Nu" = (/obj/structure/chair/comfy/black{dir = 4},/turf/open/transparent/glass,/area/space)
+"Nv" = (/obj/effect/turf_decal/stripes/line{dir = 8},/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/prophunt)
 "Nx" = (/obj/structure/curtain/cloth/fancy,/turf/open/floor/carpet/red,/area/crew_quarters/theatre)
 "Ny" = (/obj/structure/stone_tile/block/cracked,/obj/structure/stone_tile{dir = 4},/turf/open/water,/area/space)
 "Nz" = (/obj/effect/spawner/structure/window/reinforced/indestructable,/obj/structure/sign/barsign,/turf/open/floor/plating,/area/crew_quarters/abandoned_gambling_den)
 "NA" = (/obj/structure/flora/grass/jungle,/obj/structure/flora/tree/jungle{icon_state = "tree2"},/turf/open/floor/plating/dirt,/area/space)
 "NB" = (/obj/effect/turf_decal/weather/dirt,/turf/open/floor/plating/dirt{icon_state = "oldsmoothdirt"},/area/space)
+"NC" = (/turf/open/floor/plating,/area/crew_quarters/abandoned_gambling_den)
 "NJ" = (/obj/structure/chair/sofa/left,/obj/effect/turf_decal/tile/blue,/obj/effect/turf_decal/tile/blue{dir = 1},/obj/effect/turf_decal/tile/blue{dir = 4},/obj/effect/turf_decal/tile/blue{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
 "NK" = (/obj/structure/sign/logo{icon_state = "nanotrasen_sign3"},/turf/open/floor/plasteel,/area/space)
 "NL" = (/obj/structure/chair/comfy{color = "#596479"; dir = 1},/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
@@ -1611,12 +1642,16 @@
 "Of" = (/obj/structure/stone_tile/surrounding_tile{dir = 8},/turf/open/floor/plasteel/cult,/area/space)
 "Oh" = (/obj/structure/stone_tile/surrounding_tile{dir = 1},/obj/structure/stone_tile/surrounding_tile{dir = 4},/turf/open/floor/plasteel/cult,/area/space)
 "Oi" = (/obj/structure/stone_tile/block,/obj/structure/stone_tile/block/cracked{dir = 1},/turf/open/water,/area/space)
+"Oj" = (/obj/effect/turf_decal/stripes/line{dir = 8},/obj/effect/turf_decal/bot,/obj/machinery/vending/snack,/turf/open/floor/plasteel,/area/prophunt)
 "Ol" = (/turf/open/water,/area/ruin/unpowered/ash_walkers)
 "On" = (/obj/structure/table/wood,/obj/item/reagent_containers/food/snacks/sosjerky{pixel_x = -4; pixel_y = 7},/obj/item/reagent_containers/food/snacks/sosjerky{pixel_x = -4; pixel_y = 5},/obj/item/reagent_containers/food/snacks/sosjerky{pixel_x = -4; pixel_y = 3},/obj/item/reagent_containers/food/snacks/sosjerky{pixel_x = -4; pixel_y = 1},/obj/item/reagent_containers/food/snacks/sugarcookie{pixel_x = 9; pixel_y = 7},/obj/item/reagent_containers/food/snacks/sugarcookie{pixel_x = 9; pixel_y = 4},/obj/item/reagent_containers/food/snacks/sugarcookie{pixel_x = 9; pixel_y = 1},/turf/open/floor/carpet/purple,/area/crew_quarters/dorms)
 "Oq" = (/obj/structure/table/wood/fancy/green{desc = "It's for RPGs. No, not that kind of RPG."; max_integrity = 99999; name = "top table"},/obj/item/storage/pill_bottle/dice{icon_state = "magicdicebag"; pixel_y = 3},/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
 "Ot" = (/obj/structure/chair/sofa/right{color = "#596479"; dir = 1},/turf/open/floor/plasteel/dark,/area/crew_quarters/dorms)
+"Ov" = (/obj/effect/spawner/structure/window/reinforced,/turf/open/floor/plating,/area/crew_quarters/abandoned_gambling_den)
+"Ox" = (/obj/effect/turf_decal/bot,/obj/machinery/vending/cigarette,/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/prophunt)
 "Oz" = (/obj/machinery/door/airlock/wood{id_tag = "cabin9"; name = "Cabin 9"},/turf/open/floor/wood,/area/space)
 "OA" = (/obj/machinery/door/airlock/wood{id_tag = "cabin6"; name = "Cabin 6"},/turf/open/floor/wood,/area/space)
+"OC" = (/turf/open/floor/wood,/area/prophunt)
 "OE" = (/obj/structure/stone_tile/surrounding,/obj/structure/stone_tile/center,/turf/open/floor/plasteel/cult,/area/space)
 "OF" = (/obj/structure/stone_tile,/turf/open/water,/area/space)
 "OG" = (/obj/structure/stone_tile,/obj/structure/stone_tile{dir = 1},/turf/open/floor/plasteel/cult,/area/space)
@@ -1647,6 +1682,7 @@
 "PC" = (/obj/structure/sign/logo{icon_state = "nanotrasen_sign4"},/turf/open/floor/plasteel,/area/space)
 "PE" = (/obj/machinery/vending/wardrobe/medi_wardrobe,/turf/open/floor/carpet/red,/area/space)
 "PH" = (/obj/structure/chair/sofa/right{dir = 4},/obj/effect/turf_decal/tile/blue,/obj/effect/turf_decal/tile/blue{dir = 1},/obj/effect/turf_decal/tile/blue{dir = 4},/obj/effect/turf_decal/tile/blue{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
+"PI" = (/obj/effect/turf_decal/arrows{dir = 4; pixel_y = 10},/obj/effect/turf_decal/arrows{dir = 4},/obj/effect/turf_decal/arrows{dir = 4; pixel_y = -10},/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "PL" = (/obj/structure/chair/comfy/black,/turf/open/transparent/glass,/area/space)
 "PN" = (/obj/structure/stone_tile/block/cracked,/obj/structure/stone_tile{dir = 1},/turf/open/floor/plasteel/cult,/area/space)
 "PO" = (/obj/effect/turf_decal/weather/dirt{dir = 8},/turf/open/floor/plating/dirt{icon_state = "oldsmoothdirt"},/area/space)
@@ -1661,18 +1697,24 @@
 "Qb" = (/obj/structure/stone_tile/surrounding_tile,/turf/open/floor/plasteel/cult,/area/space)
 "Qe" = (/obj/machinery/door/airlock/freezer{name = "Kitchen Freezer"},/turf/open/floor/plasteel/freezer,/area/crew_quarters/abandoned_gambling_den)
 "Qj" = (/obj/structure/stone_tile/surrounding_tile{dir = 1},/obj/structure/stone_tile/surrounding_tile,/turf/open/floor/plasteel/cult,/area/space)
+"Qk" = (/turf/open/floor/plating{icon_state = "panelscorched"},/area/crew_quarters/abandoned_gambling_den)
 "Qm" = (/obj/machinery/door/airlock/wood{id_tag = "cabin5"; name = "Cabin 5"},/turf/open/floor/wood,/area/space)
+"Qo" = (/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/plating{icon_state = "platingdmg1"},/area/crew_quarters/abandoned_gambling_den)
 "Qp" = (/obj/structure/stone_tile{dir = 4},/obj/structure/stone_tile/block,/turf/open/water,/area/space)
 "Qq" = (/obj/structure/stone_tile/surrounding_tile,/obj/structure/stone_tile/surrounding_tile{dir = 8},/turf/open/floor/plasteel/cult,/area/ruin/unpowered/ash_walkers)
 "Qv" = (/obj/structure/chair/sofa/right{color = "#596479"; dir = 1},/obj/effect/landmark/start/assistant,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
+"Qx" = (/obj/effect/turf_decal/stripes/line{dir = 8},/obj/effect/turf_decal/bot,/obj/machinery/vending/coffee,/turf/open/floor/plasteel,/area/prophunt)
 "Qy" = (/turf/open/transparent/glass,/area/space)
+"QB" = (/obj/item/reagent_containers/glass/rag,/obj/structure/table/wood,/turf/open/floor/wood{icon_state = "wood-broken4"},/area/crew_quarters/abandoned_gambling_den)
 "QC" = (/obj/structure/stone_tile/block,/obj/structure/stone_tile{dir = 1},/turf/open/water,/area/space)
 "QD" = (/obj/effect/turf_decal/stripes/line{dir = 4},/obj/effect/turf_decal/stripes/red/line{color = "#000000"; dir = 4},/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
 "QE" = (/obj/structure/stone_tile/block{dir = 1},/obj/structure/stone_tile,/obj/structure/stone_tile/cracked{dir = 8},/turf/open/water,/area/space)
 "QG" = (/obj/machinery/door/airlock/security/glass{name = "Brig"; req_access_txt = "63"},/turf/open/floor/plasteel/dark,/area/security/brig/upper)
+"QH" = (/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
 "QI" = (/obj/structure/holobox/statue/mage,/turf/open/floor/plasteel/cult,/area/space)
 "QK" = (/obj/machinery/door/airlock{name = "Stall 2"},/turf/open/floor/plasteel/showroomfloor,/area/crew_quarters/theatre)
 "QL" = (/obj/structure/railing{icon_state = "railing"; dir = 4},/turf/open/floor/plating/asteroid,/area/space)
+"QM" = (/obj/item/reagent_containers/food/drinks/drinkingglass{pixel_x = 4; pixel_y = 5},/obj/item/reagent_containers/food/drinks/drinkingglass{pixel_x = 6; pixel_y = -1},/obj/item/reagent_containers/food/drinks/drinkingglass{pixel_x = -4; pixel_y = 6},/obj/item/reagent_containers/food/drinks/drinkingglass{pixel_x = -5; pixel_y = 2},/obj/structure/table/wood,/obj/structure/light_construct/small{dir = 1},/obj/machinery/newscaster{pixel_y = 32},/obj/item/reagent_containers/food/drinks/drinkingglass/shotglass,/obj/item/reagent_containers/food/drinks/drinkingglass/shotglass,/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "QO" = (/obj/structure/stone_tile/block{dir = 4},/obj/structure/stone_tile{dir = 4},/obj/structure/stone_tile{dir = 8},/turf/open/water,/area/space)
 "QS" = (/obj/effect/turf_decal/stripes/line{dir = 6},/obj/effect/turf_decal/stripes/red/line{color = "#000000"; dir = 9},/turf/open/floor/wood,/area/crew_quarters/theatre)
 "QU" = (/obj/effect/turf_decal/stripes/line{dir = 1},/obj/effect/turf_decal/stripes/red/line{color = "#000000"; dir = 1},/turf/open/floor/carpet/red,/area/crew_quarters/abandoned_gambling_den)
@@ -1686,12 +1728,14 @@
 "Ri" = (/obj/structure/flora/rock{color = "#4aff00"; desc = "A cluster of a strange ore. It seems to react to the sunlight."; icon_state = "basalt3"; name = "chlorophyte rock"},/turf/open/water{color = "#7fff00"; density = 1; desc = "A sickly green pool of acid. No way I am crossing that."; name = "acid"},/area/space)
 "Rj" = (/obj/structure/flora/junglebush/b,/turf/open/floor/plating/dirt,/area/space)
 "Ro" = (/obj/structure/stone_tile/cracked{dir = 4},/turf/open/water,/area/space)
+"Rr" = (/obj/item/paper{name = "Please find a way to link the door timer to the status display"},/obj/effect/turf_decal/stripes/line{dir = 8},/turf/open/floor/plasteel,/area/prophunt)
 "Rt" = (/obj/structure/stone_tile/block{dir = 8},/turf/open/floor/plasteel/cult,/area/space)
 "Ru" = (/turf/open/floor/plasteel,/area/crew_quarters/fitness/recreation)
 "Rv" = (/obj/structure/stone_tile/block/cracked,/turf/open/water,/area/space)
 "RA" = (/obj/machinery/door/airlock{name = "Stall 3"},/turf/open/floor/plasteel/showroomfloor,/area/crew_quarters/abandoned_gambling_den)
 "RB" = (/obj/machinery/vending/boozeomat/all_access{name = "\improper Minibar"},/turf/closed/wall,/area/crew_quarters/dorms)
 "RC" = (/obj/structure/chair/comfy/black{desc = "Not to be confused with electronics."; dir = 2; max_integrity = 99999; name = "PC Chair"},/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
+"RF" = (/turf/open/floor/plasteel,/area/prophunt)
 "RJ" = (/obj/machinery/computer/slot_machine,/turf/open/floor/plasteel/dark,/area/space)
 "RK" = (/obj/structure/stone_tile{dir = 1},/obj/structure/stone_tile,/turf/open/water,/area/space)
 "RL" = (/obj/machinery/vending/wardrobe/science_wardrobe,/turf/open/floor/carpet/red,/area/space)
@@ -1712,6 +1756,9 @@
 "Sz" = (/obj/structure/chair/sofa,/turf/open/floor/carpet/red,/area/crew_quarters/theatre)
 "SA" = (/obj/machinery/vending/wardrobe/civil_wardrobe,/turf/open/floor/carpet/red,/area/space)
 "SB" = (/obj/structure/sign/logo,/turf/open/floor/plasteel,/area/space)
+"SC" = (/obj/structure/window/reinforced{dir = 1; layer = 2.9},/turf/open/floor/carpet,/area/prophunt)
+"SD" = (/obj/structure/window/reinforced{dir = 4},/turf/open/floor/carpet,/area/prophunt)
+"SE" = (/obj/machinery/door/airlock/grunge{name = "Prop Hunt"},/turf/open/floor/plasteel/dark,/area/prophunt)
 "SF" = (/obj/effect/turf_decal/weather/dirt{dir = 1},/obj/structure/stone_tile,/obj/structure/stone_tile/cracked{dir = 1},/turf/open/water,/area/space)
 "SG" = (/obj/structure/stone_tile/surrounding_tile,/obj/structure/stone_tile/surrounding_tile{dir = 8},/turf/open/floor/plasteel/cult,/area/space)
 "SH" = (/obj/structure/stone_tile/block{dir = 8},/obj/structure/stone_tile{dir = 1},/obj/structure/stone_tile,/turf/open/water,/area/space)
@@ -1726,6 +1773,8 @@
 "Tf" = (/obj/machinery/door/airlock/public/glass{id_tag = "cabin9"; name = "Cabin 9 Balcony"},/turf/open/floor/wood,/area/space)
 "Tg" = (/obj/structure/mirror{pixel_y = 27},/obj/structure/sink{pixel_y = 21; pixel_x = 1},/turf/open/floor/plasteel/showroomfloor,/area/crew_quarters/theatre)
 "Th" = (/obj/machinery/vending/games,/turf/open/floor/plasteel/dark,/area/space)
+"Ti" = (/obj/structure/table/wood,/turf/open/floor/plasteel/dark,/area/prophunt)
+"Tj" = (/obj/machinery/door/airlock/grunge{name = "Prop Hunt"},/obj/effect/decal/cleanable/dirt,/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/plasteel/dark,/area/prophunt)
 "To" = (/obj/structure/stone_tile/block/cracked{dir = 1},/obj/structure/stone_tile/block,/turf/open/water,/area/space)
 "Tq" = (/turf/open/floor/plasteel/stairs/right,/area/ruin/unpowered/ash_walkers)
 "Tr" = (/turf/open/transparent/glass,/area/crew_quarters/abandoned_gambling_den)
@@ -1736,6 +1785,7 @@
 "Ty" = (/obj/structure/railing{dir = 8},/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "TA" = (/obj/structure/flora/grass/jungle/b,/obj/structure/flora/tree/jungle{icon_state = "tree2"},/turf/open/floor/plating/dirt,/area/space)
 "TB" = (/obj/structure/table/wood/poker,/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
+"TC" = (/obj/item/reagent_containers/food/drinks/beer,/obj/structure/table/wood,/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "TE" = (/obj/structure/shuttle/engine/heater{dir = 4},/obj/effect/spawner/structure/window/shuttle,/turf/open/floor/plating,/area/space)
 "TG" = (/obj/structure/stone_tile{dir = 4},/obj/structure/stone_tile/surrounding_tile{dir = 8},/obj/structure/stone_tile/surrounding_tile{dir = 1},/turf/open/floor/plasteel/cult,/area/space)
 "TL" = (/obj/structure/table/glass,/obj/item/toy/cards/deck/cas,/obj/item/toy/cards/deck/cas/black{pixel_y = 3},/turf/open/floor/plasteel/dark,/area/space)
@@ -1747,6 +1797,7 @@
 "Uc" = (/obj/structure/bed,/obj/item/bedsheet/rd{desc = "A truly regal sheet to sleep under."; dream_messages = list("gambling","cards","chips","poker","roulette","dice"); name = "casino bedsheet"},/turf/open/floor/carpet/purple,/area/crew_quarters/dorms)
 "Uf" = (/obj/item/cardboard_cutout/adaptive{icon_state = "cutout_ian"; name = "White Knight"},/turf/open/floor/plasteel/dark,/area/space)
 "Uh" = (/obj/structure/stone_tile/slab/cracked,/turf/open/floor/plasteel/cult,/area/space)
+"Uj" = (/obj/structure/table/wood,/obj/item/radio/headset/heads/captain/alt,/obj/machinery/door_timer{desc = "The game timer for each round in PropHunt."; id = "PropHunt"; name = "PropHunt Timer"; pixel_y = -32},/turf/open/floor/carpet,/area/prophunt)
 "Um" = (/obj/machinery/vending/cola/shamblers,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Up" = (/obj/structure/stone_tile/surrounding_tile,/obj/structure/stone_tile/surrounding_tile{dir = 8},/turf/open/water,/area/space)
 "Uq" = (/obj/effect/turf_decal/trimline/red/filled/corner{dir = 1},/obj/structure/fluff/hedge/opaque,/turf/open/floor/plasteel/dark/corner{dir = 1},/area/security/brig/upper)
@@ -1800,11 +1851,13 @@
 "Wi" = (/obj/machinery/vending/boozeomat/all_access,/turf/closed/wall,/area/crew_quarters/abandoned_gambling_den)
 "Wk" = (/obj/structure/stone_tile/surrounding_tile{dir = 1},/turf/open/floor/plating/dirt,/area/space)
 "Wl" = (/obj/machinery/door/airlock/public/glass{id_tag = "cabin11"; name = "Cabin 11 Balcony"},/turf/open/floor/wood,/area/space)
+"Wm" = (/obj/structure/sign/poster/contraband/random{pixel_y = 32},/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "Wn" = (/obj/structure/stone_tile/block{dir = 1},/obj/structure/stone_tile{dir = 8},/turf/open/floor/plasteel/cult,/area/ruin/unpowered/ash_walkers)
 "Wo" = (/obj/structure/table/wood/poker,/obj/item/toy/cards/deck/kotahi,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Wq" = (/obj/structure/stone_tile{dir = 1},/obj/structure/stone_tile/surrounding_tile{dir = 4},/obj/structure/stone_tile/surrounding_tile,/turf/open/floor/plasteel/cult,/area/space)
 "Wt" = (/obj/structure/stone_tile/cracked{dir = 1},/obj/structure/stone_tile/surrounding_tile{dir = 4},/obj/structure/stone_tile/surrounding_tile,/turf/open/floor/plasteel/cult,/area/space)
 "Ww" = (/obj/structure/stone_tile/slab,/turf/open/water,/area/space)
+"Wy" = (/obj/structure/table/wood,/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "Wz" = (/obj/machinery/door/airlock/wood{id_tag = "cabin10"; name = "Cabin 10"},/turf/open/floor/wood,/area/space)
 "WF" = (/obj/structure/stone_tile/block{dir = 8},/obj/structure/stone_tile,/obj/structure/stone_tile{dir = 1},/turf/open/floor/plasteel/cult,/area/space)
 "WK" = (/obj/structure/chair/sofa/left{dir = 4},/turf/open/transparent/glass,/area/space)
@@ -1815,11 +1868,13 @@
 "WS" = (/obj/structure/sign/poster/party_game{pixel_y = 32},/obj/item/tail_pin,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "WV" = (/obj/structure/flora/tree/jungle/small,/turf/open/floor/plating/dirt,/area/space)
 "WX" = (/obj/structure/stone_tile/block{dir = 8},/turf/open/floor/plating/dirt,/area/space)
+"WY" = (/obj/effect/turf_decal/stripes/line{dir = 8},/turf/open/floor/plasteel,/area/prophunt)
 "Xa" = (/turf/open/floor/carpet/green,/area/crew_quarters/abandoned_gambling_den)
 "Xb" = (/obj/structure/stone_tile/surrounding_tile{dir = 8},/turf/open/floor/plating/dirt,/area/space)
 "Xd" = (/obj/effect/turf_decal/tile/blue,/obj/effect/turf_decal/tile/blue{dir = 1},/obj/effect/turf_decal/tile/blue{dir = 4},/obj/effect/turf_decal/tile/blue{dir = 8},/obj/item/kirbyplants{icon_state = "plant-10"},/turf/open/floor/plasteel/dark,/area/space)
 "Xf" = (/obj/machinery/door/airlock/public/glass{id_tag = "cabin3"; name = "Cabin 3 Balcony"},/turf/open/floor/wood,/area/space)
 "Xj" = (/obj/structure/table/reinforced,/obj/effect/turf_decal/tile/red{dir = 8},/obj/effect/turf_decal/tile/red,/obj/item/storage/lockbox/medal/sec,/turf/open/floor/plasteel/dark,/area/security/brig/upper)
+"Xk" = (/obj/item/paper{name = "Please find a way to link the door timer to the status display"},/obj/effect/decal/cleanable/dirt,/turf/open/floor/wood,/area/prophunt)
 "Xn" = (/obj/structure/stone_tile/block{dir = 8},/obj/structure/stone_tile/cracked{dir = 1},/turf/open/floor/plasteel/cult,/area/ruin/unpowered/ash_walkers)
 "Xo" = (/obj/structure/stone_tile{dir = 8},/obj/structure/stone_tile/surrounding_tile{dir = 4},/obj/structure/stone_tile/surrounding_tile,/turf/open/floor/plasteel/cult,/area/space)
 "Xq" = (/obj/structure/chair/comfy/black{dir = 8},/turf/open/transparent/glass,/area/space)
@@ -1835,7 +1890,9 @@
 "XE" = (/obj/structure/stone_tile/surrounding_tile{dir = 4},/obj/structure/stone_tile/surrounding_tile{dir = 1},/turf/open/water,/area/space)
 "XF" = (/obj/structure/table/glass,/obj/effect/turf_decal/tile/blue,/obj/effect/turf_decal/tile/blue{dir = 1},/obj/effect/turf_decal/tile/blue{dir = 4},/obj/effect/turf_decal/tile/blue{dir = 8},/obj/item/cardpack/resin,/obj/item/cardpack/resin,/obj/item/cardpack/resin,/obj/item/cardpack/resin,/obj/item/cardpack/resin,/obj/item/cardpack/resin,/obj/item/cardpack/resin,/obj/item/cardpack/resin,/obj/item/cardpack/resin,/obj/item/cardpack/resin,/turf/open/floor/plasteel/dark,/area/space)
 "XG" = (/obj/structure/chair/sofa/corner,/turf/open/floor/carpet/red,/area/crew_quarters/theatre)
+"XH" = (/obj/effect/turf_decal/bot,/obj/machinery/vending/cigarette,/turf/open/floor/plasteel,/area/prophunt)
 "XI" = (/turf/open/floor/plasteel/stairs/medium{dir = 4},/area/crew_quarters/fitness/recreation)
+"XJ" = (/obj/machinery/door/window/brigdoor{name = "Secure Window"; dir = 4},/obj/effect/decal/cleanable/dirt,/turf/open/floor/carpet,/area/prophunt)
 "XK" = (/obj/structure/necropolis_arch,/obj/structure/necropolis_gate,/obj/machinery/door/keycard/jungle{pixel_x = -32; pixel_y = -32},/turf/open/floor/plasteel/cult,/area/space)
 "XL" = (/obj/item/kirbyplants{icon_state = "plant-21"},/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "XM" = (/obj/structure/stone_tile{dir = 8},/obj/structure/stone_tile/block/cracked{dir = 1},/turf/open/water,/area/space)
@@ -1856,6 +1913,7 @@
 "Yo" = (/obj/structure/chair/sofa/right{color = "#596479"},/obj/effect/landmark/start/assistant,/turf/open/floor/plasteel/dark,/area/crew_quarters/abandoned_gambling_den)
 "Yp" = (/obj/structure/chair/sofa{dir = 4},/turf/open/floor/carpet/red,/area/crew_quarters/theatre)
 "Yq" = (/obj/machinery/door/airlock/public/glass{id_tag = "cabin5"; name = "Cabin 5 Balcony"},/turf/open/floor/wood,/area/space)
+"Ys" = (/obj/structure/chair/stool,/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "Yx" = (/obj/structure/sign/logo,/turf/open/floor/carpet/royalblue,/area/crew_quarters/abandoned_gambling_den)
 "Yy" = (/obj/structure/flora/grass/jungle/b,/turf/open/floor/plating/dirt,/area/space)
 "Yz" = (/obj/item/cardboard_cutout/adaptive{color = "#9999BB"; icon_state = "cutout_ian"; name = "Black Knight"},/turf/open/floor/plasteel/white,/area/space)
@@ -1879,10 +1937,13 @@
 "Zh" = (/obj/structure/railing{dir = 1},/turf/open/floor/plasteel/dark,/area/crew_quarters/fitness/recreation)
 "Zi" = (/obj/machinery/vending/cola/pwr_game,/turf/open/floor/plasteel/dark,/area/space)
 "Zj" = (/obj/structure/rack,/obj/item/chair/plastic{pixel_y = 18},/obj/item/chair/plastic{pixel_y = 16},/obj/item/chair/plastic{pixel_y = 14},/obj/item/chair/plastic{pixel_y = 12},/obj/item/chair/plastic{pixel_y = 10},/obj/item/chair/plastic{pixel_y = 8},/obj/item/chair/plastic{pixel_y = 6},/obj/item/chair/plastic{pixel_y = 4},/obj/item/chair/plastic{pixel_y = 2},/obj/item/chair/plastic,/turf/open/floor/wood,/area/crew_quarters/theatre)
+"Zk" = (/obj/structure/closet/crate/trashcart,/turf/open/floor/plating/ashplanet/rocky,/area/space)
 "Zl" = (/obj/structure/chair/comfy{color = "#596479"},/turf/open/floor/plasteel/dark,/area/crew_quarters/dorms)
+"Zm" = (/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "Zp" = (/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/crew_quarters/fitness/recreation)
 "Zr" = (/obj/structure/stone_tile/cracked{dir = 4},/obj/structure/stone_tile/block,/turf/open/floor/plasteel/cult,/area/space)
 "Zs" = (/obj/machinery/door/airlock/wood{id_tag = "cabin11"; name = "Cabin 11"},/turf/open/floor/wood,/area/space)
+"Zu" = (/obj/structure/chair/stool,/obj/effect/decal/cleanable/vomit/old,/turf/open/floor/wood,/area/crew_quarters/abandoned_gambling_den)
 "Zv" = (/obj/machinery/door/airlock{name = "Stall 1"},/turf/open/floor/plasteel/showroomfloor,/area/crew_quarters/abandoned_gambling_den)
 "Zw" = (/obj/structure/table/wood,/turf/open/floor/carpet/red,/area/crew_quarters/theatre)
 "Zx" = (/obj/structure/stone_tile/block{dir = 1},/obj/item/abductor/gizmo,/turf/open/floor/plasteel/cult,/area/space)
@@ -1897,6 +1958,7 @@
 "ZN" = (/obj/structure/chair/stool/bar{pixel_x = 6},/turf/open/floor/carpet/red,/area/crew_quarters/abandoned_gambling_den)
 "ZP" = (/obj/structure/flora/rock{color = "#4aff00"; desc = "A cluster of a strange ore. It seems to react to the sunlight."; icon_state = "basalt2"; name = "chlorophyte rock"},/turf/open/water{color = "#7fff00"; density = 1; desc = "A sickly green pool of acid. No way I am crossing that."; name = "acid"},/area/space)
 "ZQ" = (/obj/structure/chair/sofa/left{dir = 1},/turf/open/floor/carpet/red,/area/crew_quarters/theatre)
+"ZR" = (/obj/structure/window/reinforced{dir = 1; layer = 2.9},/obj/structure/window/reinforced{dir = 4},/obj/structure/table/wood,/obj/machinery/computer/security/telescreen,/turf/open/floor/carpet,/area/prophunt)
 "ZS" = (/obj/structure/table/glass,/obj/item/kirbyplants{icon_state = "plant-18"; pixel_y = 11},/turf/open/floor/plasteel/dark,/area/space)
 "ZX" = (/obj/structure/table/glass,/turf/open/floor/plasteel/dark,/area/crew_quarters/dorms)
 "ZY" = (/obj/machinery/roulette,/turf/open/floor/plasteel/dark,/area/space)
@@ -2159,7 +2221,6 @@ cobMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbM
 cobMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMcodTaJaJaJaJdFquqvqwaCqxqyqzqAdTdTqBgXgXgQgQqCaJaJdFqDqEjLqFdTdTqGqbjyjyqHaCmeqIqIqJqIqImedTdTkTaJaJqKdFguqeqLqMqNqgqOqPdTdTqQqRjPqSqTqTqUjPqVqWqXjVqYdT
 cocococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococodTdTdTjmjmdTdTdTdTdTdTdTdTdTdTdTdTdTjmjmdTdTdTdTdTdTdTdTdTdTdTdTdTjmjmdTdTdTdTdTdTdTdTdTdTdTdTdTjmjmdTdTdTdTdTdTdTdTdTdTdTdTdTjmjmdTdTdTdTdTdTdTdTdTdT
 "}
-
 (1,1,2) = {"
 qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
 qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
@@ -2261,29 +2322,29 @@ qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbGeGeGeGe
 qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbGeAEteuyuzVCGeuquAuvGeSquBuuuuSquuBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWclrWrWrWrWrWrWrWrWrWsGsGzVzVzVzVzVzVzVzVFEFEFOFOFOFOFOFOFOFOFOFOFOQUQUFOFOFOYoMdzVFEFEzVsOsOzVsOsOzVFEFEzVYoMdFOFOFOFDFDFOFOFOFOFOFOFOFOFOFOFOFEFEVXFEFEVXVXFEFEVXVXFEzVUQIgrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
 qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbGeuCteuDGeBbGeGeuEuFGeSqSqSqSqSquuBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWclrWrWrWclrWrWrWrWrWrWrWrWsGzVKNKNKNzVKNKNKNFEFEFOKvKvEwKvKvKvKvEwKvKvKvKvKvKvFOTMFIOcFEFEsOxtxtxuxtxvsOFEFEMxTMFIFOSnXaXaXaXaXaCKXaXaXaXaCKXaXaFOFEFEVDFEFEVDVDFEFEVDVDFEzVHVIgrWrWrWrWrWrWrWclrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
 qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbGeuGteuHGeBbMYuIugBbGeuJuJuKuLuMGeBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWsGsGBFLsLszVBFLsLsFEFEFOZNFhEgEgKwZNFhEgEgKwKvKvKrKvsGCqCqzVFEFEsOxwxuxuxuxwsOFEFEzVCqCqsGXaOUXaXaDVTBFLTBHSDVTBFLTBHSFOFEFEFEFEFEFEFEFEFEFEFEFEzVNLIgrWrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbGeGeGeuNGeuOuPuQuPuPGeGeGeGeGeGeGeBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWsGOeMKzVzVzVMKKBFEFESpKvEoEoEoKvKvEoEoEoKvKvZNFhKvsGGQGQzVFEFEsOxxxuxyxuxzsOFEFEzVGQGQsGXaTBHSXaXaJeJeJeXaXaJeJeJeXaQDFEFEFOFOFOFOFOFOFOFOFOFOFOFOFOrWrWrWrWclrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbDKuRuSBbGeGeGeGeGeGeGeuTuUuVuWuXGeBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWsGFOFOFOFOFOFOFOFEFESpKvKvKvKvKvKvKvKvKvKvKvZNEgKvsGTMFIOcFEFEsOxwxuxBxuxwsOFEFEMxTMFIsGCKFLHSXaXaXaXaXaXaXaXaXaXaXaQDFEFEFOzVzVzVzVzVzVzVzVzVzVzVFOrWrWrWrWrWrWrWclrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbGeGeBbuguYGeuZuZuZuZuZFlFlFlFlvbtLBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWclrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFESpKvKrKrKrKvKvKrKrKrKvKvZNEgKvsGCqCqzVFEFEsOxvxuxCxuxxsOFEFEzVCqCqsGXaTBHSXaXaOUOUOUXaXaOUOUOUXaQDFEFEFOzVzVzVzVzVzVzVzVzVzVzVFOrWrWrWrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbGeGeGeGeGevcvcvcvcvcFlFlFlFlvdtLBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWclrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFOZNFhEgEgKwZNFhEgEgKwKvKvEoKvsGYoMdzVFEFEsOxzxuxuxuxwsOFEFEzVYoMdsGXaJeXaXaDVTBFLTBHSDVTBIuTBHSFOFEFEFOzVzVzVzVzVzVzVzVzVzVzVFOrWrWrWrWrWrWrWrWrWrWclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbGevevfvgGeFlFlFlFlFlFlFlFlFlvdtLBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFOKvKvEwKvKvKvKvEwKvKvKvKvKvKvFOTMFIOcFEFEsOxtxtxuxtxtsOFEFEMxTMFIFOMIXaXaXaXaXaCKXaXaXaXaCKXaXaFOFEFEFOzVzVzVzVzVzVzVzVzVzVzVFOrWrWrWrWrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbGeGeGevhGevcvcvcvcvcFlFlFlFlvitLBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZclrWclrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFOFOFOFOFOFOFOFOFOFOFOZyZyFOFOFOCqCqzVFEFEzVsOsOzVsOsOzVFEFEzVCqCqFOFOFOJYJYFOFOFOFOFOFOFOFOFOFOFOFEFEFOzVzVzVzVzVzVzVzVzVzVzVFOrWrWrWrWrWrWrWrWclrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbGevjvkZpGeuZuZuZuZuZvlFlFlvlGeGeBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFOzVzVzVzVzVzVzVzVzVzVzVFOrWrWrWrWrWrWrWrWrWrWclrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscxDxDGeBbxEBbGexDxDGeGeGevnGetLtLtLtLtLGevovaGeGeBbBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFOzVzVzVzVzVzVzVzVzVzVzVFOrWrWrWrWrWclrWrWrWrWrWclrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWclrWclrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVFEFEzVzVzVzVzVzVzVzVzVFEFEzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVdFdFdFdFdFdFdFdFdFdFdFdFdFdFdFrWrWrWrWrWrWclrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFOFOFOFOFOFOFOFOFOFOFOVGFOzVzVzVzVzVFOFOFEFEFOFOFOFOzVFOFOFOFOFEFEFOFOzVzVzVzVzVFOVGFOFOzVzVzVzVzVzVzVzVzVdFcxcxcxcxcxcxcxcxcxcxcxcxcxdFrWrWrWrWrWclrWrWclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbBbBbBbvqvrBbBbBbBbBbBbBbBbBbBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZclrWrWrWrWrWrWrWrWrWrWrWrWFOFOzVzVzVzVzVzVzVzVzVzVzVzVzVzVFOzVzVFOYoMdzVYoMdFOXLFEFEzVFOzVzVzVzVzVFOzVFEFEXLFOYoMdzVYoMdFOzVzVFOzVzVzVzVzVzVzVzVzVdFcxwFwFcxcxcxcxcxcxcxcxcxcxdFrWrWrWrWrWclrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevsGeGeGeGeGezvBbBbzvzvzvFTBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVzVzVzVzVzVzVzVzVzVFOHHzUFOTMFIzVTMFIFOzVFEFEzVFOzVzVzVzVzVFOzVFEFEzVFOTMFIzVTMFIFOzUHHFOzVzVzVzVzVzVzVzVzVdFcxwFcxwFcxcxcxcxcxcxcxcxcxdFrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevtvuvvvvvvGevwBbBbvwvwBbvxBbBbBbBbvyswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOFOzVzVzVzVzVzVzVzVzVzVzVzVzVFOFOzUFOQvWLzVQvWLFOzVFEFEzVFUzVAxzVAxzVFUzVFEFEzVFOQvWLzVQvWLFOzUFOFOzVzVzVzVzVzVzVzVzVdFcxwFwFcxcxcxwFwFcxcxcxcxcxdFrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevtvtvtvtvtGevzBbBbvAvBBbvxBbBbBbBbvCswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWclrWrWrWrWrWrWrWrWrWrWrWrWFOFOFOzVzVzVzVzVzVzVzVzVzVzVFOFOFOFOsGsGsGsGsGFOzVFEFEFEDQFUFUFUFUFUDQFEFEFEzVFOsGsGsGsGsGFOFOFOFOFOFOFOFOFOFOFOFOFOdFcxwFcxcxcxcxcxcxcxcxcxcxcxdFrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevtvtvtvtvtGevDBbBbvDvDBbvxBbBbBbBbvCswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOFOFOFOzVzVzVzVzVzVzVzVFOrWrWrWrWrWrWrWrWsGzVzVFEFEFEYxJXCEJxHqFEFEFEzVzVsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWdFcxwFcxcxcxcxcxcxcxcxcxcxcxdFrWrWrWrWrWrWclrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevEGevFvFvFGeGevGvHGeGeBbvxBbBbBbBbvIswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOFOFOFOFOFOFOFOFOFOrWrWrWrWrWrWrWrWsGzVzVzVFEFEFEFEFEFEFEFEFEzVzVzVsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWdFcxcxcxcxcxcxcxcxcxcxcxcxcxdFrWrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevJvJvJvJvJvJvJvJvJvKtLvwvxBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWclrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWsGsGzVzVzVzVFEFEzVFEFEzVzVzVzVsGsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWdFwFcxwFcxwFcxcxwFcxwFwFwFcxdFrWrWrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevJvJvJvJvJvJvJvJvJvLtLvMvxBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWclrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWsGsGsGzVzVFEFEzVFEFEzVzVsGsGsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWdFwFcxwFcxwFwFcxwFcxcxwFcxcxdFrWrWrWrWrWrWrWrWrWclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevNvOvPvNvQvPvJvJvJvRtLvDvxBbBbBbBbvyswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWsGsGsGOPFEsGOPFEsGsGsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWdFwFwFwFcxwFcxwFwFcxcxwFcxcxdFrWrWrWrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevNvSvPvNvTvPvUvJvJvKtLvwvxBbBbBbBbvCswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYbYbYbYbYbYbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWdFwFcxwFcxwFcxcxwFcxcxwFcxcxdFrWrWrWrWrWrWrWrWclrWrWrWclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZclclclqZqZqZqZclqZcl
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGetLtLtLtLtLGevVvJvJvWtLvXvxBbBbBbBbvCswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZbYbYbYbYbYbYbYbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWdFwFcxwFcxwFcxcxwFcxcxwFcxcxdFrWrWrWrWrWrWrWrWrWrWrWrWrWrWclclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWclclclclqZqZqZclclrWrWrWclclclclrWclrW
-qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbBbBbBbBbBbBbGevYvJvJvRtLvDvxBbBbBbBbvIswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZbYbYbYbYbYbYbYbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWdFcxcxcxcxcxcxcxcxcxcxcxcxcxdFrWrWrWrWrWrWrWrWrWrWclclrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWclrWrWrWrWclclclrWclrWrWclrWrWrWrWrWrWrW
-qZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZsaBbBbXZXZXZXZXZXZXZBbBbBbBbBbBbBbBbGeGevGvHvZGeysHQBbBbBbBbBbsbrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrEqZqZqZrYrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZsawawbwbwbwbwbwcrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWdFdFdFdFdFdFdFdFdFdFdFdFdFdFdFrWrWrWrWrWrWrWrWrWrWrWrWrWclrWrWclrWclclclclclclqZqZqZqZqZqZclclclrWrWrWrWclrWrWrWrWrWrWrWrWrWclrWrWrWrWrWrW
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbGeGeGeuNGeuOuPuQuPuPGeGeGeGeGeGeGeBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWsGOeMKzVzVzVMKKBFEFESpKvEoEoEoKvKvEoEoEoKvKvZNFhKvsGGQGQzVFEFEsOxxxuxyxuxzsOFEFEzVGQGQsGXaTBHSXaXaJeJeJeXaXaJeJeJeXaQDFEFEFOFOFOFOFOFOFOFOFOFOFOFOFOFOFOZkbYclrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbDKuRuSBbGeGeGeGeGeGeGeuTuUuVuWuXGeBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWsGFOFOFOFOFOFOFOFEFESpKvKvKvKvKvKvKvKvKvKvKvZNEgKvsGTMFIOcFEFEsOxwxuxBxuxwsOFEFEMxTMFIsGCKFLHSXaXaXaXaXaXaXaXaXaXaXaQDFEFEEbPIzVzVzVzVzVzVzVFODMWmQMHnFOFObYrWrWrWclrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZsLBbBbBbBbBbBbBbBbGeGeBbuguYGeuZuZuZuZuZFlFlFlFlvbtLBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWclrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFESpKvKrKrKrKvKvKrKrKrKvKvZNEgKvsGCqCqzVFEFEsOxvxuxCxuxxsOFEFEzVCqCqsGXaTBHSXaXaOUOUOUXaXaOUOUOUXaQDFEFEGzGzGzGzGzGzGzGzzVOvDMDMWyQHJhFObYrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbGeGeGeGeGevcvcvcvcvcFlFlFlFlvdtLBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWclrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFOZNFhEgEgKwZNFhEgEgKwKvKvEoKvsGYoMdzVFEFEsOxzxuxuxuxwsOFEFEzVYoMdsGXaJeXaXaDVTBFLTBHSDVTBIuTBHSFOFEFEKPJaOCOCOCAmOxGzzVOvDMZuWyXaFOFObYrWrWrWrWrWrWclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbGevevfvgGeFlFlFlFlFlFlFlFlFlvdtLBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFOKvKvEwKvKvKvKvEwKvKvKvKvKvKvFOTMFIOcFEFEsOxtxtxuxtxtsOFEFEMxTMFIFOMIXaXaXaXaXaCKXaXaXaXaCKXaXaFOFEFEKPSCZROCOCWYDlGzzVOvDMYsQBXaBjbYbYrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbGeGeGevhGevcvcvcvcvcFlFlFlFlvitLBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZclrWclrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFOFOFOFOFOFOFOFOFOFOFOZyZyFOFOFOCqCqzVFEFEzVsOsOzVsOsOzVFEFEzVCqCqFOFOFOJYJYFOFOFOFOFOFOFOFOFOFOFOFEFECpKCXJXkOCRryHTjCtFOQkEqKnXaFOrWrWrWrWrWrWclrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbGevjvkZpGeuZuZuZuZuZvlFlFlvlGeGeBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEKPzGSDMJMJWYRFGzCtEbQoIVTCZmFOrWrWrWrWrWrWrWrWclrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscxDxDGeBbxEBbGexDxDGeGeGevnGetLtLtLtLtLGevovaGeGeBbBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEFEKPUjHCMJMJyizIGzDfFONCDMDMDMFOrWrWrWclrWrWrWrWrWclrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWclrWclrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVFEFEzVzVzVzVzVzVzVzVzVFEFEzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVGzKPKPKPKPGzGzGzKPKPKPKPGzGzGzKPKPKPKPGzrWrWrWrWrWrWclrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVFOFOFOFOFOFOFOFOFOFOFOFOVGFOzVzVzVzVzVFOFOFEFEFOFOFOFOzVFOFOFOFOFEFEFOFOzVzVzVzVzVFOVGFOFOzVzVzVzVKPTiTiQxXHGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWclrWrWclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbBbBbBbvqvrBbBbBbBbBbBbBbBbBbBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZclrWrWrWrWrWrWrWrWrWrWrWrWFOFOzVzVzVzVzVzVzVzVzVzVzVzVzVzVFOzVzVFOYoMdzVYoMdFOXLFEFEzVFOzVzVzVzVzVFOzVFEFEXLFOYoMdzVYoMdFOzVzVFOzVzVzVzVSEyTyTNvyHAtBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWclrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevsGeGeGeGeGezvBbBbzvzvzvFTBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOzVzVzVzVzVzVzVzVzVzVzVzVzVzVFOHHzUFOTMFIzVTMFIFOzVFEFEzVFOzVzVzVzVzVFOzVFEFEzVFOTMFIzVTMFIFOzUHHFOzVzVzVzVSEyTyTWYyHAtBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevtvuvvvvvvGevwBbBbvwvwBbvxBbBbBbBbvyswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOFOzVzVzVzVzVzVzVzVzVzVzVzVzVFOFOzUFOQvWLzVQvWLFOzVFEFEzVFUzVAxzVAxzVFUzVFEFEzVFOQvWLzVQvWLFOzUFOFOzVzVzVzVKPAPLrOjMlGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevtvtvtvtvtGevzBbBbvAvBBbvxBbBbBbBbvCswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWclrWrWrWrWrWrWrWrWrWrWrWrWFOFOFOzVzVzVzVzVzVzVzVzVzVzVFOFOFOFOsGsGsGsGsGFOzVFEFEFEDQFUFUFUFUFUDQFEFEFEzVFOsGsGsGsGsGFOFOFOFOFOFOFOFOGzGzGzGzGzGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevtvtvtvtvtGevDBbBbvDvDBbvxBbBbBbBbvCswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOFOFOFOzVzVzVzVzVzVzVzVFOrWrWrWrWrWrWrWrWsGzVzVFEFEFEYxJXCEJxHqFEFEFEzVzVsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWclrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevEGevFvFvFGeGevGvHGeGeBbvxBbBbBbBbvIswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWFOFOFOFOFOFOFOFOFOFOrWrWrWrWrWrWrWrWsGzVzVzVFEFEFEFEFEFEFEFEFEzVzVzVsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevJvJvJvJvJvJvJvJvJvKtLvwvxBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWclrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWsGsGzVzVzVzVFEFEzVFEFEzVzVzVzVsGsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevJvJvJvJvJvJvJvJvJvLtLvMvxBbBbBbBbBbswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWclrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWsGsGsGzVzVFEFEzVFEFEzVzVsGsGsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWrWrWclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevNvOvPvNvQvPvJvJvJvRtLvDvxBbBbBbBbvyswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWsGsGsGOPFEsGOPFEsGsGsGrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGevNvSvPvNvTvPvUvJvJvKtLvwvxBbBbBbBbvCswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYbYbYbYbYbYbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWrWclrWrWrWclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZclclclqZqZqZqZclqZcl
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbGetLtLtLtLtLGevVvJvJvWtLvXvxBbBbBbBbvCswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZbYbYbYbYbYbYbYbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWrWrWrWrWrWrWrWclclclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWrWclclclclqZqZqZclclrWrWrWclclclclrWclrW
+qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZscBbBbXZXZXZXZXZXZXZBbBbBbBbBbBbBbBbGevYvJvJvRtLvDvxBbBbBbBbvIswqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZbYbYbYbYbYbYbYbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWGzBTBTBTBTBTBTBTBTBTBTBTBTBTGzrWrWrWrWrWrWrWrWrWrWclclrWrWrWrWrWclqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZrWclrWrWrWrWclclclrWclrWrWclrWrWrWrWrWrWrW
+qZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZsaBbBbXZXZXZXZXZXZXZBbBbBbBbBbBbBbBbGeGevGvHvZGeysHQBbBbBbBbBbsbrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrEqZqZqZrYrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZrZsawawbwbwbwbwbwcrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWGzGzGzGzGzGzGzGzGzGzGzGzGzGzGzrWrWrWrWrWrWrWrWrWrWrWrWrWclrWrWclrWclclclclclclqZqZqZqZqZqZclclclrWrWrWrWclrWrWrWrWrWrWrWrWrWclrWrWrWrWrWrW
 chchchchchchchchchchchchchchchchchchchchchchchchchchchwdBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbwechchchchchchwfwgwhchchchwfwgwhchchchwfwgwhchchchchchchswqZqZqZsLchchchchchchwfwgwhchchchwfwgwhchchchchchchchchchchchchwdrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFwFbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWclrWclclclclrWclrWrWrWrWrWrWrWrWclrWrWrWrWrWrWrWrWrWrWclrWrWrW
 chchchchchchchchchchchchchchchchchchchchchchchchchchchsnBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbsochchchwiwjwkchchchwiwjwkchchchwiwjwkchchchwiwjwkchchchwlchchchwmchchchwiwjwkchchchwiwjwkchchchwiwjwkchchchwiwjwkchchchsnrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYwFwFwFbYbYbYbYbYbYbYbYbYbYbYbYbYbYbYwFwFwFbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWclrWrWrWclrWrWrWclclrWrWrWclclrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrW
 chchchchchchchchchchchchchchchchchchchchchchchchchchchsnBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbBbsochchchwnwowpchchchwnwqwpchchchwnwrwpchchchwnwswpchchchwlchQWchwmchchchwnwswpchchchwnwswpchchchwnwswpchchchwnwswpchchchsnrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWbYwFwFwFbYaJaJaJaJaJaJaJaJaJaJaJaJaJbYwFwFwFbYrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWclclrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrWrW
@@ -2417,7 +2478,6 @@ cocoDODODODODODODODODODODODODODODODODODODODODODODODODODODODODODODODODODODODODODO
 cococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococobMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbM
 cococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococococobMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbMbM
 "}
-
 (1,1,3) = {"
 qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
 qZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZ
