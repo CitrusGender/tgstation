@@ -5,7 +5,7 @@
 "dr" = (/obj/effect/decal/cleanable/dirt,/obj/effect/decal/cleanable/dirt,/turf/open/floor/wood,/area/space)
 "dt" = (/obj/effect/decal/cleanable/dirt,/obj/structure/urinal{dir = 4; pixel_x = -32},/turf/open/floor/plasteel,/area/space)
 "dP" = (/obj/item/kirbyplants/random,/turf/open/floor/plasteel,/area/space)
-"dW" = (/obj/structure/table/wood/fancy/orange,/obj/machinery/atmospherics/pipe/simple/scrubbers/hidden,/obj/item/clothing/mask/cigarette/cigar{pixel_x = -4; pixel_y = 1},/obj/item/clothing/mask/cigarette/cigar{pixel_x = -6; pixel_y = 6},/obj/item/clothing/mask/cigarette/cigar{pixel_x = -1; pixel_y = -2},/obj/item/lighter{pixel_x = 11; pixel_y = -7},/obj/item/coin/gold{pixel_x = 9; pixel_y = 9},/turf/open/floor/carpet/red,/area/space)
+"dW" = (/obj/structure/table/wood/fancy/orange,/obj/item/clothing/mask/cigarette/cigar{pixel_x = -1; pixel_y = -2},/obj/item/clothing/mask/cigarette/cigar{pixel_x = -4; pixel_y = 1},/obj/item/clothing/mask/cigarette/cigar{pixel_x = -6; pixel_y = 6},/obj/item/storage/wallet{pixel_x = -3; pixel_y = 10},/obj/item/gps{gpstag = "QM0"; pixel_x = 10; pixel_y = 12},/obj/item/lighter{pixel_x = 11; pixel_y = -7},/obj/item/coin/gold{pixel_x = 9; pixel_y = 9},/turf/open/floor/carpet/red,/area/space)
 "eR" = (/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
 "eT" = (/obj/structure/rack,/obj/effect/spawner/lootdrop/techstorage/AI,/turf/open/floor/plasteel/dark,/area/space)
 "fr" = (/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/space)
@@ -66,7 +66,6 @@
 "Kn" = (/obj/structure/table/wood,/obj/item/storage/secure/briefcase{desc = "A large briefcase with a digital locking system, and the Nanotrasen logo emblazoned on the sides."; name = "\improper Nanotrasen-brand secure briefcase exhibit"; pixel_y = 2},/turf/open/floor/carpet,/area/space)
 "KF" = (/obj/effect/decal/cleanable/dirt,/turf/open/floor/wood,/area/space)
 "KX" = (/obj/item/disk/data{pixel_x = 9; pixel_y = -1},/obj/item/disk/tech_disk{pixel_x = -2; pixel_y = -3},/obj/item/disk/design_disk{name = "component design disk"; pixel_y = 6},/obj/structure/table/wood,/obj/item/toy/talking/AI{name = "\improper Nanotrasen-brand toy AI"; pixel_y = 6},/turf/open/floor/carpet,/area/space)
-"Lk" = (/obj/structure/table/wood/fancy/orange,/obj/item/gps{gpstag = "QM0"; pixel_x = 10; pixel_y = 12},/obj/machinery/atmospherics/pipe/simple/scrubbers/hidden,/obj/item/storage/wallet{pixel_x = -3; pixel_y = 10},/obj/item/ammo_casing/caseless/rocket{desc = "Your grandpappy brought this home after the war. You're pretty sure it's a dud."; name = "Dud Rocket"; pixel_x = -4; pixel_y = -7},/turf/open/floor/carpet/red,/area/space)
 "MY" = (/obj/item/trash/candy,/turf/open/floor/wood{icon_state = "wood-broken3"},/area/space)
 "Pc" = (/obj/machinery/door/airlock{id_tag = "AuxToilet1"; name = "Unit 1"},/turf/open/floor/plasteel,/area/space)
 "PD" = (/obj/machinery/light/small{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
@@ -76,15 +75,15 @@
 "RY" = (/turf/open/space/basic,/area/space)
 "SD" = (/obj/structure/mirror{pixel_x = 28},/turf/open/floor/plating,/area/space)
 "Tf" = (/obj/machinery/door/airlock,/obj/effect/decal/cleanable/dirt,/turf/open/floor/plasteel,/area/space)
-"Tx" = (/obj/structure/table/wood/fancy/orange,/obj/item/reagent_containers/food/drinks/bottle/whiskey{pixel_x = -5; pixel_y = 4},/obj/item/reagent_containers/food/drinks/drinkingglass/shotglass{pixel_x = 2; pixel_y = -4},/obj/item/reagent_containers/food/drinks/drinkingglass/shotglass{pixel_x = -9; pixel_y = -4},/obj/machinery/atmospherics/pipe/simple/scrubbers/hidden,/turf/open/floor/carpet/red,/area/space)
+"Tx" = (/obj/item/reagent_containers/food/drinks/bottle/whiskey{pixel_x = -5; pixel_y = 4},/obj/item/reagent_containers/food/drinks/drinkingglass/shotglass{pixel_x = 2; pixel_y = -4},/obj/item/reagent_containers/food/drinks/drinkingglass/shotglass{pixel_x = -9; pixel_y = -4},/obj/item/coin/gold{pixel_x = 9; pixel_y = 9},/obj/structure/table/wood/fancy/orange,/turf/open/floor/carpet/red,/area/space)
 "YZ" = (/obj/structure/showcase/mecha/ripley,/obj/effect/decal/cleanable/cobweb,/turf/open/floor/carpet,/area/space)
 "Zz" = (/obj/structure/rack,/obj/item/book/manual/wiki/security_space_law{pixel_y = 2; pixel_x = 1},/turf/open/floor/wood,/area/space)
 "ZE" = (/obj/structure/table/wood,/obj/item/camera_film{pixel_x = 4; pixel_y = 5},/obj/item/camera_film{pixel_x = -3; pixel_y = 2},/turf/open/floor/wood,/area/space)
 
 (1,1,1) = {"
-TxnrREFExRHFaMrXAmuMfZcrxR
-LknryeyeDHHsaMrXxRdtSDxRxR
-dWnrtGJDxRhAdPELxRidkDPctZ
+TxdWREFExRHFaMrXAmuMfZcrxR
+nrnryeyeDHHsaMrXxRdtSDxRxR
+nrnrtGJDxRhAdPELxRidkDPctZ
 itititititTfRTTfxRxRxRxRxR
 RYiteTIjitfrdPELxRxaZzqHZE
 RYkJwgeRHRHFaMrXiVyetKPGus

@@ -30,7 +30,7 @@
 "aD" = (/obj/structure/disposalpipe/segment{dir = 4},/obj/effect/turf_decal/box/white{color = "#52B4E9"},/obj/machinery/holopad,/turf/open/floor/plasteel/white,/area/space)
 "aE" = (/obj/structure/disposalpipe/segment{dir = 4},/obj/machinery/atmospherics/components/unary/vent_scrubber/on,/turf/open/floor/plasteel/white,/area/space)
 "aF" = (/obj/machinery/atmospherics/pipe/simple/scrubbers/hidden{dir = 6},/obj/structure/disposalpipe/segment{dir = 4},/obj/effect/turf_decal/tile/blue{dir = 4},/obj/effect/turf_decal/tile/blue,/turf/open/floor/plasteel/white,/area/space)
-"aG" = (/obj/structure/cable,/obj/effect/turf_decal/tile/blue{dir = 1},/obj/effect/turf_decal/tile/blue{dir = 8},/obj/effect/turf_decal/tile/blue,/obj/structure/disposalpipe/segment{dir = 6},/obj/machinery/light_switch{pixel_x = -26; pixel_y = -5},/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/plasteel/white,/area/space)
+"aG" = (/obj/structure/cable,/obj/effect/turf_decal/tile/blue{dir = 1},/obj/effect/turf_decal/tile/blue{dir = 8},/obj/effect/turf_decal/tile/blue,/obj/structure/disposalpipe/segment{dir = 6},/obj/effect/decal/cleanable/dirt/dust,/turf/open/floor/plasteel/white,/area/space)
 "aH" = (/obj/structure/disposalpipe/segment,/obj/machinery/atmospherics/pipe/simple/scrubbers/hidden{dir = 4},/obj/machinery/atmospherics/components/unary/vent_pump/on,/obj/structure/cable,/turf/open/floor/plasteel/white,/area/space)
 "aI" = (/obj/effect/decal/cleanable/blood/old,/turf/open/floor/plasteel/white,/area/space)
 "aJ" = (/obj/effect/turf_decal/tile/blue{dir = 1},/obj/effect/turf_decal/tile/blue,/obj/effect/turf_decal/tile/blue{dir = 4},/obj/effect/turf_decal/tile/blue{dir = 8},/turf/open/floor/plasteel,/area/space)

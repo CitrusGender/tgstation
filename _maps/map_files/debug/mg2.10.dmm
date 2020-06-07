@@ -16,7 +16,7 @@
 "ap" = (/obj/machinery/status_display/evac{pixel_y = 32},/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/obj/machinery/power/terminal{dir = 8},/obj/structure/cable,/obj/structure/showcase{desc = "An empty plastic shell of a PACMAN generator."; icon = 'icons/obj/power.dmi'; icon_state = "portgen0_0"; name = "P.A.C.M.A.N. type portable generator"},/turf/open/floor/plasteel/dark,/area/space)
 "aq" = (/obj/machinery/atmospherics/components/unary/portables_connector/visible{name = "Auxiliary MiniSat Distribution Port"},/obj/machinery/portable_atmospherics/canister/air,/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/obj/item/wrench,/turf/open/floor/plasteel/dark,/area/space)
 "ar" = (/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/obj/machinery/recharge_station,/obj/structure/showcase/cyborg{desc = "A stand with the empty body of an engineering cyborg bolted to it."; dir = 2; icon = 'icons/mob/robots.dmi'; icon_state = "engineer"; name = "engineering cyborg"},/turf/open/floor/plasteel/dark,/area/space)
-"as" = (/obj/structure/showcase/cyborg/old{dir = 4; pixel_x = -9; pixel_y = 2},/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/turf/open/floor/plasteel/dark,/area/space)
+"as" = (/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/obj/structure/showcase/cyborg/old{dir = 4; pixel_x = -9; pixel_y = 2},/turf/open/floor/plasteel/dark,/area/space)
 "at" = (/obj/machinery/computer/security/telescreen{dir = 8; name = "Telecomms Camera Monitor"; network = list("ss13"); pixel_x = 26},/obj/machinery/computer/telecomms/monitor{dir = 8; network = "tcommsat"},/turf/open/floor/plasteel/grimy,/area/space)
 "au" = (/obj/item/radio/intercom{freerange = 1; name = "Common Channel"; pixel_x = -27; pixel_y = -7},/obj/item/radio/intercom{freerange = 1; listening = 0; name = "Custom Channel"; pixel_y = -27},/obj/item/radio/intercom{freerange = 1; frequency = 1447; name = "Private Channel"; pixel_x = 27; pixel_y = -7},/obj/machinery/button/door{id = "AI Core shutters"; name = "AI Core shutters control"; pixel_x = 24; pixel_y = -22; req_access_txt = "16"},/obj/structure/showcase/cyborg{desc = "A true to life plastic replica of the station AI."; dir = 2; icon = 'icons/mob/ai.dmi'; icon_state = "ai"; name = "\improper AI"},/turf/open/floor/circuit/green,/area/space)
 "av" = (/obj/machinery/atmospherics/pipe/simple/supply/hidden,/turf/open/floor/circuit,/area/space)
@@ -94,11 +94,13 @@
 "bP" = (/obj/structure/window/reinforced{dir = 8; layer = 2.9},/obj/structure/window/reinforced{dir = 1},/obj/structure/lattice,/turf/open/floor/fakespace,/area/space)
 "bQ" = (/obj/structure/window/reinforced{dir = 8; layer = 2.9},/obj/structure/lattice,/turf/open/floor/fakespace,/area/space)
 "bR" = (/obj/machinery/light/small,/obj/item/folder,/obj/item/folder,/obj/machinery/camera{c_tag = "Telecomms - Control Room"; dir = 1; network = list("ss13","tcomms")},/obj/structure/table/wood,/obj/item/pen,/obj/item/taperecorder,/turf/open/floor/plasteel/grimy,/area/space)
+"FT" = (/obj/structure/showcase/cyborg/old{dir = 8; pixel_x = 9; pixel_y = 2},/turf/open/floor/circuit,/area/space)
+"XY" = (/obj/machinery/atmospherics/pipe/simple/supply/hidden,/obj/structure/showcase/cyborg/old{dir = 4; pixel_x = -9; pixel_y = 2},/turf/open/floor/circuit,/area/space)
 
 (1,1,1) = {"
 asabaDaMaDaeafaaanapaqacar
 agahaTaTaTalamaoayazaAaJaB
-asaDaaadaaavaTaEaFaGaHaIaI
+aTFTaaadaaXYaTaEaFaGaHaIaI
 aCaDaiajakavaWawaNaOaPaLaQ
 aRaDaaauaaavaUaaaaaaaaaEaa
 aaaSaaaaaabDaaaabHbOaxaLbI

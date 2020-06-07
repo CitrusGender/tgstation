@@ -3,7 +3,7 @@
 "cq" = (/turf/open/floor/plasteel,/area/space)
 "cu" = (/obj/effect/turf_decal/tile/red,/obj/effect/turf_decal/tile/red{dir = 8},/turf/open/floor/plasteel,/area/space)
 "dz" = (/obj/structure/filingcabinet,/obj/machinery/requests_console{department = "Security"; departmentType = 5; pixel_y = 30},/obj/effect/turf_decal/tile/red{dir = 1},/obj/effect/turf_decal/tile/red{dir = 4},/turf/open/floor/plasteel,/area/space)
-"dB" = (/obj/structure/closet{name = "Evidence Closet"},/obj/item/bikehorn{pixel_x = -6; pixel_y = 5},/obj/item/grown/bananapeel,/obj/item/megaphone/clown,/obj/item/clothing/shoes/clown_shoes,/turf/open/floor/plasteel/dark,/area/space)
+"dB" = (/obj/effect/spawner/structure/window/reinforced,/turf/open/floor/plasteel/dark,/area/space)
 "ef" = (/obj/effect/turf_decal/tile/neutral{dir = 1},/obj/effect/turf_decal/tile/neutral,/obj/effect/turf_decal/tile/neutral{dir = 4},/obj/effect/turf_decal/tile/neutral{dir = 8},/obj/machinery/suit_storage_unit/security,/turf/open/floor/plasteel/dark,/area/space)
 "gq" = (/turf/closed/wall/r_wall,/area/space)
 "gE" = (/obj/structure/chair/office{dir = 1},/turf/open/floor/plasteel,/area/space)
@@ -16,7 +16,7 @@
 "pV" = (/obj/effect/turf_decal/tile/red{dir = 1},/obj/effect/turf_decal/tile/red,/obj/effect/turf_decal/tile/red{dir = 8},/turf/open/floor/plasteel,/area/space)
 "pX" = (/obj/effect/turf_decal/tile/red,/obj/effect/turf_decal/tile/red{dir = 4},/obj/effect/turf_decal/tile/red{dir = 8},/turf/open/floor/plasteel,/area/space)
 "ry" = (/obj/structure/rack,/obj/structure/sign/warning/nosmoking{pixel_x = 32},/turf/open/floor/plasteel/dark,/area/space)
-"rL" = (/obj/structure/filingcabinet/chestdrawer,/obj/machinery/light_switch{pixel_y = -22},/turf/open/floor/plasteel/showroomfloor,/area/space)
+"rL" = (/obj/structure/filingcabinet/chestdrawer,/turf/open/floor/plasteel/showroomfloor,/area/space)
 "sm" = (/obj/structure/table,/obj/item/laser_pointer/red,/obj/item/wrench,/obj/item/crowbar,/turf/open/floor/plasteel/showroomfloor,/area/space)
 "tc" = (/obj/structure/lattice,/turf/open/space,/area/space)
 "ue" = (/obj/structure/closet/bombcloset/security,/obj/effect/turf_decal/delivery,/turf/open/floor/plasteel/showroomfloor,/area/space)
@@ -53,9 +53,9 @@
 "Zx" = (/obj/structure/chair/stool,/turf/open/floor/plasteel,/area/space)
 
 (1,1,1) = {"
-tctcyVtctcmGFOFONqFONqFOFO
-gqgqgqgqgqgqFOFOFOFOFOFOFO
-bRdBQoGIbRgqwNLWvsvsvsueFO
+GIdBtcyVtcmGFOFONqFONqFOFO
+GIgqgqgqgqgqFOFOFOFOFOFOFO
+GIGIQoGIbRgqwNLWvsvsvsueFO
 bRGIGIGIbRgqoGMCMCMCMCMCoG
 CaGICaGIrygqzkdzMOzWIlyMvm
 CaGICaGICagqzjcqZxZxcqcqVZ
