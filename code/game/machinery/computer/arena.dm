@@ -23,7 +23,7 @@
 	name = "arena exit"
 	landmark_tag = ARENA_EXIT
 
-/// Controller for admin event arenas
+/// Controller for admin event arenas.
 /obj/machinery/computer/arena
 	name = "arena controller"
 	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | UNACIDABLE | ACID_PROOF
