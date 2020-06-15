@@ -1,13 +1,56 @@
-// Wait for 6 people to sign up
-// Roll seeker
-// Load random arena
-// Move all to prep areas
-// Send seeker after their prep time
-// Send searchers after delay
-// Wait round time
-// GOTO START
 #define PROPHUNT_HIDER_SPAWN "hider_spawn"
 #define PROPHUNT_SEARCHER_SPAWN "searcher_spawn"
+#define COMSIG_SIGNUP_SIGNUPS_CHANGED "signup_changed"
+
+GLOBAL_DATUM_INIT(minigame_signups,/datum/minigame_signups,new)
+
+/datum/minigame_signups
+	var/list/signed_up = list()
+	var/debug_mode = FALSE
+
+/datum/minigame_signups/proc/SignUpFor(mob/user,game_id)
+	if(!user.ckey || !game_id)
+		return
+	if(!signed_up[game_id])
+		signed_up[game_id] = list()
+	var/list/game_q = signed_up[game_id]
+	if(game_q[user.ckey])
+		game_q -= user.ckey
+		to_chat(user,"You unregister from [game_id] game.")
+	else
+		game_q[user.ckey] = user
+		to_chat(user,"You register for [game_id] game.")
+	SEND_SIGNAL(src,COMSIG_SIGNUP_SIGNUPS_CHANGED,game_id)
+
+/datum/minigame_signups/proc/GetCurrentPlayerCount(game_id)
+	var/list/game_q = signed_up[game_id]
+	. = 0
+	if(debug_mode)
+		return length(game_q)
+	for(var/key in game_q)
+		if(GLOB.directory[key] && GLOB.directory[key] == game_q[key])
+			. += 1
+
+//flush to remove from signups
+/datum/minigame_signups/proc/GetPlayers(game_id,count,flush=TRUE)
+	var/result = list()
+	var/list/game_q = signed_up[game_id]
+	var/list/possible_keys = list()
+	for(var/key in game_q)
+		if(GLOB.directory[key] && GLOB.directory[key] == game_q[key])
+			possible_keys += key
+	if(debug_mode)
+		possible_keys = game_q.Copy()
+	if(length(possible_keys) < count)
+		return
+	for(var/i in 1 to count)
+		var/chosen_key = pick_n_take(possible_keys)
+		result += chosen_key
+		if(flush)
+			for(var/key in signed_up)
+				var/list/tbr = signed_up[key]
+				tbr -= chosen_key
+	return result
 
 /obj/prophunt_signup_board
 	name = "Prophunt Game Signup"
@@ -29,10 +72,7 @@
 
 /obj/prophunt_signup_board/attack_hand(mob/living/user)
 	. = ..()
-	if(linked_arena)
-		linked_arena.try_to_signup(user)
-	else
-		to_chat(user,"UNLINKED SIGNUP")
+	GLOB.minigame_signups.SignUpFor(user,"prophunt")
 
 #define PROPHUNT_SIGNUPS 1
 #define PROPHUNT_SETUP 2
@@ -63,14 +103,14 @@
 
 	custom_specials = list("End round"="end_prophunt_round")
 
-/obj/machinery/computer/arena/prophunt/proc/try_to_signup(mob/living/user)
-	if(user in signed_up)
-		signed_up -= user.ckey
-		to_chat(user,"<span class='notice'>You remove your name from next prophunt game.</span>")
-	else
-		signed_up[user.ckey] = user
-		to_chat(user,"<span class='notice'>You sign up for next prophunt game.</span>")
-	if(auto && game_state == PROPHUNT_SIGNUPS && length(hider_count + searcher_count) >= 6)
+/obj/machinery/computer/arena/prophunt/Initialize(mapload, obj/item/circuitboard/C)
+	. = ..()
+	RegisterSignal(GLOB.minigame_signups,COMSIG_SIGNUP_SIGNUPS_CHANGED,.proc/check_autostart)
+
+/obj/machinery/computer/arena/prophunt/proc/check_autostart(datum/source,game_id)
+	if(game_id != "prophunt")
+		return
+	if(auto && game_state == PROPHUNT_SIGNUPS && GLOB.minigame_signups.GetCurrentPlayerCount("prophunt") > hider_count + searcher_count)
 		start_game()
 
 /obj/machinery/computer/arena/prophunt/proc/debug_signups()
@@ -88,19 +128,11 @@
 			return FALSE
 
 /obj/machinery/computer/arena/prophunt/proc/start_game()
-	var/list/filtered_keys = list()
-	for(var/key in signed_up)
-		if(GLOB.directory[key] && GLOB.directory[key] == signed_up[key])//Same mob as we signed in with
-			filtered_keys += key
-	if(debug)
-		filtered_keys = signed_up.Copy() //DEBUG ONLY
 	var/req_players = hider_count + searcher_count
-	if(length(filtered_keys) < req_players)
+	var/list/filtered_keys = GLOB.minigame_signups.GetPlayers("prophunt",req_players,!debug)
+	if(!filtered_keys)
 		return
 	game_state = PROPHUNT_SETUP
-	while(length(filtered_keys) > req_players)
-		pick_n_take(filtered_keys)
-	signed_up -= filtered_keys
 	hiders = list()
 	for(var/i in 1 to hider_count)
 		var/chosen_key = pick_n_take(filtered_keys)
