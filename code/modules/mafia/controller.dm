@@ -365,7 +365,7 @@
 /datum/mafia_controller/proc/basic_setup()
 	var/list/filtered_keys = list()
 	for(var/key in signed_up)
-		if(GLOB.directory[key] == signed_up[key])//Same mob as we signed in with
+		if(GLOB.directory[key] && GLOB.directory[key] == signed_up[key])//Same mob as we signed in with
 			filtered_keys += key
 	if(debug)
 		filtered_keys = signed_up.Copy() //DEBUG ONLY
