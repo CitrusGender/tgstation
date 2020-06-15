@@ -26,17 +26,18 @@
 	for(var/obj/machinery/computer/arena/prophunt/P in GLOB.machines)
 		if(P.arena_id == arena_id)
 			linked_arena = P
+
 /obj/prophunt_signup_board/attack_hand(mob/living/user)
 	. = ..()
-
 	if(linked_arena)
 		linked_arena.try_to_signup(user)
 	else
 		to_chat(user,"UNLINKED SIGNUP")
 
 #define PROPHUNT_SIGNUPS 1
-#define PROPHUNT_HIDING 2
-#define PROPHUNT_GAME 3
+#define PROPHUNT_SETUP 2
+#define PROPHUNT_HIDING 3
+#define PROPHUNT_GAME 4
 
 // snowflake subtype for prophunt
 /obj/machinery/computer/arena/prophunt
@@ -45,9 +46,13 @@
 	var/auto = FALSE //Toggle to start autogame
 	var/game_state = PROPHUNT_SIGNUPS
 	var/list/current_signups = list()
-	var/obj/item/chameleon/projector
-	var/mob/living/hider
+	var/list/projectors = list()
+	var/list/hiders = list()
 	var/list/searchers = list()
+
+	var/hider_count = 1
+	var/searcher_count = 5
+
 	teams = list() //We'll handle it here
 	objects_delete_on_leaving_arena = TRUE
 	safe_reset = TRUE
@@ -64,11 +69,11 @@
 	else
 		current_signups += user
 		to_chat(user,"<span class='notice'>You sign up for next prophunt game.</span>")
-	if(auto && game_state == PROPHUNT_SIGNUPS && length(current_signups) >= 6)
+	if(auto && game_state == PROPHUNT_SIGNUPS && length(hider_count + searcher_count) >= 6)
 		start_game()
 
 /obj/machinery/computer/arena/prophunt/proc/debug_signups()
-	for(var/i in 1 to 5)
+	for(var/i in 1 to hider_count+searcher_count)
 		var/mob/living/carbon/human/H = new(get_turf(usr))
 		current_signups |= H
 
@@ -81,23 +86,26 @@
 			return FALSE
 
 /obj/machinery/computer/arena/prophunt/proc/start_game()
-	game_state = PROPHUNT_SETUP
 	listclearnulls(current_signups) //Technically it should be ckey -> mob filter but i'm lazy
-	if(length(current_signups) < 6)
-		game_state = PROPHUNT_SIGNUPS
+	if(length(current_signups) < hider_count + searcher_count)
 		return
-	hider = pick_n_take(current_signups)
+	game_state = PROPHUNT_SETUP
+	hiders = list()
+	for(var/i in 1 to hider_count)
+		hiders += pick_n_take(current_signups)
 	searchers = list()
-	for(var/i in 1 to 5)
+	for(var/i in 1 to searcher_count)
 		searchers += pick_n_take(current_signups)
 	load_random_arena()
-	send_hider_in()
+	send_hiders_in()
 
-/obj/machinery/computer/arena/prophunt/proc/send_hider_in()
-	projector = new()
-	hider.forceMove(get_landmark_turf(PROPHUNT_HIDER_SPAWN))
-	hider.put_in_hands(projector)
-	to_chat(hider,"<span class='danger'>Use the chameleon projector to hide! You got 2 minutes!</span>")
+/obj/machinery/computer/arena/prophunt/proc/send_hiders_in()
+	for(var/mob/living/L in hiders)
+		var/obj/item/chameleon/projector = new()
+		projectors += projector
+		L.forceMove(get_landmark_turf(PROPHUNT_HIDER_SPAWN))
+		L.put_in_hands(projector)
+	to_chat(hiders,"<span class='danger'>Use the chameleon projector to hide! You got 2 minutes!</span>")
 	to_chat(searchers,"<span class='danger'>Hider is now hiding! Wait 2 minutes.</span>")
 	game_state = PROPHUNT_HIDING
 	next_stage_timer = addtimer(CALLBACK(src,.proc/send_searchers_in),hiding_time, TIMER_STOPPABLE)
@@ -110,7 +118,7 @@
 	next_stage_timer = addtimer(CALLBACK(src,.proc/conclude_round),search_time, TIMER_STOPPABLE)
 
 /obj/machinery/computer/arena/prophunt/proc/conclude_round()
-	QDEL_NULL(projector)
+	QDEL_LIST(projectors)
 	kick_players_out()
 	if(next_stage_timer)
 		deltimer(next_stage_timer)
