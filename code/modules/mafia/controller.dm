@@ -359,13 +359,13 @@
 		signed_up -= player.key
 		to_chat(player,"<span class='warning'>You unregister from next mafia game.</span>")
 	else
-		signed_up += player.key
+		signed_up[player.key] = player
 		to_chat(player,"<span class='warning'>You register for next mafia game.</span>")
 
 /datum/mafia_controller/proc/basic_setup()
 	var/list/filtered_keys = list()
 	for(var/key in signed_up)
-		if(GLOB.directory[key])
+		if(GLOB.directory[key] == signed_up[key])//Same mob as we signed in with
 			filtered_keys += key
 	if(debug)
 		filtered_keys = signed_up.Copy() //DEBUG ONLY

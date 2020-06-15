@@ -45,7 +45,7 @@
 	arena_id = "prophunt_arena"
 	var/auto = FALSE //Toggle to start autogame
 	var/game_state = PROPHUNT_SIGNUPS
-	var/list/current_signups = list()
+	var/list/signed_up = list()
 	var/list/projectors = list()
 	var/list/hiders = list()
 	var/list/searchers = list()
@@ -59,23 +59,25 @@
 	var/hiding_time = 2 MINUTES
 	var/search_time = 3 MINUTES
 	var/next_stage_timer
+	var/debug = FALSE
 
 	custom_specials = list("End round"="end_prophunt_round")
 
 /obj/machinery/computer/arena/prophunt/proc/try_to_signup(mob/living/user)
-	if(user in current_signups)
-		current_signups -= user
+	if(user in signed_up)
+		signed_up -= user.ckey
 		to_chat(user,"<span class='notice'>You remove your name from next prophunt game.</span>")
 	else
-		current_signups += user
+		signed_up[user.ckey] = user
 		to_chat(user,"<span class='notice'>You sign up for next prophunt game.</span>")
 	if(auto && game_state == PROPHUNT_SIGNUPS && length(hider_count + searcher_count) >= 6)
 		start_game()
 
 /obj/machinery/computer/arena/prophunt/proc/debug_signups()
+	debug = TRUE
 	for(var/i in 1 to hider_count+searcher_count)
 		var/mob/living/carbon/human/H = new(get_turf(usr))
-		current_signups |= H
+		signed_up["[pick(GLOB.first_names_male)]"] = H
 
 /obj/machinery/computer/arena/prophunt/special_handler(special_value)
 	switch(special_value)
@@ -86,16 +88,29 @@
 			return FALSE
 
 /obj/machinery/computer/arena/prophunt/proc/start_game()
-	listclearnulls(current_signups) //Technically it should be ckey -> mob filter but i'm lazy
-	if(length(current_signups) < hider_count + searcher_count)
+	var/list/filtered_keys = list()
+	for(var/key in signed_up)
+		if(GLOB.directory[key] == signed_up[key])//Same mob as we signed in with
+			filtered_keys += key
+	if(debug)
+		filtered_keys = signed_up.Copy() //DEBUG ONLY
+	var/req_players = hider_count + searcher_count
+	if(length(filtered_keys) < req_players)
 		return
 	game_state = PROPHUNT_SETUP
+	while(length(filtered_keys) > req_players)
+		pick_n_take(filtered_keys)
+	signed_up -= filtered_keys
 	hiders = list()
 	for(var/i in 1 to hider_count)
-		hiders += pick_n_take(current_signups)
+		var/chosen_key = pick_n_take(filtered_keys)
+		var/chosen_mob = GLOB.directory[chosen_key]
+		hiders += chosen_mob
 	searchers = list()
 	for(var/i in 1 to searcher_count)
-		searchers += pick_n_take(current_signups)
+		var/chosen_key = pick_n_take(filtered_keys)
+		var/chosen_mob = GLOB.directory[chosen_key]
+		searchers += chosen_mob
 	load_random_arena()
 	send_hiders_in()
 
