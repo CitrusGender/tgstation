@@ -38,6 +38,7 @@
 
 /mob/dead/new_player/Destroy()
 	GLOB.new_player_list -= src
+	QDEL_NULL(interview_form)
 	return ..()
 
 /mob/dead/new_player/prepare_huds()
