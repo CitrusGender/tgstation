@@ -26,8 +26,17 @@
 
 	sight |= SEE_TURFS
 
-	new_player_panel()
 	client.playtitlemusic()
+
+	// Check if user should be added to interview queue
+	if (!client.holder && CONFIG_GET(flag/allowlist_interview))
+		var/required_living_minutes = CONFIG_GET(number/allowlist_previous_hours_count) * 60
+		var/living_minutes = client.get_exp_living(TRUE)
+		if (required_living_minutes > living_minutes)
+			register_for_interview()
+			return
+
+	new_player_panel()
 	if(SSticker.current_state < GAME_STATE_SETTING_UP)
 		var/tl = SSticker.GetTimeLeft()
 		to_chat(src, "Please set up your character and select \"Ready\". The game will start [tl > 0 ? "in about [DisplayTimeText(tl)]" : "soon"].")

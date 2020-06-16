@@ -522,3 +522,5 @@
 /datum/config_entry/flag/allowlist_previous_players
 
 /datum/config_entry/number/allowlist_previous_hours_count
+
+/datum/config_entry/flag/allowlist_interview

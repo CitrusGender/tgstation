@@ -369,7 +369,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 
 	//Config that only allows players with previous play experience, requires a database to track
 	//living hours in the first place
-	if(CONFIG_GET(flag/allowlist_previous_players))
+	if(!connecting_admin && CONFIG_GET(flag/allowlist_previous_players))
 		//Make sure the users exp is loaded
 		if(src.set_exp_from_db())
 			// check for living hours requirement
@@ -381,10 +381,13 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 				return 0
 
 			if(living_minutes < required_living_minutes)
-				to_chat(src, "<span class='warning'>You must have at least [required_living_minutes] minutes of living " \
+				if(CONFIG_GET(flag/allowlist_interview))
+					interviewee = TRUE
+				else
+					to_chat(src, "<span class='warning'>You must have at least [required_living_minutes] minutes of living " \
 					+ "playtime on tg servers to play on this server. You have [living_minutes] minutes. Play more!</span>")
-				qdel(src)
-				return 0
+					qdel(src)
+					return 0
 		else
 			to_chat(src, "The experienced players allow list is configured, but is not setup correctly and user exp cannot be loaded")
 			qdel(src)
@@ -450,26 +453,8 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 	if(!tooltips)
 		tooltips = new /datum/tooltip(src)
 
-	var/list/topmenus = GLOB.menulist[/datum/verbs/menu]
-	for (var/thing in topmenus)
-		var/datum/verbs/menu/topmenu = thing
-		var/topmenuname = "[topmenu]"
-		if (topmenuname == "[topmenu.type]")
-			var/list/tree = splittext(topmenuname, "/")
-			topmenuname = tree[tree.len]
-		winset(src, "[topmenu.type]", "parent=menu;name=[url_encode(topmenuname)]")
-		var/list/entries = topmenu.Generate_list(src)
-		for (var/child in entries)
-			winset(src, "[child]", "[entries[child]]")
-			if (!ispath(child, /datum/verbs/menu))
-				var/procpath/verbpath = child
-				if (verbpath.name[1] != "@")
-					new child(src)
-
-	for (var/thing in prefs.menuoptions)
-		var/datum/verbs/menu/menuitem = GLOB.menulist[thing]
-		if (menuitem)
-			menuitem.Load_checked(src)
+	if (!interviewee)
+		initialize_menus()
 
 	view_size = new(src, getScreenSize(prefs.widescreenpref))
 	view_size.resetFormat()
@@ -1028,3 +1013,25 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 	if(!src)
 		return
 	prefs.save_preferences()
+
+/client/proc/initialize_menus()
+	var/list/topmenus = GLOB.menulist[/datum/verbs/menu]
+	for (var/thing in topmenus)
+		var/datum/verbs/menu/topmenu = thing
+		var/topmenuname = "[topmenu]"
+		if (topmenuname == "[topmenu.type]")
+			var/list/tree = splittext(topmenuname, "/")
+			topmenuname = tree[tree.len]
+		winset(src, "[topmenu.type]", "parent=menu;name=[url_encode(topmenuname)]")
+		var/list/entries = topmenu.Generate_list(src)
+		for (var/child in entries)
+			winset(src, "[child]", "[entries[child]]")
+			if (!ispath(child, /datum/verbs/menu))
+				var/procpath/verbpath = child
+				if (verbpath.name[1] != "@")
+					new child(src)
+
+	for (var/thing in prefs.menuoptions)
+		var/datum/verbs/menu/menuitem = GLOB.menulist[thing]
+		if (menuitem)
+			menuitem.Load_checked(src)

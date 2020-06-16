@@ -17,6 +17,9 @@
 	//Used to make sure someone doesn't get spammed with messages if they're ineligible for roles
 	var/ineligible_for_roles = FALSE
 
+	/// Used when the new player interview system is enabled for handling the TGUI window
+	var/datum/interview/interview_form
+
 /mob/dead/new_player/Initialize()
 	if(client && SSticker.state == GAME_STATE_STARTUP)
 		var/obj/screen/splash/S = new(client, TRUE, TRUE)
@@ -41,6 +44,9 @@
 	return
 
 /mob/dead/new_player/proc/new_player_panel()
+	if (client?.interviewee)
+		return
+
 	var/output = "<center><p><a href='byond://?src=[REF(src)];show_preferences=1'>Setup Character</a></p>"
 
 	if(SSticker.current_state <= GAME_STATE_PREGAME)
@@ -100,8 +106,8 @@
 	if(src != usr)
 		return 0
 
-	if(!client)
-		return 0
+	if(client?.interviewee)
+		return FALSE
 
 	//Determines Relevent Population Cap
 	var/relevant_cap
@@ -516,3 +522,13 @@
 
 		return FALSE //This is the only case someone should actually be completely blocked from antag rolling as well
 	return TRUE
+
+/mob/dead/new_player/proc/register_for_interview()
+	// first we detain them
+	for (var/v in client.verbs)
+		client.verbs -= v
+	verbs.Cut()
+
+	// now we register for interview
+	interview_form = new
+	interview_form.ui_interact(src)
