@@ -143,6 +143,7 @@ GLOBAL_DATUM_INIT(minigame_signups,/datum/minigame_signups,new)
 /obj/machinery/computer/arena/prophunt/special_handler(special_value)
 	switch(special_value)
 		if("end_prophunt_round")
+			auto = FALSE
 			conclude_round()
 			return TRUE
 		else
@@ -184,6 +185,7 @@ GLOBAL_DATUM_INIT(minigame_signups,/datum/minigame_signups,new)
 	for(var/mob/living/L in searchers)
 		L.forceMove(get_landmark_turf(PROPHUNT_SEARCHER_SPAWN))
 	to_chat(searchers,"<span class='danger'>Search! You got 3 minutes!</span>")
+	to_chat(hiders,"<span class='userdanger'>Search started! Try to stay hidden for 3 minutes!</span>")
 	game_state = PROPHUNT_GAME
 	next_stage_timer = addtimer(CALLBACK(src,.proc/conclude_round),search_time, TIMER_STOPPABLE)
 
