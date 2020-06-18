@@ -69,6 +69,8 @@ GLOBAL_DATUM_INIT(minigame_signups,/datum/minigame_signups,new)
 	desc = "Sign up here."
 	icon = 'icons/obj/mafia.dmi'
 	icon_state = "joinme"
+	anchored = TRUE
+	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | UNACIDABLE | ACID_PROOF
 	var/arena_id = "prophunt_arena"
 	var/obj/machinery/computer/arena/prophunt/linked_arena
 

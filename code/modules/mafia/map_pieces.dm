@@ -7,6 +7,8 @@
 	desc = "Sign up here."
 	icon = 'icons/obj/mafia.dmi'
 	icon_state = "joinme"
+	anchored = TRUE
+	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | UNACIDABLE | ACID_PROOF
 	var/game_id = "mafia"
 	var/autostart = FALSE //Will try to start immidiately
 	var/autostart_delay = 1 MINUTES
