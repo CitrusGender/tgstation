@@ -527,5 +527,5 @@
 	verbs.Cut()
 
 	// then we create the interview form and give them the verb to open it
-	GLOB.interviews.interview_for_ckey(client.ckey)
+	GLOB.interviews.interview_for_client(client)
 	verbs += /mob/dead/new_player/proc/open_interview

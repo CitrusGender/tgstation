@@ -8,7 +8,22 @@ export const Interview = (props, context) => {
     questions,
     read_only,
     queue_pos,
+    is_admin,
+    status,
   } = data;
+
+  const rendered_status = status => {
+    switch (status) {
+      case "interview_approved":
+        return (<NoticeBox success>This interview was approved.</NoticeBox>);
+      case "interview_denied":
+        return (<NoticeBox danger>This interview was denied.</NoticeBox>);
+      default:
+        return (<NoticeBox info>
+          Your answers have been submitted. You are position {queue_pos} in
+          queue.</NoticeBox>);
+    }
+  };
 
   return (
     <Window>
@@ -22,24 +37,30 @@ export const Interview = (props, context) => {
               and you may be asked further questions before being allowed to
               play. Please be patient as there may be others ahead of you.
             </p>
-          </Section>)) || (
-          <NoticeBox info>
-            Your answers have been submitted. You are position {queue_pos} in
-            queue.
-          </NoticeBox>
-        )}
+          </Section>)) || rendered_status(status)}
         <Section
           title="Questionnaire"
           buttons={(
-            <Button
-              content={read_only ? "Submitted" : "Submit"}
-              onClick={() => act('submit')}
-              disabled={read_only} />
+            <span>
+              <Button
+                content={read_only ? "Submitted" : "Submit"}
+                onClick={() => act('submit')}
+                disabled={read_only} />
+              {is_admin && status === "interview_pending" && (
+                <span>
+                  <Button content="Approve"
+                    color="good" onClick={() => act('approve')} />
+                  <Button content="Deny"
+                    color="bad" onClick={() => act('deny')} />
+                </span>
+              )}
+            </span>
           )}>
           {!read_only && (
             <p>
               Please answer the following questions,
-              and press submit when you are satisfied with your answers.
+              and press submit when you are satisfied with your answers.<br /><br />
+              <b>You will not be able to edit your answers after submitting.</b>
             </p>)}
           {questions.map(({ qidx, question, response }) => (
             <Section key={qidx} title={`Question ${qidx}`}>

@@ -1,6 +1,11 @@
+#define INTERVIEW_APPROVED	"interview_approved"
+#define INTERVIEW_DENIED 	"interview_denied"
+#define INTERVIEW_PENDING	"interview_pending"
+
 /datum/interview
 	var/id
 	var/static/atomic_id = 0
+	var/client/owner
 	var/owner_ckey
 	var/list/questions = list(
 		"Why have you joined the server today?",
@@ -11,23 +16,52 @@
 	var/list/responses = list()
 	var/read_only = FALSE
 	var/pos_in_queue
+	var/status = INTERVIEW_PENDING
 	var/obj/effect/statclick/interview/statclick
 
-/datum/interview/New(interviewee)
+/datum/interview/New(client/interviewee)
 	if(!interviewee)
 		qdel(src)
 		return
 	id = ++atomic_id
-	owner_ckey = interviewee
+	owner = interviewee
+	owner_ckey = owner.ckey
 	responses.len = questions.len
 	statclick = new(null, src)
+
+/datum/interview/proc/approve(client/approved_by)
+	status = INTERVIEW_APPROVED
+	GLOB.interviews.approved_ckeys |= owner_ckey
+	GLOB.interviews.dequeue_specific(src)
+	log_admin_private("[key_name(approved_by)] has approved interview #[id] for [owner_ckey][!owner ? "(DC)": ""].")
+	message_admins("<span class='adminnotice'>[key_name(approved_by)] has approved interview #[id] for [owner_ckey][!owner ? "(DC)": ""].</span>")
+	if (owner)
+		SEND_SOUND(owner, sound('sound/effects/adminhelp.ogg'))
+		to_chat(owner, "<font color='red' size='4'><b>-- Interview Update --</b></font>" \
+			+ "\n<span class='adminsay'>Your interview was approved, you will now be reconnected in 5 seconds.</span>", confidential = TRUE)
+		addtimer(CALLBACK(src, .proc/reconnect_owner), 50)
+
+/datum/interview/proc/deny(client/denied_by)
+	status = INTERVIEW_DENIED
+	GLOB.interviews.dequeue_specific(src)
+	log_admin_private("[key_name(denied_by)] has denied interview #[id] for [owner_ckey][!owner ? "(DC)": ""].")
+	message_admins("<span class='adminnotice'>[key_name(denied_by)] has denied interview #[id] for [owner_ckey][!owner ? "(DC)": ""].</span>")
+	if (owner)
+		SEND_SOUND(owner, sound('sound/effects/adminhelp.ogg'))
+		to_chat(owner, "<font color='red' size='4'><b>-- Interview Update --</b></font>" \
+			+ "\n<span class='adminsay'>Unfortunately your interview was denied. Please try submitting another questionnaire.</span>", confidential = TRUE)
+
+/datum/interview/proc/reconnect_owner()
+	if (!owner)
+		return
+	winset(owner, null, "command=.reconnect")
 
 /mob/dead/new_player/proc/open_interview()
 	set name = "Open Interview"
 	set category = "Interview"
 	var/mob/dead/new_player/M = usr
 	if (M?.client?.interviewee)
-		var/datum/interview/I = GLOB.interviews.interview_for_ckey(M.client.ckey)
+		var/datum/interview/I = GLOB.interviews.interview_for_client(M.client, FALSE)
 		I.ui_interact(M)
 
 /datum/interview/ui_interact(mob/user, ui_key = "main", datum/tgui/ui = null, force_open = FALSE, datum/tgui/master_ui = null, datum/ui_state/state = GLOB.new_player_state)
@@ -48,12 +82,25 @@
 				read_only = TRUE
 				GLOB.interviews.enqueue(src)
 				. = TRUE
+		if ("approve")
+			if (usr.client?.holder && status == INTERVIEW_PENDING)
+				src.approve(usr)
+				. = TRUE
+		if ("deny")
+			if (usr.client?.holder && status == INTERVIEW_PENDING)
+				src.deny(usr)
+				. = TRUE
 
 /datum/interview/ui_status(mob/user, datum/ui_state/state)
 	return (user?.client) ? UI_INTERACTIVE : UI_CLOSE
 
 /datum/interview/ui_data(mob/user)
-	. = list("questions" = list(), "read_only" = read_only, "queue_pos" = pos_in_queue)
+	. = list(
+		"questions" = list(),
+		"read_only" = read_only,
+		"queue_pos" = pos_in_queue,
+		"is_admin" = user?.client && user.client.holder,
+		"status" = status)
 	for (var/i in 1 to questions.len)
 		var/list/data = list(
 			"qidx" = i,
@@ -70,7 +117,8 @@
 	. = ..()
 
 /obj/effect/statclick/interview/update()
-	return ..(interview_datum.owner_ckey)
+	var/datum/interview/I = interview_datum
+	return ..("[I.owner_ckey][!I.owner ? " (DC)": ""] \[I[I.id]\]")
 
 /obj/effect/statclick/interview/Click()
 	interview_datum.ui_interact(usr)

@@ -215,6 +215,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 	GLOB.directory[ckey] = src
 
 	GLOB.ahelp_tickets.ClientLogin(src)
+	GLOB.interviews.client_login(src)
 	var/connecting_admin = FALSE //because de-admined admins connecting should be treated like admins.
 	//Admin Authorisation
 	holder = GLOB.admin_datums[ckey]
@@ -380,7 +381,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 				qdel(src)
 				return 0
 
-			if(living_minutes < required_living_minutes)
+			if(living_minutes < required_living_minutes && !(src.ckey in GLOB.interviews.approved_ckeys))
 				if(CONFIG_GET(flag/allowlist_interview))
 					interviewee = TRUE
 				else
@@ -476,6 +477,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 	GLOB.directory -= ckey
 	log_access("Logout: [key_name(src)]")
 	GLOB.ahelp_tickets.ClientLogout(src)
+	GLOB.interviews.client_logout(src)
 	SSserver_maint.UpdateHubStatus()
 	if(credits)
 		QDEL_LIST(credits)
