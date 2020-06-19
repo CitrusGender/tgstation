@@ -532,4 +532,4 @@
 
 	// now we register for interview
 	interview_form = new
-	interview_form.ui_interact(src)
+	verbs += /mob/dead/new_player/proc/open_interview
