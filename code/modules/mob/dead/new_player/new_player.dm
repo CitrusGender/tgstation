@@ -531,5 +531,5 @@
 	verbs.Cut()
 
 	// now we register for interview
-	interview_form = new
+	interview_form = new(src)
 	verbs += /mob/dead/new_player/proc/open_interview
