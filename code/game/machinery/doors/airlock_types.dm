@@ -110,7 +110,7 @@
 	autoclose = FALSE
 	frequency = FREQ_AIRLOCK_CONTROL
 	heat_proof = TRUE
-	req_access = list(ACCESS_TOX)
+	req_access = list(ACCESS_TOXINS)
 
 /obj/machinery/door/airlock/research/glass/incinerator/toxmix_interior
 	name = "Mixing Room Interior Airlock"
@@ -551,6 +551,19 @@
 /obj/machinery/door/airlock/glass_large
 	name = "large glass airlock"
 	icon = 'icons/obj/doors/airlocks/glass_large/glass_large.dmi'
+	overlays_file = 'icons/obj/doors/airlocks/glass_large/overlays.dmi'
+	opacity = 0
+	assemblytype = null
+	glass = TRUE
+	bound_width = 64 // 2x1
+
+/obj/machinery/door/airlock/glass_large/narsie_act()
+	return
+
+/obj/machinery/door/airlock/wood_large
+	name = "House of Spooks"
+	desc = "Are you prepared for the spookening?!"
+	icon = 'icons/obj/doors/airlocks/glass_large/wood_large.dmi'
 	overlays_file = 'icons/obj/doors/airlocks/glass_large/overlays.dmi'
 	opacity = 0
 	assemblytype = null

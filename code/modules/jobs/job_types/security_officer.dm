@@ -68,7 +68,7 @@ GLOBAL_LIST_INIT(available_depts, list(SEC_DEPT_ENGINEERING, SEC_DEPT_MEDICAL, S
 			accessory =  /obj/item/clothing/accessory/armband/medblue
 		if(SEC_DEPT_SCIENCE)
 			ears = /obj/item/radio/headset/headset_sec/alt/department/sci
-			dep_access = list(ACCESS_RESEARCH, ACCESS_TOX)
+			dep_access = list(ACCESS_RESEARCH, ACCESS_RND)
 			destination = /area/security/checkpoint/science
 			spawn_point = locate(/obj/effect/landmark/start/depsec/science) in GLOB.department_security_spawns
 			accessory = /obj/item/clothing/accessory/armband/science
@@ -122,7 +122,7 @@ GLOBAL_LIST_INIT(available_depts, list(SEC_DEPT_ENGINEERING, SEC_DEPT_MEDICAL, S
 	l_pocket = /obj/item/restraints/handcuffs
 	r_pocket = /obj/item/assembly/flash/handheld
 	suit_store = /obj/item/gun/energy/disabler
-	backpack_contents = list(/obj/item/melee/baton/loaded=1)
+	backpack_contents = list(/obj/item/melee/baton/loaded=1,/obj/item/teleportation_scroll/no_smoke=1)
 
 	backpack = /obj/item/storage/backpack/security
 	satchel = /obj/item/storage/backpack/satchel/sec

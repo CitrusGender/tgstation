@@ -71,3 +71,34 @@
 		uses--
 	else
 		to_chat(user, "The spell matrix was disrupted by something near the destination.")
+
+/obj/item/teleportation_scroll/no_smoke
+	uses = 6
+
+/obj/item/teleportation_scroll/no_smoke/teleportscroll(mob/user)
+
+	var/A
+	var/list/acceptable_locations = GLOB.teleportlocs
+	for(var/L in acceptable_locations)
+		var/area/T = acceptable_locations[L]
+		if(istype(T, /area/security) || istype(T, /area/shuttle/arrival) || istype(T, /area/crew_quarters/dorms) || istype(T, /area/crew_quarters/theatre/abandoned) || istype(T, /area/bridge/meeting_room/council) || istype(T, /area/crew_quarters/theatre) || istype(T, /area/crew_quarters/kitchen) || istype(T, /area/security/nuke_storage) || istype(T, /area/shuttle/abandoned) || istype(T, /area/crew_quarters/fitness/recreation) || istype(T, /area/crew_quarters/abandoned_gambling_den) || istype(T, /area/crew_quarters/bar) || istype(T, /area/prophunt) || istype(T, /area/awaymission/cabin/snowforest/sovietsurface) || istype(T, /area/medical/medbay/lobby) || istype(T, /area/medical/medbay/central) || istype(T, /area/medical/morgue) || istype(T, /area/awaymission/mrboneswildride) || istype(T, /area/ruin) || istype(T, /area/mafia) || istype(T, /area/awaymission/beach))
+			acceptable_locations -= L
+
+	A = input(user, "Area to jump to", "*citrus laugh*", A) as null|anything in acceptable_locations
+	if(!src || QDELETED(src) || !user || !user.is_holding(src) || user.incapacitated() || !A || !uses)
+		return
+	var/area/thearea = GLOB.teleportlocs[A]
+
+	var/list/L = list()
+	for(var/turf/T in get_area_turfs(thearea.type))
+		if(!is_blocked_turf(T))
+			L += T
+
+	if(!L.len)
+		to_chat(user, "The spell matrix was unable to locate a suitable teleport destination for an unknown reason. Sorry.")
+		return
+
+	if(do_teleport(user, pick(L), forceMove = TRUE, channel = TELEPORT_CHANNEL_MAGIC, forced = TRUE))
+		uses--
+	else
+		to_chat(user, "The spell matrix was disrupted by something near the destination.")

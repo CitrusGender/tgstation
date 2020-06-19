@@ -308,11 +308,11 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 	icon_state = "meeting"
 
 /area/bridge/meeting_room/council
-	name = "Council Chamber"
+	name = "High-roller Suite"
 	icon_state = "meeting"
 
 /area/bridge/showroom/corporate
-	name = "Corporate Showroom"
+	name = "A Station of Salem Minigame"
 	icon_state = "showroom"
 
 /area/crew_quarters/heads/captain
@@ -359,7 +359,7 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 	safe = TRUE
 
 /area/crew_quarters/dorms/barracks
-	name = "Sleep Barracks"
+	name = "Beach Boardwalk"
 
 /area/crew_quarters/dorms/barracks/male
 	name = "Male Sleep Barracks"
@@ -411,11 +411,11 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 
 
 /area/crew_quarters/fitness/recreation
-	name = "Recreation Area"
+	name = "Boardwalk"
 	icon_state = "rec"
 
 /area/crew_quarters/cafeteria
-	name = "Cafeteria"
+	name = "Restaurant"
 	icon_state = "cafeteria"
 
 /area/crew_quarters/kitchen
@@ -433,26 +433,28 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 	mood_message = "<span class='nicegreen'>I love being in the bar!\n</span>"
 
 /area/crew_quarters/bar/atrium
-	name = "Atrium"
+	name = "Casino Entrance"
 	icon_state = "bar"
 
 /area/crew_quarters/electronic_marketing_den
-	name = "Electronic Marketing Den"
+	name = "Casino Upper Level"
 	icon_state = "abandoned_m_den"
 
 /area/crew_quarters/abandoned_gambling_den
-	name = "Abandoned Gambling Den"
+	name = "Casino"
 	icon_state = "abandoned_g_den"
+	ambientsounds = list('sound/ambience/casino_bg.ogg')
 
 /area/crew_quarters/abandoned_gambling_den/secondary
+	name = "Casino"
 	icon_state = "abandoned_g_den_2"
 
 /area/crew_quarters/theatre
-	name = "Theatre"
+	name = "Lower Casino"
 	icon_state = "theatre"
 
 /area/crew_quarters/theatre/abandoned
-	name = "Abandoned Theatre"
+	name = "Theatre Backstage"
 	icon_state = "abandoned_theatre"
 
 /area/library
@@ -461,23 +463,23 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 	flags_1 = CULT_PERMITTED_1
 
 /area/library/lounge
-	name = "Library Lounge"
+	name = "A Prophunt Lobby Minigame"
 	icon_state = "library_lounge"
 
 /area/library/artgallery
-	name = " Art Gallery"
+	name = "NTSS Spirit of Freedom"
 	icon_state = "library_gallery"
 
 /area/library/private
-	name = "Library Private Study"
+	name = "Deep Jungle"
 	icon_state = "library_gallery_private"
 
 /area/library/upper
-	name = "Library Upper Floor"
+	name = "Rage Cage Arena"
 	icon_state = "library"
 
 /area/library/printer
-	name = "Library Printer Room"
+	name = "Beach Cabins"
 	icon_state = "library"
 
 /area/library/abandoned
@@ -949,15 +951,15 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 	icon_state = "quart"
 
 /area/quartermaster/sorting
-	name = "Delivery Office"
+	name = "Mapper Lair"
 	icon_state = "cargo_delivery"
 
 /area/quartermaster/warehouse
-	name = "Warehouse"
+	name = "Biodome"
 	icon_state = "cargo_warehouse"
 
 /area/quartermaster/warehouse/upper
-	name = "Upper Warehouse"
+	name = "Biodome Caves"
 
 /area/quartermaster/office
 	name = "Cargo Office"
@@ -1078,7 +1080,7 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 	icon_state = "science"
 
 /area/science/research/abandoned
-	name = "Abandoned Research Lab"
+	name = "Casino Lower Level"
 	icon_state = "abandoned_sci"
 
 /area/science/nanite

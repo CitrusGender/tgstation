@@ -90,6 +90,8 @@
 
 	var/list/power_usage
 
+	var/no_minigames = FALSE
+
 
 /**
   * A list of teleport locations
@@ -150,6 +152,10 @@ GLOBAL_LIST_EMPTY(teleportlocs)
 	map_name = name // Save the initial (the name set in the map) name of the area.
 	canSmoothWithAreas = typecacheof(canSmoothWithAreas)
 
+	#ifdef EVENTMODE
+	requires_power = FALSE
+	has_gravity = STANDARD_GRAVITY
+	#endif
 	if(requires_power)
 		luminosity = 0
 	else
@@ -165,6 +171,10 @@ GLOBAL_LIST_EMPTY(teleportlocs)
 	if(dynamic_lighting == DYNAMIC_LIGHTING_IFSTARLIGHT)
 		dynamic_lighting = CONFIG_GET(flag/starlight) ? DYNAMIC_LIGHTING_ENABLED : DYNAMIC_LIGHTING_DISABLED
 
+	#ifdef EVENTMODE
+	///No fancy lighting ever
+	dynamic_lighting = DYNAMIC_LIGHTING_DISABLED
+	#endif
 	. = ..()
 
 	blend_mode = BLEND_MULTIPLY // Putting this in the constructor so that it stops the icons being screwed up in the map editor.
@@ -493,6 +503,9 @@ GLOBAL_LIST_EMPTY(teleportlocs)
   * Space is not powered ever, so this returns 0
   */
 /area/space/powered(chan) //Nope.avi
+	#ifdef EVENTMODE
+	return 1 //SIKE.gif
+	#endif
 	return 0
 
 /**
@@ -563,7 +576,7 @@ GLOBAL_LIST_EMPTY(teleportlocs)
 	if(!(L.client && (L.client.prefs.toggles & SOUND_AMBIENCE)))
 		return //General ambience check is below the ship ambience so one can play without the other
 
-	if(prob(35))
+	if(prob(100))
 		var/sound = pick(ambientsounds)
 
 		if(!L.client.played)
