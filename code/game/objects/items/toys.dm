@@ -953,7 +953,7 @@
 		if(C.parentdeck == src.parentdeck)
 			src.currenthand += C.cardname
 			src.value = src.value + C.value
-			src.maptext = "<font color='#000000'><b>[src.value]</b></font>"
+			src.maptext = "<span class='maptext'>[src.value]</span>"
 			user.visible_message("<span class='notice'>[user] adds a card to [user.p_their()] hand.</span>", "<span class='notice'>You add the [C.cardname] to your hand.</span>")
 			qdel(C)
 			interact(user)
@@ -1036,7 +1036,7 @@
 			src.icon_state = "sc_Ace of Spades_[deckstyle]"
 			src.name = "What Card"
 		src.pixel_x = 5
-		src.maptext = "<font color='#000000'><b>[src.value]</b></font>"
+		src.maptext = "<span class='maptext'>[src.value]</span>"
 	else if(flipped)
 		src.flipped = 0
 		src.icon_state = "singlecard_down_[deckstyle]"
@@ -1049,7 +1049,7 @@
 		if(C.parentdeck == src.parentdeck)
 			var/obj/item/toy/cards/cardhand/H = new/obj/item/toy/cards/cardhand(user.loc)
 			H.value = src.value + C.value
-			H.maptext = "<font color='#000000'><b>[H.value]</b></font>"
+			H.maptext = "<span class='maptext'>[H.value]</span>"
 			H.currenthand += C.cardname
 			H.currenthand += src.cardname
 			H.parentdeck = C.parentdeck
@@ -1114,6 +1114,15 @@
 	card_throw_range = 7
 	card_attack_verb = list("attacked", "sliced", "diced", "slashed", "cut")
 	resistance_flags = NONE
+
+/obj/item/toy/cards/deck/split_test
+
+/obj/item/toy/cards/deck/populate_deck()
+	icon_state = "deck_[deckstyle]_full"
+	var/i = 52
+	while(i > 0)
+		cards += "10 of Hearts"
+		i--
 
 /*
  * Fake nuke
