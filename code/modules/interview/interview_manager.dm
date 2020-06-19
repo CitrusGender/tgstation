@@ -11,6 +11,15 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 	QDEL_LIST(closed_interviews)
 	return ..()
 
+/datum/interview_manager/proc/stat_entry()
+	stat("Open Interviews:", "[open_interviews.len]")
+	stat("Queued Interviews:", "[interview_queue.len]")
+	stat("Closed Interviews:", "[closed_interviews.len]")
+	if (interview_queue.len)
+		stat("Interview Queue:", null)
+		for(var/datum/interview/I in interview_queue)
+			stat("\[[I.pos_in_queue]\]:", I.statclick.update())
+
 /datum/interview_manager/proc/interview_for_ckey(ckey)
 	var/list/combined = open_interviews | closed_interviews
 	if (combined[ckey])
@@ -29,7 +38,7 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 /datum/interview_manager/proc/enqueue(datum/interview/to_queue)
 	if (!to_queue || (to_queue in interview_queue))
 		return
-	to_queue.pos_in_queue = interview_queue.len
+	to_queue.pos_in_queue = interview_queue.len + 1
 	interview_queue |= to_queue
 
 /datum/interview_manager/proc/dequeue()

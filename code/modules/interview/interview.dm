@@ -11,6 +11,7 @@
 	var/list/responses = list()
 	var/read_only = FALSE
 	var/pos_in_queue
+	var/obj/effect/statclick/interview/statclick
 
 /datum/interview/New(interviewee)
 	if(!interviewee)
@@ -19,6 +20,7 @@
 	id = ++atomic_id
 	owner_ckey = interviewee
 	responses.len = questions.len
+	statclick = new(null, src)
 
 /mob/dead/new_player/proc/open_interview()
 	set name = "Open Interview"
@@ -47,6 +49,9 @@
 				GLOB.interviews.enqueue(src)
 				. = TRUE
 
+/datum/interview/ui_status(mob/user, datum/ui_state/state)
+	return (user?.client) ? UI_INTERACTIVE : UI_CLOSE
+
 /datum/interview/ui_data(mob/user)
 	. = list("questions" = list(), "read_only" = read_only, "queue_pos" = pos_in_queue)
 	for (var/i in 1 to questions.len)
@@ -56,3 +61,20 @@
 			"response" = responses.len < i ? null : responses[i]
 		)
 		.["questions"] += list(data)
+
+/obj/effect/statclick/interview
+	var/datum/interview/interview_datum
+
+/obj/effect/statclick/interview/Initialize(mapload, datum/interview/I)
+	interview_datum = I
+	. = ..()
+
+/obj/effect/statclick/interview/update()
+	return ..(interview_datum.owner_ckey)
+
+/obj/effect/statclick/interview/Click()
+	interview_datum.ui_interact(usr)
+
+/obj/effect/statclick/interview/Destroy(force)
+	interview_datum = null
+	. = ..()
