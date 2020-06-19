@@ -15,11 +15,6 @@
 	owner = interviewee
 	responses.len = questions.len
 
-/datum/interview/Destroy(force, ...)
-	var/e = "omg im being deleted ARRGHHH"
-	. = ..()
-
-
 /mob/dead/new_player/proc/open_interview()
 	set name = "Open Interview"
 	set category = "Interview"
