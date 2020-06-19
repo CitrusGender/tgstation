@@ -1993,6 +1993,7 @@
 #include "code\modules\hydroponics\grown\tomato.dm"
 #include "code\modules\hydroponics\grown\towercap.dm"
 #include "code\modules\interview\interview.dm"
+#include "code\modules\interview\interview_manager.dm"
 #include "code\modules\jobs\access.dm"
 #include "code\modules\jobs\job_exp.dm"
 #include "code\modules\jobs\jobs.dm"

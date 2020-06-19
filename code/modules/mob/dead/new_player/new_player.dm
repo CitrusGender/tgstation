@@ -17,9 +17,6 @@
 	//Used to make sure someone doesn't get spammed with messages if they're ineligible for roles
 	var/ineligible_for_roles = FALSE
 
-	/// Used when the new player interview system is enabled for handling the TGUI window
-	var/datum/interview/interview_form
-
 /mob/dead/new_player/Initialize()
 	if(client && SSticker.state == GAME_STATE_STARTUP)
 		var/obj/screen/splash/S = new(client, TRUE, TRUE)
@@ -38,7 +35,6 @@
 
 /mob/dead/new_player/Destroy()
 	GLOB.new_player_list -= src
-	QDEL_NULL(interview_form)
 	return ..()
 
 /mob/dead/new_player/prepare_huds()
@@ -530,6 +526,6 @@
 		client.verbs -= v
 	verbs.Cut()
 
-	// now we register for interview
-	interview_form = new(src)
+	// then we create the interview form and give them the verb to open it
+	GLOB.interviews.interview_for_ckey(client.ckey)
 	verbs += /mob/dead/new_player/proc/open_interview
