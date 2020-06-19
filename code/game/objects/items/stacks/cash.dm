@@ -25,10 +25,10 @@
 /obj/item/stack/spacecash/get_item_credit_value()
 	return (amount*value)
 
-/obj/item/stack/spacecash/merge(obj/item/stack/S)
-	. = ..()
-	update_desc()
-
+///obj/item/stack/spacecash/merge(obj/item/stack/S)
+//	. = ..()
+//	update_desc()
+// I'm sorry, but does my stack of singles magically merge into a single super dollar worth the sum because I threw them all in the same 5ft sq? Get the fuck out of here with this shit.
 /obj/item/stack/spacecash/use(used, transfer = FALSE)
 	. = ..()
 	update_desc()
