@@ -32,7 +32,7 @@
 /datum/interview/proc/approve(client/approved_by)
 	status = INTERVIEW_APPROVED
 	GLOB.interviews.approved_ckeys |= owner_ckey
-	GLOB.interviews.dequeue_specific(src)
+	GLOB.interviews.close_interview(src)
 	log_admin_private("[key_name(approved_by)] has approved interview #[id] for [owner_ckey][!owner ? "(DC)": ""].")
 	message_admins("<span class='adminnotice'>[key_name(approved_by)] has approved interview #[id] for [owner_ckey][!owner ? "(DC)": ""].</span>")
 	if (owner)
@@ -43,13 +43,16 @@
 
 /datum/interview/proc/deny(client/denied_by)
 	status = INTERVIEW_DENIED
-	GLOB.interviews.dequeue_specific(src)
+	GLOB.interviews.close_interview(src)
+	GLOB.interviews.cooldown_ckeys |= owner_ckey
 	log_admin_private("[key_name(denied_by)] has denied interview #[id] for [owner_ckey][!owner ? "(DC)": ""].")
 	message_admins("<span class='adminnotice'>[key_name(denied_by)] has denied interview #[id] for [owner_ckey][!owner ? "(DC)": ""].</span>")
+	addtimer(CALLBACK(GLOB.interviews, /datum/interview_manager.proc/release_from_cooldown, owner_ckey), 180)
 	if (owner)
 		SEND_SOUND(owner, sound('sound/effects/adminhelp.ogg'))
 		to_chat(owner, "<font color='red' size='4'><b>-- Interview Update --</b></font>" \
-			+ "\n<span class='adminsay'>Unfortunately your interview was denied. Please try submitting another questionnaire.</span>", confidential = TRUE)
+			+ "\n<span class='adminsay'>Unfortunately your interview was denied. Please try submitting another questionnaire." \
+			+ " You may do this in three minutes.</span>", confidential = TRUE)
 
 /datum/interview/proc/reconnect_owner()
 	if (!owner)
@@ -61,8 +64,12 @@
 	set category = "Interview"
 	var/mob/dead/new_player/M = usr
 	if (M?.client?.interviewee)
-		var/datum/interview/I = GLOB.interviews.interview_for_client(M.client, FALSE)
-		I.ui_interact(M)
+		var/datum/interview/I = GLOB.interviews.interview_for_client(M.client)
+		if (I) // we can be returned nothing if the user is on cooldown
+			I.ui_interact(M)
+		else
+			to_chat(usr, "<span class='adminsay'>You are on cooldown for interviews. Please" \
+				+ " wait at least 3 minutes before starting a new questionnaire.</span>", confidential = TRUE)
 
 /datum/interview/ui_interact(mob/user, ui_key = "main", datum/tgui/ui = null, force_open = FALSE, datum/tgui/master_ui = null, datum/ui_state/state = GLOB.new_player_state)
 	if (!ui)
@@ -118,7 +125,7 @@
 
 /obj/effect/statclick/interview/update()
 	var/datum/interview/I = interview_datum
-	return ..("[I.owner_ckey][!I.owner ? " (DC)": ""] \[I[I.id]\]")
+	return ..("[I.owner_ckey][!I.owner ? " (DC)": ""] \[INT-[I.id]\]")
 
 /obj/effect/statclick/interview/Click()
 	interview_datum.ui_interact(usr)

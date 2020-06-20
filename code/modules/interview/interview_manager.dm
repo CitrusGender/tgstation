@@ -5,6 +5,7 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 	var/list/interview_queue = list()
 	var/list/closed_interviews = list()
 	var/list/approved_ckeys = list()
+	var/list/cooldown_ckeys = list()
 
 /datum/interview_manager/Destroy(force, ...)
 	QDEL_LIST(open_interviews)
@@ -39,13 +40,13 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 		if (I.owner && C.ckey == I.owner_ckey)
 			I.owner = null
 
-/datum/interview_manager/proc/interview_for_client(client/C, include_closed = TRUE)
+/datum/interview_manager/proc/interview_for_client(client/C)
 	if (!C)
 		return
-	var/list/combined = include_closed ? (open_interviews | closed_interviews) : open_interviews
-	if (combined[C.ckey])
-		return combined[C.ckey]
-	else
+	if (open_interviews[C.ckey])
+		return open_interviews[C.ckey]
+	else if (!(C.ckey in cooldown_ckeys))
+		log_admin_private("New interview created for [key_name(C)].")
 		open_interviews[C.ckey] = new /datum/interview(C)
 		return open_interviews[C.ckey]
 
@@ -61,6 +62,18 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 		return
 	to_queue.pos_in_queue = interview_queue.len + 1
 	interview_queue |= to_queue
+
+	// Notify admins
+	var/ckey = to_queue.owner_ckey
+	log_admin_private("Interview for [ckey] has been enqueued for review.")
+	for(var/client/X in GLOB.admins)
+		if(X.prefs.toggles & SOUND_ADMINHELP)
+			SEND_SOUND(X, sound('sound/effects/adminhelp.ogg'))
+		window_flash(X, ignorepref = TRUE)
+		to_chat(X, "<span class='adminhelp'>Interview for [ckey] enqueued for review. Current position in queue: [to_queue.pos_in_queue]</span>", confidential = TRUE)
+
+/datum/interview_manager/proc/release_from_cooldown(ckey)
+	cooldown_ckeys -= ckey
 
 /datum/interview_manager/proc/dequeue()
 	if (interview_queue.len == 0)
@@ -93,6 +106,7 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 /datum/interview_manager/proc/close_interview(datum/interview/to_close)
 	if (!to_close)
 		return
-	if (to_close in open_interviews)
-		open_interviews -= to_close
-		closed_interviews |= to_close
+	dequeue_specific(to_close)
+	if (open_interviews[to_close.owner_ckey])
+		open_interviews -= to_close.owner_ckey
+		closed_interviews += to_close
