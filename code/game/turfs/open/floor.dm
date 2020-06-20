@@ -24,6 +24,9 @@
 
 	tiled_dirt = TRUE
 
+	/// Blocks prying and replacing the tile
+	var/no_replacement = FALSE
+
 /turf/open/floor/Initialize(mapload)
 	if (!broken_states)
 		broken_states = typelist("broken_states", list("damaged1", "damaged2", "damaged3", "damaged4", "damaged5"))
@@ -166,12 +169,12 @@
 		return 1
 	if(..())
 		return 1
-	if(intact && istype(C, /obj/item/stack/tile))
+	if(intact && !no_replacement && istype(C, /obj/item/stack/tile))
 		try_replace_tile(C, user, params)
 	return 0
 
 /turf/open/floor/crowbar_act(mob/living/user, obj/item/I)
-	if(intact && pry_tile(I, user))
+	if(intact && !no_replacement && pry_tile(I, user))
 		return TRUE
 
 /turf/open/floor/proc/try_replace_tile(obj/item/stack/tile/T, mob/user, params)
@@ -207,23 +210,24 @@
 
 /turf/open/floor/singularity_pull(S, current_size)
 	..()
-	if(current_size == STAGE_THREE)
-		if(prob(30))
-			if(floor_tile)
-				new floor_tile(src)
-				make_plating(TRUE)
-	else if(current_size == STAGE_FOUR)
-		if(prob(50))
-			if(floor_tile)
-				new floor_tile(src)
-				make_plating(TRUE)
-	else if(current_size >= STAGE_FIVE)
-		if(floor_tile)
+	var/sheer = FALSE
+	switch(current_size)
+		if(STAGE_THREE)
+			if(prob(30))
+				sheer = TRUE
+		if(STAGE_FOUR)
+			if(prob(50))
+				sheer = TRUE
+		if(STAGE_FIVE to INFINITY)
 			if(prob(70))
-				new floor_tile(src)
-				make_plating(TRUE)
-		else if(prob(50))
-			ReplaceWithLattice()
+				sheer = TRUE
+			else if(prob(50) && (/turf/open/space in baseturfs))
+				ReplaceWithLattice()
+	if(sheer)
+		if(floor_tile)
+			make_plating(TRUE)
+			new floor_tile(src)
+
 
 /turf/open/floor/narsie_act(force, ignore_mobs, probability = 20)
 	. = ..()

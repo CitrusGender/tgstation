@@ -13,6 +13,9 @@
 	var/log_amount = 10
 
 /obj/structure/flora/tree/attackby(obj/item/W, mob/user, params)
+	#ifdef EVENTMODE
+	return
+	#endif
 	if(log_amount && (!(flags_1 & NODECONSTRUCT_1)))
 		if(W.get_sharpness() && W.force > 0)
 			if(W.hitsound)
@@ -132,7 +135,8 @@
 	pixel_y = -20
 
 /obj/structure/flora/tree/jungle/Initialize()
-	icon_state = "[icon_state][rand(1, 6)]"
+	if(icon_state == "tree")
+		icon_state = "[icon_state][rand(1, 6)]"
 	. = ..()
 
 /obj/structure/flora/tree/jungle/small
@@ -307,6 +311,7 @@
 	desc = "A little bit of nature contained in a pot."
 	layer = ABOVE_MOB_LAYER
 	w_class = WEIGHT_CLASS_HUGE
+	anchored = 1
 	force = 10
 	throwforce = 13
 	throw_speed = 2
@@ -382,10 +387,6 @@
 	var/obj/item/stack/mineResult = /obj/item/stack/ore/glass/basalt
 	/// Amount of the itemstack to drop
 	var/mineAmount = 20
-
-/obj/structure/flora/rock/Initialize()
-	. = ..()
-	icon_state = "[icon_state][rand(1,3)]"
 
 /obj/structure/flora/rock/Destroy()
 	if(mineResult && mineAmount)
