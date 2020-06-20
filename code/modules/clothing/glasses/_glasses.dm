@@ -25,7 +25,7 @@
 /obj/item/clothing/glasses/examine(mob/user)
 	. = ..()
 	if(glass_colour_type && ishuman(user))
-		. += "<span class='notice'>Alt-click to toggle its colors.</span>"
+		. += "<span class='notice'>Alt-click to toggle [p_their()] colors.</span>"
 
 /obj/item/clothing/glasses/visor_toggling()
 	..()
@@ -340,10 +340,16 @@
 	icon_state = "mrbonesglasses"
 	inhand_icon_state = "bigsunglasses"
 	clothing_flags = BLOCKS_SHOVE_KNOCKDOWN
+	vision_flags = SEE_TURFS|SEE_MOBS|SEE_OBJS
+	var/view_range = 4
 
-/obj/item/clothing/glasses/sunglasses/mrbones/Initialize()
+/obj/item/clothing/glasses/sunglasses/mrbones/equipped(mob/user, slot) // Respect to arm for helping.
+	if(slot == ITEM_SLOT_EYES)
+		user.client?.view_size.setTo(view_range) // If returns true, the line will go off - Armhulen.
+
+/obj/item/clothing/glasses/sunglasses/mrbones/dropped(mob/user) // Sets view back to normal
+	user.client?.view_size.setTo(1)
 	. = ..()
-	ADD_TRAIT(src, TRAIT_NODROP, EYE_OF_GOD_TRAIT)
 
 /obj/item/clothing/glasses/thermal
 	name = "optical thermal scanner"

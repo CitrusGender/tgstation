@@ -13,13 +13,14 @@
 	anchored = TRUE
 	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | UNACIDABLE | ACID_PROOF
 	var/game_id = "mafia"
-	var/autostart = FALSE //Will try to start immidiately
+	var/autostart = TRUE //Will try to start immidiately
 	var/autostart_delay = 1 MINUTES
 	var/autostart_timer
 
 /obj/mafia_game_signup/Initialize()
 	. = ..()
 	GLOB.minigame_signups.boards[game_id] = src
+	toggle_autostart()
 
 /obj/mafia_game_signup/attack_hand(mob/user)
 	. = ..()
@@ -81,7 +82,7 @@
 
 /obj/mafia_game_signup/debug
 	var/datum/mafia_controller/MF
-	var/list/debug_setup = list(/datum/mafia_role/md=1,/datum/mafia_role/clown=1,/datum/mafia_role/detective=1,/datum/mafia_role/mafia=1)
+	var/list/debug_setup = list(/datum/mafia_role/md=1,/datum/mafia_role/obsessed=1,/datum/mafia_role/detective=1,/datum/mafia_role/mafia=1)
 
 /obj/mafia_game_signup/debug/Initialize()
 	. = ..()

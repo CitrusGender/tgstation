@@ -22,6 +22,7 @@
 	var/player_outfit = /datum/outfit/mafia //todo some fluffy outfit
 
 	var/list/landmarks = list()
+	var/town_center_landmark = null
 	var/list/votes = list() //group voting on one person, like putting people to trial or choosing who to kill as mafia
 
 	//and these are the judgement phase votes, aka people sorting themselves into guilty and innocent lists. whichever has more wins!
@@ -38,7 +39,11 @@
 	src.game_id = game_id
 	GLOB.mafia_games[game_id] = src
 	for(var/obj/effect/landmark/mafia/possible_spawn in GLOB.landmarks_list)
-		if(possible_spawn.game_id == game_id)
+		if(possible_spawn.game_id != game_id)
+			continue
+		if(istype(possible_spawn, /obj/effect/landmark/mafia/town_center))
+			town_center_landmark = possible_spawn
+		else
 			landmarks += possible_spawn
 
 /datum/mafia_controller/Destroy(force, ...)
@@ -96,6 +101,7 @@
 	if(loser)
 		send_message("<span class='big'>[loser.body.real_name] wins the day vote, Listen to their defense and vote \"INNOCENT\" or \"GUILTY\"!</span>")
 		on_trial = loser
+		on_trial.body.forceMove(get_turf(town_center_landmark))
 		phase = MAFIA_PHASE_JUDGEMENT
 		next_phase_timer = addtimer(CALLBACK(src, .proc/lynch),judgement_phase_period,TIMER_STOPPABLE)
 		reset_votes("Day")
@@ -116,8 +122,10 @@
 	if(judgement_guilty_votes.len > judgement_innocent_votes.len) //strictly need majority guilty to lynch
 		send_message("<span class='big red'>Guilty wins majority, [on_trial.body.real_name] has been lynched.</span>")
 		on_trial.kill(src, lynch = TRUE)
+		addtimer(CALLBACK(src, .proc/returnlynched, on_trial), judgement_lynch_period)
 	else
 		send_message("<span class='big green'>Innocent wins majority, [on_trial.body.real_name] has been spared.</span>")
+		on_trial.body.forceMove(get_turf(on_trial.assigned_landmark))
 	//by now clowns should have killed someone in guilty list, clear this out
 	judgement_innocent_votes = list()
 	judgement_guilty_votes = list()
@@ -125,10 +133,18 @@
 	//day votes are already cleared, so this will skip the trial and check victory/lockdown/whatever else
 	next_phase_timer = addtimer(CALLBACK(src, .proc/check_trial, FALSE),judgement_lynch_period,TIMER_STOPPABLE)// small pause to see the guy dead, no verbosity since we already did this
 
+/datum/mafia_controller/proc/returnlynched(datum/mafia_role/R)
+	R.body.forceMove(get_turf(R.assigned_landmark))
+
 /datum/mafia_controller/proc/check_victory()
 	var/alive_town = 0
 	var/alive_mafia = 0
-	var/solo_present = FALSE
+	var/list/solos_to_ask = list() //need to ask after because first round is counting team sizes
+	var/list/total_victors = null //if this has someone, they won alone. list because side antags can with with people
+	var/blocked_victory = FALSE
+
+	///PHASE ONE: TALLY UP ALL NUMBERS OF PEOPLE STILL ALIVE
+
 	for(var/datum/mafia_role/R in all_roles)
 		if(R.game_status == MAFIA_ALIVE)
 			switch(R.team)
@@ -137,19 +153,40 @@
 				if(MAFIA_TEAM_TOWN)
 					alive_town++
 				if(MAFIA_TEAM_SOLO)
-					solo_present = TRUE
-	if(solo_present && alive_town + alive_mafia <= 1)
-		start_the_end("<span class='big red'>!! TRAITOR VICTORY !!</span>")
-		return TRUE
-	if(alive_mafia == 0 && !solo_present)
+					if(R.solo_counts_as_town)
+						alive_town++
+					solos_to_ask += R
+
+	///PHASE TWO: SEND STATS TO SOLO ANTAGS, SEE IF THEY WON OR TEAMS CANNOT WIN
+
+	for(var/datum/mafia_role/solo in solos_to_ask)
+		if(solo.check_total_victory(alive_town, alive_mafia))
+			total_victors += solo
+		else if(solo.block_team_victory(alive_town, alive_mafia))
+			blocked_victory = TRUE
+
+	///PHASE THREE: IF SOLOS WON, SEND A SIGNAL THAT GAME IS ENDING (literally just for fugitives to say they won sorry not sorry)
+	if(length(total_victors))
+		SEND_SIGNAL(src,COMSIG_MAFIA_GAME_END)
+	//solo victories!
+	for(var/datum/mafia_role/winner in total_victors)
+		send_message("<span class='big red'>!! [uppertext(winner.name)] VICTORY !!</span>")
+		start_the_end()
+	if(alive_mafia == 0 && !blocked_victory)
+		SEND_SIGNAL(src,COMSIG_MAFIA_GAME_END)
 		start_the_end("<span class='big green'>!! TOWN VICTORY !!</span>")
 		return TRUE
-	else if(alive_mafia >= alive_town && !solo_present) //guess could change if town nightkill is added
+	else if(alive_mafia >= alive_town && !blocked_victory) //guess could change if town nightkill is added
+		SEND_SIGNAL(src,COMSIG_MAFIA_GAME_END)
 		start_the_end("<span class='big red'>!! MAFIA VICTORY !!</span>")
 		return TRUE
 
 /datum/mafia_controller/proc/start_the_end(message)
-	send_message(message)
+	if(message)
+		send_message(message)
+	for(var/datum/mafia_role/R in all_roles)
+		R.reveal_role(src)
+		R.body.Stun(INFINITY,ignore_canstun = TRUE)//so they don't grief the area around them with their outfit
 	phase = MAFIA_PHASE_VICTORY_LAP
 	next_phase_timer = addtimer(CALLBACK(src,.proc/end_game),victory_lap_period,TIMER_STOPPABLE)
 
@@ -345,7 +382,9 @@
 					deltimer(next_phase_timer)
 					tc.InvokeAsync()
 				return TRUE
-	if(!user_role)
+	if(!user_role)//ghosts
+		return
+	if(user_role.game_status == MAFIA_DEAD)//dead people?
 		return
 	//User actions
 	switch(action)
@@ -379,7 +418,6 @@
 			if(phase != MAFIA_PHASE_JUDGEMENT)
 				return
 			to_chat(user_role.body,"Your vote on [on_trial.body.real_name] submitted as INNOCENT!")
-			//
 			judgement_innocent_votes -= user_role//no double voting
 			judgement_guilty_votes -= user_role//no radical centrism
 			judgement_innocent_votes += user_role
