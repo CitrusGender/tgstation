@@ -1014,6 +1014,9 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 		return
 	prefs.save_preferences()
 
+/**
+  * Initializes dropdown menus on client
+  */
 /client/proc/initialize_menus()
 	var/list/topmenus = GLOB.menulist[/datum/verbs/menu]
 	for (var/thing in topmenus)

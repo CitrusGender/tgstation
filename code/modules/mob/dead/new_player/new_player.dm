@@ -520,6 +520,12 @@
 		return FALSE //This is the only case someone should actually be completely blocked from antag rolling as well
 	return TRUE
 
+/**
+  * Prepares a client for the interview system, and provides them with a new interview
+  *
+  * This proc will both prepare the user by removing all verbs from them, as well as
+  * giving them the interview form and forcing it to appear.
+  */
 /mob/dead/new_player/proc/register_for_interview()
 	// first we detain them
 	for (var/v in client.verbs)

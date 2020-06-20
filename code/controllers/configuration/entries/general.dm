@@ -523,4 +523,6 @@
 
 /datum/config_entry/number/allowlist_previous_hours_count
 
+// Toggles the interview system to allow new players to apply to bypass limits
+// enforced by the time based allowlist
 /datum/config_entry/flag/allowlist_interview

@@ -1,22 +1,43 @@
+/// State when an interview has been approved
 #define INTERVIEW_APPROVED	"interview_approved"
+/// State when an interview as been denied
 #define INTERVIEW_DENIED 	"interview_denied"
+/// State when an interview has had no action on it yet
 #define INTERVIEW_PENDING	"interview_pending"
 
+/**
+  * Represents a new-player interview form
+  *
+  * Represents a new-player interview form, enabled by configuration to require
+  * players with low playtime to request access to the server. To do so, they will
+  * out a brief questionnaire, and are otherwise unable to do anything while they
+  * wait for a response.
+  */
 /datum/interview
+	/// Unique ID of the interview
 	var/id
+	/// Atomic ID for incrementing unique IDs
 	var/static/atomic_id = 0
+	/// The /client who owns this interview, the intiator
 	var/client/owner
+	/// The Ckey of the owner, used for when a client could disconnect
 	var/owner_ckey
+	/// The questions to display on the questionnaire of the interview
 	var/list/questions = list(
 		"Why have you joined the server today?",
 		"Have you played space-station 13 before? If so, on what servers?",
 		"Do you know anybody on the server today? If so, who?",
 		"Do you have any additional comments?"
 	)
+	/// The stored responses, will be filled as the questionnaire is answered
 	var/list/responses = list()
+	/// Boolean operator controlling if the questionnaire's contents can be edited
 	var/read_only = FALSE
+	/// Integer that contains the current position in the interview queue, used for rendering
 	var/pos_in_queue
+	/// Contains the state of the form, used for rendering and sanity checking
 	var/status = INTERVIEW_PENDING
+	/// The statclick effect used for the stats panel of admins
 	var/obj/effect/statclick/interview/statclick
 
 /datum/interview/New(client/interviewee)
@@ -29,6 +50,14 @@
 	responses.len = questions.len
 	statclick = new(null, src)
 
+/**
+  * Approves the interview, forces reconnect of owner if relevant.
+  *
+  * Approves the interview, and if relevant will force the owner to reconnect so that they have the proper
+  * verbs returned to them.
+  * Arguments:
+  * * approved_by - The user who approved the interview, used for logging
+  */
 /datum/interview/proc/approve(client/approved_by)
 	status = INTERVIEW_APPROVED
 	GLOB.interviews.approved_ckeys |= owner_ckey
@@ -41,6 +70,12 @@
 			+ "\n<span class='adminsay'>Your interview was approved, you will now be reconnected in 5 seconds.</span>", confidential = TRUE)
 		addtimer(CALLBACK(src, .proc/reconnect_owner), 50)
 
+/**
+  * Denies the interview and adds the owner to the cooldown for new interviews.
+  *
+  * Arguments:
+  * * denied_by - The user who denied the interview, used for logging
+  */
 /datum/interview/proc/deny(client/denied_by)
 	status = INTERVIEW_DENIED
 	GLOB.interviews.close_interview(src)
@@ -54,11 +89,17 @@
 			+ "\n<span class='adminsay'>Unfortunately your interview was denied. Please try submitting another questionnaire." \
 			+ " You may do this in three minutes.</span>", confidential = TRUE)
 
+/**
+  * Forces client to reconnect, used in the callback from approval
+  */
 /datum/interview/proc/reconnect_owner()
 	if (!owner)
 		return
 	winset(owner, null, "command=.reconnect")
 
+/**
+  * Verb for opening the existing interview, or if relevant creating a new interview if possible.
+  */
 /mob/dead/new_player/proc/open_interview()
 	set name = "Open Interview"
 	set category = "Interview"
@@ -121,6 +162,11 @@
 		)
 		.["questions"] += list(data)
 
+/**
+  * # Interview StatClick
+  *
+  * Object used for handling the statclick events for administrators on the stat panel for interviews
+  */
 /obj/effect/statclick/interview
 	var/datum/interview/interview_datum
 
