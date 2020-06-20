@@ -7,17 +7,29 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
   * handling the interview queue.
   */
 /datum/interview_manager
+	/// The interviews that are currently "open", those that are not submitted as well as those that are waiting review
 	var/list/open_interviews = list()
+	/// The queue of interviews to be processed (submitted interviews)
 	var/list/interview_queue = list()
+	/// All closed interviews
 	var/list/closed_interviews = list()
+	/// Ckeys which are allowed to bypass the time-based allowlist
 	var/list/approved_ckeys = list()
+	/// Ckeys which are currently in the cooldown system, they will be unable to create new interviews
 	var/list/cooldown_ckeys = list()
+	/// The statclick effect for supporting viewing the list of open and closed interviews
+	var/obj/effect/statclick/interview_list/statclick
+
+/datum/interview_manager/New()
+	statclick = new(null, src)
+	. = ..()
 
 /datum/interview_manager/Destroy(force, ...)
 	QDEL_LIST(open_interviews)
 	QDEL_LIST(interview_queue)
 	QDEL_LIST(closed_interviews)
 	QDEL_LIST(approved_ckeys)
+	QDEL_LIST(cooldown_ckeys)
 	return ..()
 
 /**
@@ -25,9 +37,9 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
   * system
   */
 /datum/interview_manager/proc/stat_entry()
-	stat("Active Interviews:", "[open_interviews.len] [active_interview_count()]")
-	stat("Queued Interviews:", "[interview_queue.len]")
-	stat("Closed Interviews:", "[closed_interviews.len]")
+	stat("Active Interviews:", statclick.update("[open_interviews.len] [active_interview_count()]"))
+	stat("Queued Interviews:", statclick.update("[interview_queue.len]"))
+	stat("Closed Interviews:", statclick.update("[closed_interviews.len]"))
 	if (interview_queue.len)
 		stat("Interview Queue:", null)
 		for(var/datum/interview/I in interview_queue)
@@ -87,6 +99,23 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 		log_admin_private("New interview created for [key_name(C)].")
 		open_interviews[C.ckey] = new /datum/interview(C)
 		return open_interviews[C.ckey]
+
+/**
+  * Attempts to return an interview for a provided ID, will return null if no matching interview is found
+  *
+  * Arguments:
+  * * id - The ID of the interview to find
+  */
+/datum/interview_manager/proc/interview_by_id(id)
+	if (!id)
+		return
+	for (var/ckey in open_interviews)
+		var/datum/interview/I = open_interviews[ckey]
+		if (I?.id == id)
+			return I
+	for (var/datum/interview/I in closed_interviews)
+		if (I.id == id)
+			return I
 
 /**
   * Enqueues an interview in the interview queue, and notifies admins of the new interview to be
@@ -172,3 +201,62 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 	if (open_interviews[to_close.owner_ckey])
 		open_interviews -= to_close.owner_ckey
 		closed_interviews += to_close
+
+/datum/interview_manager/ui_interact(mob/user, ui_key = "main", datum/tgui/ui = null, force_open = TRUE, datum/tgui/master_ui = null, datum/ui_state/state = GLOB.admin_state)
+	ui = SStgui.try_update_ui(user, src, ui_key, ui, force_open)
+	if (!ui)
+		ui = new(user, src, ui_key, "InterviewManager", "Interview Manager", 500, 600, master_ui, state)
+		ui.open()
+
+/datum/interview_manager/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
+	if (..())
+		return
+	switch(action)
+		if ("open")
+			var/datum/interview/I = interview_by_id(text2num(params["id"]))
+			if (I)
+				I.ui_interact(usr)
+
+
+/datum/interview_manager/ui_data(mob/user)
+	. = list(
+		"open_interviews" = list(),
+		"closed_interviews" = list())
+	for (var/ckey in open_interviews)
+		var/datum/interview/I = open_interviews[ckey]
+		if (I)
+			var/list/data = list(
+				"id" = I.id,
+				"ckey" = I.owner_ckey,
+				"status" = I.status,
+				"queued" = I.pos_in_queue && I.status == INTERVIEW_PENDING,
+				"disconnected" = !I.owner
+			)
+			.["open_interviews"] += list(data)
+	for (var/datum/interview/I in closed_interviews)
+		var/list/data = list(
+			"id" = I.id,
+			"ckey" = I.owner_ckey,
+			"status" = I.status,
+			"disconnected" = !I.owner
+		)
+		.["closed_interviews"] += list(data)
+
+/**
+  * # Interview Manager StatClick
+  *
+  * Object used for handling the statclick events for administrators on the stat panel for interviews
+  */
+/obj/effect/statclick/interview_list
+	var/datum/interview_manager/manager
+
+/obj/effect/statclick/interview_list/Initialize(mapload, datum/interview_manager/M)
+	manager = M
+	. = ..()
+
+/obj/effect/statclick/interview_list/Click()
+	manager.ui_interact(usr)
+
+/obj/effect/statclick/interview_list/Destroy(force)
+	manager = null
+	. = ..()

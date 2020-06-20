@@ -60,6 +60,7 @@
   */
 /datum/interview/proc/approve(client/approved_by)
 	status = INTERVIEW_APPROVED
+	read_only = TRUE
 	GLOB.interviews.approved_ckeys |= owner_ckey
 	GLOB.interviews.close_interview(src)
 	log_admin_private("[key_name(approved_by)] has approved interview #[id] for [owner_ckey][!owner ? "(DC)": ""].")
@@ -78,6 +79,7 @@
   */
 /datum/interview/proc/deny(client/denied_by)
 	status = INTERVIEW_DENIED
+	read_only = TRUE
 	GLOB.interviews.close_interview(src)
 	GLOB.interviews.cooldown_ckeys |= owner_ckey
 	log_admin_private("[key_name(denied_by)] has denied interview #[id] for [owner_ckey][!owner ? "(DC)": ""].")
@@ -143,15 +145,12 @@
 			if (usr.client?.holder && owner)
 				usr.client.cmd_admin_pm(owner, null)
 
-/datum/interview/ui_status(mob/user, datum/ui_state/state)
-	return (user?.client) ? UI_INTERACTIVE : UI_CLOSE
-
 /datum/interview/ui_data(mob/user)
 	. = list(
 		"questions" = list(),
 		"read_only" = read_only,
 		"queue_pos" = pos_in_queue,
-		"is_admin" = user?.client && user.client.holder,
+		"is_admin" = !!(user?.client && user.client.holder),
 		"status" = status,
 		"connected" = !!owner)
 	for (var/i in 1 to questions.len)
