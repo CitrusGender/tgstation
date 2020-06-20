@@ -10,6 +10,7 @@ export const Interview = (props, context) => {
     queue_pos,
     is_admin,
     status,
+    connected,
   } = data;
 
   const rendered_status = status => {
@@ -48,6 +49,8 @@ export const Interview = (props, context) => {
                 disabled={read_only} />
               {is_admin && status === "interview_pending" && (
                 <span>
+                  <Button content="Admin PM"
+                    enabled={connected} onClick={() => act('adminpm')} />
                   <Button content="Approve"
                     color="good" onClick={() => act('approve')} />
                   <Button content="Deny"
@@ -59,7 +62,8 @@ export const Interview = (props, context) => {
           {!read_only && (
             <p>
               Please answer the following questions,
-              and press submit when you are satisfied with your answers.<br /><br />
+              and press submit when you are satisfied with your answers.
+              <br /><br />
               <b>You will not be able to edit your answers after submitting.</b>
             </p>)}
           {questions.map(({ qidx, question, response }) => (

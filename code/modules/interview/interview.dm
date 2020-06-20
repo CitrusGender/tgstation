@@ -97,6 +97,9 @@
 			if (usr.client?.holder && status == INTERVIEW_PENDING)
 				src.deny(usr)
 				. = TRUE
+		if ("adminpm")
+			if (usr.client?.holder && owner)
+				usr.client.cmd_admin_pm(owner, null)
 
 /datum/interview/ui_status(mob/user, datum/ui_state/state)
 	return (user?.client) ? UI_INTERACTIVE : UI_CLOSE
@@ -107,7 +110,8 @@
 		"read_only" = read_only,
 		"queue_pos" = pos_in_queue,
 		"is_admin" = user?.client && user.client.holder,
-		"status" = status)
+		"status" = status,
+		"connected" = !!owner)
 	for (var/i in 1 to questions.len)
 		var/list/data = list(
 			"qidx" = i,
