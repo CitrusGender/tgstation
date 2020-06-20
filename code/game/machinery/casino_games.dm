@@ -45,14 +45,14 @@
     if(!key)
         return
     if(in_progress)
-        to_chat(user, "A game is currently in process. Please wait until it is finished.")
+        to_chat(user, "<span class='warning>A game is currently in process. Please wait until it is finished.</span>")
         updateUsrDialog()
         return
     // Need to add check to see if player has insufficient funds.
     var/P = LAZYLEN(players)
     P++
     if(P >= current_tables.len)
-        to_chat(user, "There's already [current_tables.len] players signed up! You'll have to wait for one to leave.")
+        to_chat(user, "<span class='warning>There's already [current_tables.len] players signed up! You'll have to wait for one to leave.</span>")
         updateUsrDialog()
         return
     for(var/obj/structure/table/T in current_tables)
@@ -87,8 +87,8 @@
     var/obj/item/toy/cards/singlecard/card = linked_dealer.get_active_held_item()
     if(can_split == copytext(card.cardname,1,3)) // copies the card name, compares it to determine if we can split
         can_split = 1
-    if(TRUE)// going to need to add something so that one of the dealer's cards is flipped, and if flipped: it doesn't add to total.
-        card.Flip()
+    card.flip_card()
+    card.maptext = "<span class='maptext'>[card.value]</span>"
     if(!hand) // First card going out
         card.forceMove(T.loc)
         current_hands[current_tables[T]] = card
@@ -99,6 +99,7 @@
         var/obj/item/toy/cards/cardhand/new_hand = hand
         if(linked_dealer.get_active_held_item()) // Interaction is wonky depending on how many cards you have. This is the second card then.
             new_hand = linked_dealer.get_active_held_item()
+            new_hand.maptext = "<span class='maptext'>[new_hand.value]</span>"
             new_hand.forceMove(T.loc)
             if(!islist(current_hands[current_tables[T]]))
                 current_hands[current_tables[T]] = new_hand
@@ -110,12 +111,27 @@
                     current_split++
                     hit(current_tables[T])
                     new_hand.anchored = TRUE
+                    new_hand.maptext = "<span class='maptext'>[new_hand.value]</span>"
                     return new_hand.value
                 current_hands[current_tables[T]][current_split] = new_hand
+                new_hand.maptext = "<span class='maptext'>[new_hand.value]</span>"
                 new_hand.pixel_x = 16
                 current_split--
+        new_hand.maptext = "<span class='maptext'>[new_hand.value]</span>"
         new_hand.anchored = TRUE
         return new_hand.value
+
+/obj/machinery/computer/blackjack/proc/ace_check(obj/item/toy/cards/cardhand/hand)// aces can be 11 or 1. We want the largest value when we're not busted, smallest when we've busted.
+    for(var/card_name in hand.currenthand)
+        var/type = copytext(card_name,1,4)
+        if(type == "Ace")
+            hand.value = hand.value - 10 //people are always going to choose the higher hand, unless they go over. We'll just reset it if they bust.
+            hand.maptext = "<span class='maptext'>[hand.value]</span>"
+            hand.currenthand -= card_name // this is jank as fuck but we delete the cards each play anyways. We don't want to deduct an ace twice so let's just remove it here.
+            if(hand.value > 21)
+                return FALSE
+            return TRUE
+    return FALSE
 
 /obj/machinery/computer/blackjack/proc/hit(mob/user)
     var/H = current_hands[user]
@@ -127,6 +143,9 @@
         var/list/hands = current_hands[user]
         current_value = add_card(hands[current_split], players[user])
     if(current_value > 21)
+        if(!islist(H)) // FUCK SPLITS
+            if(ace_check(H))
+                return
         lose(user)
     
     //should probably make way to throw chips to dealer if the player busts
@@ -181,20 +200,30 @@
 
 
 /obj/machinery/computer/blackjack/proc/start_game(user)
-    in_progress = TRUE
     for(var/mob/O in players) // I don't know how this happened but I am going to get rid of it
         if(O == linked_dealer)
             players -= linked_dealer
+            continue
+        if(!O.client || !Adjacent(O)) // removes nulls from game.
+            remove_bet(O, 1)
+            remove_player(O)
+            to_chat(O, "<span class='warning>You're too far from the table! You've been kicked out.</span>")
+    if(!players.len)
+        idle_mode()
+        return
+    in_progress = TRUE
     players += linked_dealer
     var/obj/structure/table/T = current_tables[current_tables.len]
     players[linked_dealer] = T
     current_tables[T] = linked_dealer
     for(var/mob/M in players)
         hit(M)
-        hit(M) // two cards
+        if(M != linked_dealer) // We can simulate the dealer not showing their first card by not giving them one card.
+            hit(M) // two cards
     var/mob/P = players[1]
     current_player = players[P]
-    src.say("[P.name], it is your turn. You have 20 seconds.")
+    var/obj/item/toy/cards/starting_hand = current_hands[P]
+    src.say("[P.name], it is your turn. You have 20 seconds. You have [starting_hand.value]")
     reset_timer()
     updateUsrDialog()
 
@@ -216,7 +245,8 @@
         dealer_draw()
         updateUsrDialog()
         return
-    src.say("[M.name], it is your turn.")
+    var/obj/item/toy/cards/next_hand = current_hands[current_player]
+    src.say("[M.name], it is your turn. You have [next_hand.value]")
     reset_timer()
     updateUsrDialog()
 
@@ -253,6 +283,7 @@
     // need callback for 15 second timer.
 
 /obj/machinery/computer/blackjack/proc/dealer_draw()
+    hit(linked_dealer)
     var/obj/item/toy/cards/cardhand/dealer_hand = current_hands[linked_dealer]
     while(dealer_hand.value < 17)
         hit(linked_dealer)
@@ -325,7 +356,7 @@
         start_game()
         return
     if(!in_progress)
-        src.say("Place your bets!")
+        src.say("Place your bets! Please stand near the table!")
         addtimer(CALLBACK(src, .proc/idle_mode), 10 SECONDS)
 
 /obj/machinery/computer/blackjack/proc/set_bet(mob/user)
@@ -333,10 +364,10 @@
     selection = input(usr, "Set your current bet.", null) as num
     var/range_check = clamp(selection, minimum_bet, maximum_bet)
     if(selection != range_check)
-        to_chat(user, "Your selection is out of range! Your amount was clamped to the range.")
+        to_chat(user, "<span class='warning>Your selection is out of range! Your amount was clamped to the range.</span>")
         selection = range_check
     if(in_progress) // need to stop people from adding more chips if they're at the max bet or game is in progress
-        to_chat("You cannot add more chips at this time.")
+        to_chat("<span class='warning>You cannot add more chips at this time.</span>")
         return
     remove_bet(user)
     add_chips(user, selection)
@@ -347,10 +378,10 @@
         var/obj/item/card/id/C = H.get_idcard(TRUE)
         if(C)
             if(C.registered_account.account_balance < amount)
-                to_chat(user, "You do not have enough funds to bet this much. Lower your bet and try again.")
+                to_chat(user, "<span class='warning>You do not have enough funds to bet this much. Lower your bet and try again.</span>")
                 return
         else
-            to_chat(user, "Account unknown. You are unable to bet.")
+            to_chat(user, "<span class='warning>Account unknown. You are unable to bet.</span>")
             return
         C.registered_account.account_balance = C.registered_account.account_balance - amount
     var/obj/structure/table/T = players[user]
@@ -404,11 +435,11 @@
     if(ishuman(user))
         var/mob/living/carbon/human/H = user
         var/obj/item/card/id/C = H.get_idcard(TRUE)
-        var/plsfix = this_dont_work_please_fix
-        if(C && C.registered_account)
+        if(C?.registered_account?.account_balance)
             var/datum/bank_account/B = C.registered_account
             B.account_balance = B.account_balance + total
             B.bank_card_talk("Gambling transaction processed, account now holds [B.account_balance] cr.") // ensure that this works.
+    updateUsrDialog()
 
 /obj/machinery/computer/blackjack/Topic(href, href_list)
     if(..())
@@ -440,7 +471,11 @@
     dat += "<h2>Rules:<h2>"
     dat += "<ol>"
     dat += "<li>Dealer will stand at 17</li>"
-    dat += "<li></li>"
+    dat += "<li>You will be dealt two cards.</li>"
+    dat += "<li>Your goal is to beat the dealer while trying to get as close to 21</li>"
+    dat += "<li>If you go above 21, you will bust and lose.</li>"
+    dat += "<li>You can choose to bet or not, the money will be taken from your account.</li>"
+    dat += "<li>Splitting doesn't work. I'm sorry.</li>"
     dat += "</ol>"
     if(user in players)
         if(!in_progress)

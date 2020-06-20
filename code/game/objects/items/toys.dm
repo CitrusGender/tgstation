@@ -955,7 +955,6 @@
 		if(C.parentdeck == src.parentdeck)
 			src.currenthand += C.cardname
 			src.value = src.value + C.value
-			src.maptext = "<span class='maptext'>[src.value]</span>"
 			user.visible_message("<span class='notice'>[user] adds a card to [user.p_their()] hand.</span>", "<span class='notice'>You add the [C.cardname] to your hand.</span>")
 			qdel(C)
 			interact(user)
@@ -1038,7 +1037,22 @@
 			src.icon_state = "sc_Ace of Spades_[deckstyle]"
 			src.name = "What Card"
 		src.pixel_x = 5
-		src.maptext = "<span class='maptext'>[src.value]</span>"
+	else if(flipped)
+		src.flipped = 0
+		src.icon_state = "singlecard_down_[deckstyle]"
+		src.name = "card"
+		src.pixel_x = -5
+
+/obj/item/toy/cards/singlecard/proc/flip_card() // verb doesn't seem to be working.
+	if(!flipped)
+		src.flipped = 1
+		if (cardname)
+			src.icon_state = "sc_[cardname]_[deckstyle]"
+			src.name = src.cardname
+		else
+			src.icon_state = "sc_Ace of Spades_[deckstyle]"
+			src.name = "What Card"
+		src.pixel_x = 5
 	else if(flipped)
 		src.flipped = 0
 		src.icon_state = "singlecard_down_[deckstyle]"
@@ -1051,7 +1065,6 @@
 		if(C.parentdeck == src.parentdeck)
 			var/obj/item/toy/cards/cardhand/H = new/obj/item/toy/cards/cardhand(user.loc)
 			H.value = src.value + C.value
-			H.maptext = "<span class='maptext'>[H.value]</span>"
 			H.currenthand += C.cardname
 			H.currenthand += src.cardname
 			H.parentdeck = C.parentdeck
@@ -1118,7 +1131,7 @@
 
 /obj/item/toy/cards/deck/split_test
 
-/obj/item/toy/cards/deck/populate_deck()
+/obj/item/toy/cards/deck/split_test/populate_deck()
 	icon_state = "deck_[deckstyle]_full"
 	var/i = 52
 	while(i > 0)
