@@ -124,7 +124,7 @@
 	switch(action)
 		if ("update_answer")
 			if (!read_only)
-				responses[text2num(params["qidx"])] = params["answer"]
+				responses[text2num(params["qidx"])] = copytext_char(params["answer"], 1, min(params["answer"].len, 501)) // byond indexing moment
 				. = TRUE
 		if ("submit")
 			if (!read_only)
