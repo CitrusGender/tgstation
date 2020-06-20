@@ -382,9 +382,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 				return 0
 
 			if(living_minutes < required_living_minutes && !(src.ckey in GLOB.interviews.approved_ckeys))
-				if(CONFIG_GET(flag/allowlist_interview))
-					interviewee = TRUE
-				else
+				if(!CONFIG_GET(flag/allowlist_interview))
 					to_chat(src, "<span class='warning'>You must have at least [required_living_minutes] minutes of living " \
 					+ "playtime on tg servers to play on this server. You have [living_minutes] minutes. Play more!</span>")
 					qdel(src)

@@ -25,19 +25,22 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 
 /datum/interview_manager/proc/active_interview_count()
 	var/dc = 0
-	for(var/datum/interview/I in open_interviews)
-		if (!I.owner)
+	for(var/ckey in open_interviews)
+		var/datum/interview/I = open_interviews[ckey]
+		if (I && !I.owner)
 			dc++
 	return "([open_interviews.len - dc] online / [dc] disconnected)"
 
 /datum/interview_manager/proc/client_login(client/C)
-	for (var/datum/interview/I in open_interviews)
-		if (!I.owner && C.ckey == I.owner_ckey)
+	for(var/ckey in open_interviews)
+		var/datum/interview/I = open_interviews[ckey]
+		if (I && !I.owner && C.ckey == I.owner_ckey)
 			I.owner = C
 
 /datum/interview_manager/proc/client_logout(client/C)
-	for (var/datum/interview/I in open_interviews)
-		if (I.owner && C.ckey == I.owner_ckey)
+	for(var/ckey in open_interviews)
+		var/datum/interview/I = open_interviews[ckey]
+		if (I?.owner && C.ckey == I.owner_ckey)
 			I.owner = null
 
 /datum/interview_manager/proc/interview_for_client(client/C)
@@ -49,13 +52,6 @@ GLOBAL_DATUM_INIT(interviews, /datum/interview_manager, new)
 		log_admin_private("New interview created for [key_name(C)].")
 		open_interviews[C.ckey] = new /datum/interview(C)
 		return open_interviews[C.ckey]
-
-/datum/interview_manager/proc/get_interview_by_id(id)
-	if (id < 0)
-		return
-	for (var/datum/interview/i in (open_interviews | closed_interviews))
-		if (i.id == id)
-			return i
 
 /datum/interview_manager/proc/enqueue(datum/interview/to_queue)
 	if (!to_queue || (to_queue in interview_queue))

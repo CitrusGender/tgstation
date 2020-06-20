@@ -29,10 +29,11 @@
 	client.playtitlemusic()
 
 	// Check if user should be added to interview queue
-	if (!client.holder && CONFIG_GET(flag/allowlist_interview))
+	if (!client.holder && CONFIG_GET(flag/allowlist_interview) && !(client.ckey in GLOB.interviews.approved_ckeys))
 		var/required_living_minutes = CONFIG_GET(number/allowlist_previous_hours_count) * 60
 		var/living_minutes = client.get_exp_living(TRUE)
 		if (required_living_minutes > living_minutes)
+			client.interviewee = TRUE
 			register_for_interview()
 			return
 

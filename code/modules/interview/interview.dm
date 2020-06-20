@@ -71,7 +71,8 @@
 			to_chat(usr, "<span class='adminsay'>You are on cooldown for interviews. Please" \
 				+ " wait at least 3 minutes before starting a new questionnaire.</span>", confidential = TRUE)
 
-/datum/interview/ui_interact(mob/user, ui_key = "main", datum/tgui/ui = null, force_open = FALSE, datum/tgui/master_ui = null, datum/ui_state/state = GLOB.new_player_state)
+/datum/interview/ui_interact(mob/user, ui_key = "main", datum/tgui/ui = null, force_open = TRUE, datum/tgui/master_ui = null, datum/ui_state/state = GLOB.new_player_state)
+	ui = SStgui.try_update_ui(user, src, ui_key, ui, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "Interview", "New User Interview", 500, 600, master_ui, state)
 		ui.open()
