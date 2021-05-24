@@ -147,6 +147,10 @@ GLOBAL_LIST_EMPTY(teleportlocs)
 	icon_state = ""
 	if(!ambientsounds)
 		ambientsounds = GLOB.ambience_assoc[ambience_index]
+	#ifdef EVENTMODE
+	requires_power = FALSE
+	has_gravity = STANDARD_GRAVITY
+	#endif
 	if(requires_power)
 		luminosity = 0
 	else
@@ -162,7 +166,10 @@ GLOBAL_LIST_EMPTY(teleportlocs)
 	if(dynamic_lighting == DYNAMIC_LIGHTING_IFSTARLIGHT)
 		dynamic_lighting = CONFIG_GET(flag/starlight) ? DYNAMIC_LIGHTING_ENABLED : DYNAMIC_LIGHTING_DISABLED
 
-
+	#ifdef EVENTMODE
+	///No fancy lighting ever
+	dynamic_lighting = DYNAMIC_LIGHTING_DISABLED
+	#endif
 	. = ..()
 
 	blend_mode = BLEND_MULTIPLY // Putting this in the constructor so that it stops the icons being screwed up in the map editor.
@@ -544,7 +551,10 @@ GLOBAL_LIST_EMPTY(teleportlocs)
  * Space is not powered ever, so this returns false
  */
 /area/space/powered(chan) //Nope.avi
-	return FALSE
+	#ifdef EVENTMODE
+	return 1 //SIKE.gif
+	#endif
+	return 0
 
 /**
  * Called when the area power status changes
