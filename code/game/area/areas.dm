@@ -89,7 +89,10 @@
 	var/min_ambience_cooldown = 30 SECONDS
 	///Used to decide what the maximum time between ambience is
 	var/max_ambience_cooldown = 90 SECONDS
-
+	///Used to determine if we should allow dynamic lighting in this area
+	var/eventarea = FALSE
+	///Used to determine if we should force planetary atmos
+	var/eventareaair = FALSE
 /**
  * A list of teleport locations
  *
@@ -168,7 +171,10 @@ GLOBAL_LIST_EMPTY(teleportlocs)
 
 	#ifdef EVENTMODE
 	///No fancy lighting ever
-	dynamic_lighting = DYNAMIC_LIGHTING_DISABLED
+	if(eventarea == TRUE)
+		dynamic_lighting = DYNAMIC_LIGHTING_ENABLED
+	else
+		dynamic_lighting = DYNAMIC_LIGHTING_DISABLED
 	#endif
 	. = ..()
 
