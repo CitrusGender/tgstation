@@ -972,3 +972,15 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 			client.images += t_ray_images
 		else
 			client.images -= stored_t_ray_images
+
+/mob/dead/observer/Login()
+	. = ..()
+	#ifdef EVENTMODE
+	if(!client?.holder)
+		notransform = TRUE
+		remove_verb(src, list(
+			/mob/dead/observer/verb/change_view_range,
+			/mob/dead/observer/verb/add_view_range,
+			/mob/dead/observer/proc/tray_view,
+			))
+	#endif
