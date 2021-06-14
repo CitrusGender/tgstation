@@ -1,5 +1,5 @@
 #define EVENTMODE ///Special compiler flag that turns on the event mode
-#define EVENTMODE_OPTIMIZE_POP 75 //Required for EVENTMODE, amount of clients before keyLoop() resrictions for ghosts kick in
+#define EVENTMODE_OPTIMIZE_POP 75 //Required for EVENTMODE, max amount of clients before drastic performance "enhancements" kick in
 /*
 List of things this does
 1) all tiles have planetary atmos of a breathable human mix

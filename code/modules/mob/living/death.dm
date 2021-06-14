@@ -77,7 +77,7 @@
 	if(mind && mind.name && mind.active && !istype(T.loc, /area/ctf))
 		deadchat_broadcast(" has died at <b>[get_area_name(T)]</b>.", "<b>[mind.name]</b>", follow_target = src, turf_target = T, message_type=DEADCHAT_DEATHRATTLE)
 		#ifdef EVENTMODE
-		ghostize(TRUE) // ghost them so they don't have to manually use the verb with keyLoop() disabled
+		ghostize(TRUE) // ghost them so they don't have to manually use the verb with keyLoop() possibly disabled
 		#endif
 	if(mind)
 		mind.store_memory("Time of death: [tod]", 0)
