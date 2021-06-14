@@ -568,7 +568,7 @@
 	set category = "Object"
 
 	#ifdef EVENTMODE
-	if(!client || !check_rights_for(client, R_ADMIN))
+	if(!client?.holder)
 		return FALSE
 	#endif
 	if(client && !(A in view(client.view, src)))
