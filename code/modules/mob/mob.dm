@@ -567,6 +567,8 @@
 	set name = "Point To"
 	set category = "Object"
 
+	if(!client || !check_rights_for(client, R_ADMIN))
+		return FALSE
 	if(client && !(A in view(client.view, src)))
 		return FALSE
 	if(istype(A, /obj/effect/temp_visual/point))
