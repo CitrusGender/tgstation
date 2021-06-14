@@ -977,7 +977,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	. = ..()
 	#ifdef EVENTMODE
 	if(!client?.holder)
-		notransform = TRUE
+		to_chat(src, "<span class='hierophant'>Spectator ghost keybinds are disabled for the event.\nPlease use Orbit, Jump, and Teleport to look around.</span>")
 		remove_verb(src, list(
 			/mob/dead/observer/verb/change_view_range,
 			/mob/dead/observer/verb/add_view_range,

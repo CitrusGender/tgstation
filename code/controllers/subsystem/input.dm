@@ -36,4 +36,8 @@ SUBSYSTEM_DEF(input)
 
 /datum/controller/subsystem/input/fire()
 	for(var/mob/user as anything in GLOB.player_list)
+		#ifdef EVENTMODE
+		if(user.stat == DEAD && !user.client?.holder)
+			continue // ignore dead mobs, say hotkey still works and so do ghost clicks
+		#endif
 		user.focus?.keyLoop(user.client)
