@@ -29,6 +29,8 @@
 	var/static/list/arena_templates = list()
 	/// Were the config directory arenas loaded
 	var/static/default_arenas_loaded = FALSE
+	/// Exaustive typecache list of all things to keep when clearing turfs, populated on Init
+	var/static/arena_clear_ignore_types
 	/// Name of currently loaded template
 	var/current_arena_template = "None"
 	// What turf arena clears to
@@ -66,6 +68,8 @@
 	. = ..()
 	LoadDefaultArenas()
 	GenerateAntagHuds()
+	if(!arena_clear_ignore_types) // calculate these once only
+		arena_clear_ignore_types = typecacheof(/obj/machinery/camera) + typecacheof(/obj/structure/camera_assembly)
 
 /obj/machinery/computer/arena/proc/GenerateAntagHuds()
 	for(var/team in teams)
@@ -109,7 +113,7 @@
 
 /obj/machinery/computer/arena/proc/clear_arena()
 	for(var/turf/T in get_arena_turfs())
-		T.empty(turf_type = /turf/open/indestructible)
+		T.empty(turf_type = /turf/open/indestructible, ignore_typecache = arena_clear_ignore_types)
 	current_arena_template = "None"
 
 /obj/machinery/computer/arena/proc/load_arena(arena_template,mob/user)
