@@ -194,7 +194,7 @@
 	M.faction += team //In case anyone wants to add team based stuff to arena special effects
 	M.key = ckey
 	#ifdef EVENTMODE
-	ADD_TRAIT(M, TRAIT_ELEVATED_RUNECHAT, "arena_member") // Arena contestants get to bypass any runechat restrictions
+	ADD_TRAIT(M, TRAIT_BYPASS_MEASURES, "arena_member") // Arena contestants get to bypass any SSlag_switch restrictions
 	#endif
 
 	var/datum/atom_hud/antag/team_hud = team_huds[team]
