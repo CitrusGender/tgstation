@@ -365,10 +365,10 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 		return
 	client.view_size.setDefault(getScreenSize(client.prefs.widescreenpref))//Let's reset so people can't become allseeing gods
 	SStgui.on_transfer(src, mind.current) // Transfer NanoUIs.
+	if(mind.current.stat == DEAD && SSlag_switch.measures[DISABLE_DEAD_KEYLOOP])
+		to_chat(src, span_warning("To leave your body again use the Ghost verb."))
 	mind.current.key = key
 	mind.current.client.init_verbs()
-	if(SSlag_switch.measures[DISABLE_DEAD_KEYLOOP])
-		to_chat(src, span_warning("To leave your body again use the Ghost verb."))
 	return TRUE
 
 /mob/dead/observer/verb/stay_dead()

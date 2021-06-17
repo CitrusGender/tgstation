@@ -66,7 +66,7 @@ SUBSYSTEM_DEF(lag_switch)
 	switch(measure_key)
 		if(DISABLE_DEAD_KEYLOOP)
 			if(state)
-				deadchat_broadcast(span_big("To increase performance Observer freelook is disabled. Please use Orbit, Teleport, and Jump to look around."), message_type = DEADCHAT_ANNOUNCEMENT)
+				deadchat_broadcast(span_big("To increase performance Observer freelook is now disabled. Please use Orbit, Teleport, and Jump to look around."), message_type = DEADCHAT_ANNOUNCEMENT)
 			else
 				deadchat_broadcast("Observer freelook has been re-enabled. Enjoy your wooshing.", message_type = DEADCHAT_ANNOUNCEMENT)
 		if(DISABLE_GHOST_ZOOM_TRAY)

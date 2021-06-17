@@ -825,6 +825,9 @@
 		tgui_alert(usr, "You cannot manage jobs before the job subsystem is initialized!")
 		return
 
+	if(SSlag_switch.measures[DISABLE_NON_OBSJOBS])
+		dat += "<div class='notice red' style='font-size: 125%'>Lag Switch \"Disable non-observer late joining\" is ON. Only Observers may join!</div>"
+
 	dat += "<table>"
 
 	for(var/j in SSjob.occupations)
