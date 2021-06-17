@@ -18,7 +18,6 @@ SUBSYSTEM_DEF(lag_switch)
 	for(var/i = 1, i <= measures.len, i++)
 		measures[i] = FALSE
 	var/auto_switch_pop = CONFIG_GET(number/auto_lag_switch_pop)
-	span_announce()
 	if(auto_switch_pop)
 		auto_switch = TRUE
 		trigger_pop = auto_switch_pop
