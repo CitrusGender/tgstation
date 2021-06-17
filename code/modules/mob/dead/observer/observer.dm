@@ -367,6 +367,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	SStgui.on_transfer(src, mind.current) // Transfer NanoUIs.
 	mind.current.key = key
 	mind.current.client.init_verbs()
+	if(SSlag_switch.measures[DISABLE_DEAD_KEYLOOP])
+		to_chat(src, span_warning("To leave your body again use the Ghost verb."))
 	return TRUE
 
 /mob/dead/observer/verb/stay_dead()

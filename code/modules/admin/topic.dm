@@ -1680,16 +1680,16 @@
 
 		switch(href_list["change_lag_switch"])
 			if("ALL_ON")
-				SSlag_switch.set_all_switches(TRUE)
+				SSlag_switch.set_all_measures(TRUE)
 				log_admin("[key_name_admin(usr)] turned all Lag Switch measures ON.")
 				message_admins("[key_name_admin(usr)] turned all Lag Switch measures ON.")
 			if("ALL_OFF")
-				SSlag_switch.set_all_switches(FALSE)
+				SSlag_switch.set_all_measures(FALSE)
 				log_admin("[key_name_admin(usr)] turned all Lag Switch measures OFF.")
 				message_admins("[key_name_admin(usr)] turned all Lag Switch measures OFF.")
 			else
 				var/switch_index = text2num(href_list["change_lag_switch"])
-				if(!SSlag_switch.set_switch(switch_index, !LAZYACCESS(SSlag_switch.measures, switch_index)))
+				if(!SSlag_switch.set_measure(switch_index, !LAZYACCESS(SSlag_switch.measures, switch_index)))
 					to_chat(src, span_danger("Something went wrong when trying to toggle that Lag Switch. Check runtimes for more info."), confidential = TRUE)
 				else
 					log_admin("[key_name(usr)] turned a Lag Switch measure [LAZYACCESS(SSlag_switch.measures, switch_index) ? "ON" : "OFF"]")
