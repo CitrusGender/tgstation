@@ -61,6 +61,8 @@ SUBSYSTEM_DEF(lag_switch)
 	if(isnull(LAZYACCESS(measures, switch_key)))
 		stack_trace("SSlag_switch.set_switch() was called with a switch key not in the list of measures")
 		return FALSE
+	if(measures[switch_key] == state)
+		return TRUE
 
 	switch(switch_key)
 		if(DISABLE_DEAD_KEYLOOP)

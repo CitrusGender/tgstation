@@ -193,6 +193,9 @@
 	M.equipOutfit(outfits[team] ? outfits[team] : default_outfit)
 	M.faction += team //In case anyone wants to add team based stuff to arena special effects
 	M.key = ckey
+	#ifdef EVENTMODE
+	ADD_TRAIT(M, TRAIT_ELEVATED_RUNECHAT, "arena_member") // Arena contestants get to bypass any runechat restrictions
+	#endif
 
 	var/datum/atom_hud/antag/team_hud = team_huds[team]
 	team_hud.join_hud(M)
