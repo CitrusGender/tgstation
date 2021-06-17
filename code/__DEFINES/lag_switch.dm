@@ -6,5 +6,6 @@
 #define DISABLE_USR_ICON2HTML 4 // Disable icon2html procs from verbs like examine, mobs calling with TRAIT_BYPASS_MEASURES exempted
 #define DISABLE_SCREENTIPS 5 // Disable /atom/MouseEntered screentips, mobs calling with TRAIT_BYPASS_MEASURES exempted
 #define DISABLE_ITEM_TOOLTIPS 6 // Disable /obj/item/MouseEntered tooltips, mobs calling with TRAIT_BYPASS_MEASURES exempted
+#define DISABLE_NON_OBSJOBS 7 // Prevents anyone from joining the game as anything but observer
 
-#define MEASURES_AMOUNT 6 // The total number of switches defined above
+#define MEASURES_AMOUNT 7 // The total number of switches defined above
