@@ -53,17 +53,17 @@ SUBSYSTEM_DEF(lag_switch)
 	return TRUE
 
 /// Handle the state change for individual measures
-/datum/controller/subsystem/lag_switch/proc/set_measure(switch_key, state)
-	if(isnull(switch_key) || isnull(state))
+/datum/controller/subsystem/lag_switch/proc/set_measure(measure_key, state)
+	if(isnull(measure_key) || isnull(state))
 		stack_trace("SSlag_switch.set_measure() was called with a null arg")
 		return FALSE
-	if(isnull(LAZYACCESS(measures, switch_key)))
+	if(isnull(LAZYACCESS(measures, measure_key)))
 		stack_trace("SSlag_switch.set_measure() was called with a switch key not in the list of measures")
 		return FALSE
-	if(measures[switch_key] == state)
+	if(measures[measure_key] == state)
 		return TRUE
 
-	switch(switch_key)
+	switch(measure_key)
 		if(DISABLE_DEAD_KEYLOOP)
 			if(state)
 				deadchat_broadcast(span_big("To increase performance Observer freelook is disabled. Please use Orbit, Teleport, and Jump to look around."), message_type = DEADCHAT_ANNOUNCEMENT)
@@ -77,8 +77,8 @@ SUBSYSTEM_DEF(lag_switch)
 					if(!ghost.client.holder && ghost.client.view_size.getView() != ghost.client.view_size.default)
 						ghost.client.view_size.resetToDefault()
 
-	measures[switch_key] = state
-	log_game("Lag Switch: measure at index ([switch_key]) has been turned [state ? "ON" : "OFF"].")
+	measures[measure_key] = state
+	log_game("Lag Switch: measure at index ([measure_key]) has been turned [state ? "ON" : "OFF"].")
 	return TRUE
 
 /// Helper to loop over all measures for mass changes
