@@ -297,7 +297,7 @@
 
 /datum/config_entry/flag/maprotation
 
-/datum/config_entry/number/auto_lag_switch_pop //Number of clients over which drastic lag mitigation measures kick in
+/datum/config_entry/number/auto_lag_switch_pop //Number of clients at which drastic lag mitigation measures kick in
 	config_entry_value = null
 	min_val = 0
 

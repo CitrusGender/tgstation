@@ -1706,7 +1706,7 @@
 				if(SSlag_switch.cancel_auto_switch_in_progress())
 					log_admin("[key_name_admin(usr)] canceled the automatic Lag Switch activation in progress.")
 					message_admins("[key_name_admin(usr)] canceled the automatic Lag Switch activation in progress.")
-					return
+				return
 			if("TOGGLE_AUTO")
 				SSlag_switch.toggle_auto_switch()
 				log_admin("[key_name_admin(usr)] toggled automatic Lag Switch activation [SSlag_switch.auto_switch ? "ON" : "OFF"].")

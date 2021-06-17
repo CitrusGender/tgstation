@@ -1,4 +1,4 @@
-/// The subsystem for controlling drastic performance enhancements aimed at reducing server load for a smoother albeit duller gaming expirence.
+/// The subsystem for controlling drastic performance enhancements aimed at reducing server load for a smoother albeit slightly duller gaming expirence
 SUBSYSTEM_DEF(lag_switch)
 	name = "Lag Switch"
 	flags = SS_NO_FIRE
@@ -8,7 +8,7 @@ SUBSYSTEM_DEF(lag_switch)
 	var/auto_switch = FALSE
 	/// Amount of connected clients above which the Lag Switch should engage, set via config or VV
 	var/trigger_pop = INFINITY - 1337
-	/// List of bools which put the "switch" in lag switch, never set these directly
+	/// List of bools corresponding to code/__DEFINES/lag_switch.dm
 	var/static/list/measures[MEASURES_AMOUNT]
 	/// Timer ID for the automatic veto period
 	var/veto_timer_id
@@ -68,10 +68,13 @@ SUBSYSTEM_DEF(lag_switch)
 				deadchat_broadcast("To increase performance Observer freelook is disabled.\nPlease use Orbit, Teleport, and Jump to look around.", message_type = DEADCHAT_ANNOUNCEMENT)
 			else
 				deadchat_broadcast("Observer freelook has been re-enabled. Enjoy your wooshing.", message_type = DEADCHAT_ANNOUNCEMENT)
-		// if(DISABLE_GHOST_ZOOM_TRAY)
-		// 	if(state) // if enabling make sure current ghosts are updated
-		// 		for(var/mob/dead/observer/O AS in GLOB.dead_mob_list)
-		// 			// do it
+		if(DISABLE_GHOST_ZOOM_TRAY)
+			if(state) // if enabling make sure current ghosts are updated
+				for(var/mob/dead/observer/ghost in GLOB.dead_mob_list)
+					if(!ghost.client)
+						continue
+					if(!ghost.client.holder && ghost.client.view_size.getView() != ghost.client.view_size.default)
+						ghost.client.view_size.resetToDefault()
 
 	measures[switch_key] = state
 	log_game("Lag Switch: measure at index ([switch_key]) has been turned [state ? "ON" : "OFF"].")
