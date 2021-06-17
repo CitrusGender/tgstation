@@ -1681,11 +1681,11 @@
 		switch(href_list["change_lag_switch"])
 			if("ALL_ON")
 				SSlag_switch.set_all_measures(TRUE)
-				log_admin("[key_name_admin(usr)] turned all Lag Switch measures ON.")
+				log_admin("[key_name(usr)] turned all Lag Switch measures ON.")
 				message_admins("[key_name_admin(usr)] turned all Lag Switch measures ON.")
 			if("ALL_OFF")
 				SSlag_switch.set_all_measures(FALSE)
-				log_admin("[key_name_admin(usr)] turned all Lag Switch measures OFF.")
+				log_admin("[key_name(usr)] turned all Lag Switch measures OFF.")
 				message_admins("[key_name_admin(usr)] turned all Lag Switch measures OFF.")
 			else
 				var/switch_index = text2num(href_list["change_lag_switch"])
@@ -1693,7 +1693,7 @@
 					to_chat(src, span_danger("Something went wrong when trying to toggle that Lag Switch. Check runtimes for more info."), confidential = TRUE)
 				else
 					log_admin("[key_name(usr)] turned a Lag Switch measure [LAZYACCESS(SSlag_switch.measures, switch_index) ? "ON" : "OFF"]")
-					message_admins("[key_name(usr)] turned a Lag Switch measure [LAZYACCESS(SSlag_switch.measures, switch_index) ? "ON" : "OFF"]")
+					message_admins("[key_name_admin(usr)] turned a Lag Switch measure [LAZYACCESS(SSlag_switch.measures, switch_index) ? "ON" : "OFF"]")
 
 		src.show_lag_switch_panel()
 
@@ -1704,18 +1704,18 @@
 		switch(href_list["change_lag_switch_option"])
 			if("CANCEL")
 				if(SSlag_switch.cancel_auto_switch_in_progress())
-					log_admin("[key_name_admin(usr)] canceled the automatic Lag Switch activation in progress.")
+					log_admin("[key_name(usr)] canceled the automatic Lag Switch activation in progress.")
 					message_admins("[key_name_admin(usr)] canceled the automatic Lag Switch activation in progress.")
 				return
 			if("TOGGLE_AUTO")
 				SSlag_switch.toggle_auto_switch()
-				log_admin("[key_name_admin(usr)] toggled automatic Lag Switch activation [SSlag_switch.auto_switch ? "ON" : "OFF"].")
+				log_admin("[key_name(usr)] toggled automatic Lag Switch activation [SSlag_switch.auto_switch ? "ON" : "OFF"].")
 				message_admins("[key_name_admin(usr)] toggled automatic Lag Switch activation [SSlag_switch.auto_switch ? "ON" : "OFF"].")
 			else
 				var/new_num = input("Enter new number:", "Num") as null|num
 				if(!isnull(new_num))
 					SSlag_switch.trigger_pop = new_num
-					log_admin("[key_name_admin(usr)] set the Lag Switch automatic trigger pop to [new_num].")
+					log_admin("[key_name(usr)] set the Lag Switch automatic trigger pop to [new_num].")
 					message_admins("[key_name_admin(usr)] set the Lag Switch automatic trigger pop to [new_num].")
 
 		src.show_lag_switch_panel()
