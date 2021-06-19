@@ -3,6 +3,7 @@ GLOBAL_DATUM(storm_controller, /datum/storm_controller)
 
 /datum/storm_controller
 	var/area_consume_timer = 15 SECONDS
+	var/area_consume_addition = 10 SECONDS
 	///which list to pick from
 	var/list/current_area_pick
 	///outer areas, does not include space
@@ -46,7 +47,7 @@ GLOBAL_DATUM(storm_controller, /datum/storm_controller)
 			switch(progression)
 				if(2)
 					send_to_playing_players("<span class='userdanger'>The storm has consumed the entire outer station!</span>")
-					area_consume_timer += 10 SECONDS //get a little slower
+					area_consume_timer += area_consume_addition //get a little slower
 					current_area_pick = middle_areas
 				if(1)
 					send_to_playing_players("<span class='userdanger'>The storm has consumed the majority of the station!</span>")
@@ -94,51 +95,23 @@ GLOBAL_DATUM(storm_controller, /datum/storm_controller)
 		to_chat(L, "<span class='userdanger'>You're badly burned by the storm!</span>")
 
 GLOBAL_LIST_INIT(externalareasstorm, list(
-	/area/cargo/miningdock,
-	/area/cargo/miningoffice,
-	/area/cargo/office,
-	/area/cargo/qm,
-	/area/cargo/sorting,
-	/area/cargo/storage,
-	/area/command/bridge,
-	/area/command/corporate_showroom,
-	/area/command/gateway,
-	/area/command/heads_quarters/captain,
-	/area/command/heads_quarters/ce,
-	/area/command/heads_quarters/cmo,
-	/area/command/heads_quarters/hop,
-	/area/command/heads_quarters/hos,
-	/area/command/heads_quarters/rd,
-	/area/command/teleporter,
-	/area/commons/dorms,
-	/area/commons/locker,
-	/area/commons/lounge,
-	/area/commons/storage/mining))
+	/area/tdome/one,
+	/area/tdome/two,
+	/area/tdome/three,
+	/area/tdome/four,
+	/area/tdome/five,
+	/area/tdome/six,))
 
 GLOBAL_LIST_INIT(middleareastorm, list(
-	/area/commons/storage/primary,
-	/area/commons/storage/tools,
-	/area/commons/toilet/auxiliary,
-	/area/commons/toilet/locker,
-	/area/commons/toilet/restrooms,
-	/area/engineering/atmos,
-	/area/engineering/atmospherics_engine,
-	/area/engineering/break_room,
-	/area/engineering/engine_smes,
-	/area/engineering/lobby,
-	/area/engineering/main,
-	/area/engineering/supermatter,
-	/area/maintenance/aft,
-	/area/maintenance/disposal/incinerator,
-	/area/maintenance/external/aft))
+	/area/tdome/seven,
+	/area/tdome/eight,
+	/area/tdome/nine,
+	/area/tdome/ten,
+	/area/tdome/eleven,
+	/area/tdome/twelve,))
 
 GLOBAL_LIST_INIT(innerareastorm, list(
-	/area/maintenance/external/port/bow,
-	/area/maintenance/port/aft,
-	/area/maintenance/starboard/central,
-	/area/maintenance/starboard/fore,
-	/area/maintenance/starboard/secondary,
-	/area/maintenance/starboard/upper,
-	/area/medical/break_room,
-	/area/medical/chemistry,
-	/area/medical/coldroom))
+	/area/tdome/thirteen,
+	/area/tdome/fourteen,
+	/area/tdome/fifteen,
+	/area/tdome/sixteen,))
