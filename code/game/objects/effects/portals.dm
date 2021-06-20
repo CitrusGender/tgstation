@@ -204,7 +204,7 @@
 
 /obj/effect/portal/permanent/green/grocery/toward
 	name = "Grocery"
-	maptext = "Grocery"
+	maptext = MAPTEXT("Grocery")
 
 /obj/effect/portal/permanent/green/grocery/from
 	name = "Green Kitchen"
@@ -215,7 +215,7 @@
 
 /obj/effect/portal/permanent/green/hospital/toward
 	name = "Hospital"
-	maptext = "Hospital"
+	maptext = MAPTEXT("Hospital")
 
 /obj/effect/portal/permanent/green/hospital/from
 	name = "Green Kitchen"
@@ -227,7 +227,7 @@
 
 /obj/effect/portal/permanent/green/zoo/toward
 	name = "Zoo"
-	maptext = "Zoo"
+	maptext = MAPTEXT("Zoo")
 
 /obj/effect/portal/permanent/green/zoo/from
 	name = "Green Kitchen"
@@ -239,7 +239,7 @@
 
 /obj/effect/portal/permanent/green/farm/toward
 	name = "Farm"
-	maptext = "Farm"
+	maptext = MAPTEXT("Farm")
 
 /obj/effect/portal/permanent/green/farm/from
 	name = "Green Kitchen"
@@ -251,7 +251,7 @@
 
 /obj/effect/portal/permanent/green/lavaland/toward
 	name = "Lavaland"
-	maptext = "Lavaland"
+	maptext = MAPTEXT("Lavaland")
 
 /obj/effect/portal/permanent/green/lavaland/from
 	name = "Green Kitchen"
@@ -263,7 +263,7 @@
 
 /obj/effect/portal/permanent/green/jungle/toward
 	name = "Jungle"
-	maptext = "Jungle"
+	maptext = MAPTEXT("Jungle")
 
 /obj/effect/portal/permanent/green/jungle/from
 	name = "Green Kitchen"
@@ -280,7 +280,7 @@
 
 /obj/effect/portal/permanent/red/grocery/toward
 	name = "Grocery"
-	maptext = "Grocery"
+	maptext = MAPTEXT("Grocery")
 
 /obj/effect/portal/permanent/red/grocery/from
 	name = "Red Kitchen"
@@ -291,7 +291,7 @@
 
 /obj/effect/portal/permanent/red/hospital/toward
 	name = "Hospital"
-	maptext = "Hospital"
+	maptext = MAPTEXT("Hospital")
 
 /obj/effect/portal/permanent/red/hospital/from
 	name = "Red Kitchen"
@@ -303,7 +303,7 @@
 
 /obj/effect/portal/permanent/red/zoo/toward
 	name = "Zoo"
-	maptext = "Zoo"
+	maptext = MAPTEXT("Zoo")
 
 /obj/effect/portal/permanent/red/zoo/from
 	name = "Red Kitchen"
@@ -315,7 +315,7 @@
 
 /obj/effect/portal/permanent/red/farm/toward
 	name = "Farm"
-	maptext = "Farm"
+	maptext = MAPTEXT("Farm")
 
 /obj/effect/portal/permanent/red/farm/from
 	name = "Red Kitchen"
@@ -327,7 +327,7 @@
 
 /obj/effect/portal/permanent/red/lavaland/toward
 	name = "Lavaland"
-	maptext = "Lavaland"
+	maptext = MAPTEXT("Lavaland")
 
 /obj/effect/portal/permanent/red/lavaland/from
 	name = "Red Kitchen"
@@ -339,7 +339,7 @@
 
 /obj/effect/portal/permanent/red/jungle/toward
 	name = "Jungle"
-	maptext = "Jungle"
+	maptext = MAPTEXT("Jungle")
 
 /obj/effect/portal/permanent/red/jungle/from
 	name = "Red Kitchen"
@@ -354,7 +354,7 @@
 
 /obj/effect/portal/permanent/blue/grocery/toward
 	name = "Grocery"
-	maptext = "Grocery"
+	maptext = MAPTEXT("Grocery")
 
 /obj/effect/portal/permanent/blue/grocery/from
 	name = "Blue Kitchen"
@@ -365,7 +365,7 @@
 
 /obj/effect/portal/permanent/blue/hospital/toward
 	name = "Hospital"
-	maptext = "Hospital"
+	maptext = MAPTEXT("Hospital")
 
 /obj/effect/portal/permanent/blue/hospital/from
 	name = "Blue Kitchen"
@@ -377,7 +377,7 @@
 
 /obj/effect/portal/permanent/blue/zoo/toward
 	name = "Zoo"
-	maptext = "Zoo"
+	maptext = MAPTEXT("Zoo")
 
 /obj/effect/portal/permanent/blue/zoo/from
 	name = "Blue Kitchen"
@@ -389,7 +389,7 @@
 
 /obj/effect/portal/permanent/blue/farm/toward
 	name = "Farm"
-	maptext = "Farm"
+	maptext = MAPTEXT("Farm")
 
 /obj/effect/portal/permanent/blue/farm/from
 	name = "Blue Kitchen"
@@ -401,7 +401,7 @@
 
 /obj/effect/portal/permanent/blue/lavaland/toward
 	name = "Lavaland"
-	maptext = "Lavaland"
+	maptext = MAPTEXT("Lavaland")
 
 /obj/effect/portal/permanent/blue/lavaland/from
 	name = "Blue Kitchen"
@@ -413,7 +413,7 @@
 
 /obj/effect/portal/permanent/blue/jungle/toward
 	name = "Jungle"
-	maptext = "Jungle"
+	maptext = MAPTEXT("Jungle")
 
 /obj/effect/portal/permanent/blue/jungle/from
 	name = "Blue Kitchen"
