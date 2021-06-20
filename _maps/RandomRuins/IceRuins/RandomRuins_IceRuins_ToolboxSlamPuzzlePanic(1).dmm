@@ -1,45 +1,49 @@
 //MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
 "aW" = (
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
+"be" = (
+/obj/structure/sign/warning/securearea,
+/turf/closed/wall/r_wall,
+/area/tdome)
 "bY" = (
 /obj/structure/flora/tree/pine,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "cN" = (
 /obj/effect/decal/cleanable/blood/drip,
 /turf/open/floor/carpet/green,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "dW" = (
 /obj/structure/fence{
 	dir = 4
 	},
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "fy" = (
 /obj/structure/fence/corner,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "gg" = (
 /obj/structure/filingcabinet/chestdrawer/wheeled,
 /obj/item/valentine,
 /obj/item/grenade/c4,
 /obj/item/clothing/accessory/medal/conduct,
 /turf/open/floor/carpet/royalblack,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "gi" = (
 /obj/structure/chair/office/light{
 	dir = 8
 	},
 /turf/open/floor/carpet/royalblack,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "gF" = (
 /obj/machinery/door/keycard/eventtwo,
 /turf/open/floor/iron/white,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "hG" = (
-/turf/closed/wall/r_wall,
-/area/ruin/powered/golem_ship)
+/turf/closed/indestructible/reinforced,
+/area/tdome)
 "hX" = (
 /obj/effect/turf_decal/loading_area{
 	dir = 4
@@ -47,7 +51,7 @@
 /obj/effect/decal/remains/human,
 /obj/machinery/light/cold/directional/south,
 /turf/open/floor/iron/textured,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "ih" = (
 /obj/effect/turf_decal/trimline/yellow/arrow_ccw{
 	dir = 4
@@ -56,23 +60,23 @@
 	reward = /mob/living/simple_animal/pet/dog/bullterrier
 	},
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "im" = (
 /obj/machinery/door/keycard,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "in" = (
 /obj/machinery/launchpad,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "is" = (
 /obj/structure/fence,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "iA" = (
 /obj/structure/holobox,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "iC" = (
 /obj/effect/turf_decal/stripes{
 	dir = 8
@@ -80,7 +84,7 @@
 /turf/open/floor/plating{
 	icon_state = "panelscorched"
 	},
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "jj" = (
 /obj/effect/turf_decal/siding/yellow,
 /obj/structure/railing{
@@ -88,60 +92,67 @@
 	},
 /obj/machinery/vending/coffee,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "jA" = (
 /obj/structure/closet/crate/secure,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "jI" = (
 /obj/machinery/ticket_machine/directional/north,
 /turf/open/floor/iron/white,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "kb" = (
 /obj/machinery/door/airlock/mining/glass,
 /turf/open/floor/noslip,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "kS" = (
 /turf/open/floor/plating{
 	icon_state = "panelscorched"
 	},
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "lO" = (
 /turf/open/floor/iron/smooth_corner{
 	dir = 8
 	},
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "mB" = (
 /obj/effect/decal/cleanable/oil,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "mI" = (
 /obj/effect/spawner/structure/window/reinforced/indestructable,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "ng" = (
 /obj/effect/turf_decal/bot,
 /obj/item/pressure_plate/hologrid{
 	reward = /obj/item/keycard/eventtwo
 	},
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
+"nk" = (
+/turf/open/floor/iron/white,
+/area/tdome)
 "nx" = (
 /turf/closed/indestructible/riveted,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "nJ" = (
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "nP" = (
 /obj/item/ticket_machine_ticket,
 /turf/open/floor/iron/white,
-/area/ruin/powered/golem_ship)
+/area/tdome)
+"nQ" = (
+/obj/machinery/arena_spawn/red,
+/turf/open/floor/plating/grass,
+/area/tdome)
 "oK" = (
 /obj/structure/fence/corner{
 	dir = 1
 	},
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "oX" = (
 /obj/effect/decal/cleanable/oil,
 /obj/machinery/door/keycard/eventone,
@@ -152,78 +163,82 @@
 /turf/open/floor/plating{
 	icon_state = "panelscorched"
 	},
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "pk" = (
 /obj/structure/sign/warning/securearea,
-/turf/closed/wall/r_wall,
-/area/ruin/powered/golem_ship)
+/turf/closed/indestructible/reinforced,
+/area/tdome)
 "pD" = (
 /turf/open/floor/carpet/green,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "pR" = (
 /obj/machinery/modular_computer/console/preset/civilian{
 	dir = 4
 	},
 /turf/open/floor/carpet/green,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "qb" = (
 /obj/effect/decal/cleanable/blood/drip,
 /turf/open/floor/carpet/royalblack,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "qq" = (
 /obj/effect/decal/cleanable/plasma,
 /obj/machinery/light/small/red/directional/north,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "qJ" = (
 /obj/structure/filingcabinet/chestdrawer/wheeled,
 /obj/item/storage/fancy/heart_box,
 /obj/item/food/tinychocolate,
 /turf/open/floor/carpet/royalblack,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "qR" = (
 /obj/structure/holobox,
 /obj/effect/turf_decal/stripes{
 	dir = 8
 	},
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "rF" = (
 /obj/effect/decal/cleanable/wrapping,
 /obj/item/c_tube,
 /obj/effect/turf_decal/siding/yellow,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "rV" = (
 /obj/item/reagent_containers/food/drinks/trophy/gold_cup,
 /turf/open/floor/carpet/green,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "tc" = (
 /turf/closed/indestructible/rock,
-/area/ruin/powered/golem_ship)
+/area/tdome)
+"uH" = (
+/obj/structure/sign/departments/cargo,
+/turf/closed/wall/r_wall,
+/area/tdome)
 "uJ" = (
 /obj/structure/window/reinforced{
 	dir = 4
 	},
 /obj/machinery/light/cold/directional/north,
 /turf/open/floor/iron/textured,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "vj" = (
 /obj/structure/sign/poster/official/obey,
-/turf/closed/wall/r_wall,
-/area/ruin/powered/golem_ship)
+/turf/closed/indestructible/reinforced,
+/area/tdome)
 "vx" = (
 /obj/machinery/door/keycard/eventtwo,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "vH" = (
 /obj/structure/fence/door,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "wl" = (
 /obj/item/storage/toolbox/syndicate,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "wX" = (
 /obj/item/pressure_plate/hologrid{
 	reward = /obj/item/keycard/eventone
@@ -232,23 +247,23 @@
 	dir = 4
 	},
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "xy" = (
 /obj/effect/turf_decal/stripes/white/box,
 /obj/effect/spawner/lootdrop/crate_spawner,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "yz" = (
 /obj/structure/sign/departments/cargo,
-/turf/closed/wall/r_wall,
-/area/ruin/powered/golem_ship)
+/turf/closed/indestructible/reinforced,
+/area/tdome)
 "yK" = (
 /obj/structure/chair/plastic{
 	dir = 4
 	},
 /obj/effect/decal/remains/human,
 /turf/open/floor/iron/white,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "zl" = (
 /obj/structure/table/reinforced,
 /obj/machinery/door/window{
@@ -260,17 +275,17 @@
 /obj/structure/window/spawner/east,
 /obj/item/toy/figure/cargotech,
 /turf/open/floor/noslip,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "zr" = (
 /obj/item/food/grown/coffee/robusta,
 /turf/open/floor/iron/smooth_half,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Ak" = (
 /obj/structure/chair/office/light{
 	dir = 1
 	},
 /turf/open/floor/iron/smooth_corner,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Ao" = (
 /obj/structure/closet/crate/bin,
 /obj/item/mail/junkmail,
@@ -284,25 +299,25 @@
 /obj/item/mail/junkmail,
 /obj/item/mail/junkmail,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "AF" = (
 /obj/item/food/strawberryicecreamsandwich,
 /turf/open/floor/iron/smooth_corner{
 	dir = 1
 	},
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Cp" = (
 /obj/structure/sign/warning/nosmoking/circle,
-/turf/closed/wall/r_wall,
-/area/ruin/powered/golem_ship)
+/turf/closed/indestructible/reinforced,
+/area/tdome)
 "DA" = (
 /obj/structure/marker_beacon/burgundy,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "DJ" = (
 /obj/structure/flora/rock/icy,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "EO" = (
 /obj/structure/chair/office/light{
 	dir = 4
@@ -310,7 +325,7 @@
 /obj/effect/mob_spawn/human/skeleton,
 /obj/effect/decal/cleanable/blood/old,
 /turf/open/floor/carpet/royalblack,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Fq" = (
 /obj/effect/turf_decal/trimline/white/arrow_ccw{
 	dir = 4
@@ -319,99 +334,116 @@
 	reward = /obj/item/toy/plush/moth
 	},
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "FE" = (
 /obj/item/paper_bin{
 	pixel_y = 5
 	},
 /obj/structure/table/rolling,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
+"FW" = (
+/obj/machinery/arena_spawn/green,
+/turf/open/floor/plating/grass,
+/area/tdome)
 "FX" = (
 /obj/structure/closet/crate/mail/full,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Gx" = (
 /turf/open/floor/iron/white,
 /area/ruin/powered/golem_ship)
 "GO" = (
 /obj/structure/grille,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "GP" = (
 /obj/effect/turf_decal/stripes{
 	dir = 8
 	},
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "GT" = (
 /obj/item/food/grown/coffee/robusta,
 /obj/machinery/light_switch/directional/west,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "HT" = (
 /obj/item/reagent_containers/food/drinks/coffee,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Ii" = (
 /obj/structure/chair/plastic{
 	dir = 4
 	},
+/obj/item/flashlight/glowstick/orange,
 /turf/open/floor/iron/white,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Ij" = (
 /obj/structure/closet/crate/mail{
 	icon_state = "mailopen"
 	},
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
+"IS" = (
+/obj/structure/sign/poster/official/obey,
+/turf/closed/wall/r_wall,
+/area/tdome)
 "Jv" = (
 /obj/structure/fence/post{
 	dir = 4
 	},
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "JV" = (
 /turf/open/floor/carpet/royalblack,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "KV" = (
 /obj/effect/decal/cleanable/wrapping,
 /obj/machinery/light/warm/directional/west,
 /turf/open/floor/iron/smooth_half,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Lq" = (
 /obj/structure/holobox,
 /obj/effect/turf_decal/stripes/white/box,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Mg" = (
 /obj/item/trash/can,
 /turf/open/floor/plating/grass,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Nq" = (
 /obj/effect/spawner/lootdrop/crate_spawner,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Oi" = (
 /obj/structure/table/greyscale,
 /turf/open/floor/carpet/royalblack,
-/area/ruin/powered/golem_ship)
+/area/tdome)
+"Ot" = (
+/obj/effect/decal/cleanable/oil,
+/obj/machinery/door/keycard/eventone,
+/turf/open/floor/iron/white,
+/area/tdome)
+"Ox" = (
+/turf/closed/wall/r_wall,
+/area/tdome)
 "Pf" = (
 /obj/machinery/computer/launchpad,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Qf" = (
 /obj/structure/closet/crate/mail{
 	icon_state = "mailopen"
 	},
 /obj/effect/turf_decal/siding/yellow,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "QB" = (
 /turf/open/floor/iron/smooth_corner{
 	dir = 4
 	},
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "QF" = (
 /obj/machinery/status_display/evac/directional/west,
 /obj/structure/chair/plastic{
@@ -422,11 +454,11 @@
 	pixel_y = 3
 	},
 /turf/open/floor/iron/white,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "RY" = (
 /obj/effect/spawner/structure/window/ice,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "SV" = (
 /obj/structure/closet/crate/mail{
 	icon_state = "mailopen"
@@ -435,24 +467,33 @@
 	dir = 8
 	},
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
+"Ug" = (
+/obj/structure/chair/plastic{
+	dir = 4
+	},
+/turf/open/floor/iron/white,
+/area/tdome)
 "Uq" = (
 /obj/machinery/light/cold/directional/east,
 /turf/open/floor/carpet/royalblack,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "UR" = (
 /obj/structure/table/greyscale,
 /obj/item/flashlight/lamp,
 /obj/item/trash/candle,
 /turf/open/floor/carpet/royalblack,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Vn" = (
 /turf/open/floor/iron/smooth_half,
+/area/tdome)
+"Vt" = (
+/turf/closed/indestructible/reinforced,
 /area/ruin/powered/golem_ship)
 "Vv" = (
 /obj/structure/sign/poster/ripped,
-/turf/closed/wall/r_wall,
-/area/ruin/powered/golem_ship)
+/turf/closed/indestructible/reinforced,
+/area/tdome)
 "VV" = (
 /obj/effect/turf_decal/trimline/brown/arrow_ccw{
 	dir = 4
@@ -461,29 +502,29 @@
 	reward = /obj/item/keycard/eventone
 	},
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Wl" = (
 /obj/effect/spawner/lootdrop/crate_spawner,
 /obj/effect/turf_decal/stripes/white/box,
 /turf/open/floor/plating,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Xh" = (
 /obj/machinery/modular_computer/console/preset/civilian{
 	dir = 8
 	},
 /turf/open/floor/carpet/green,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "Yu" = (
 /obj/structure/window/reinforced{
 	dir = 4
 	},
 /turf/open/floor/iron/textured,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 "YP" = (
 /obj/item/food/grown/coffee,
 /obj/effect/turf_decal/siding/yellow,
 /turf/open/floor/iron/smooth_large,
-/area/ruin/powered/golem_ship)
+/area/tdome)
 
 (1,1,1) = {"
 tc
@@ -592,7 +633,7 @@ vH
 aW
 aW
 aW
-aW
+FW
 tc
 tc
 aW
@@ -657,7 +698,7 @@ Qf
 pk
 QF
 yK
-Ii
+Ug
 Ii
 hG
 DJ
@@ -677,9 +718,9 @@ Pf
 Ak
 AF
 YP
-oX
-Gx
-Gx
+Ot
+nk
+nk
 Gx
 nP
 zl
@@ -700,11 +741,11 @@ FE
 Vn
 HT
 jj
-hG
+Ox
 jI
 nP
-Gx
-Gx
+nk
+nk
 kb
 aW
 vH
@@ -771,7 +812,7 @@ mI
 im
 hG
 hG
-vj
+IS
 hG
 GO
 hG
@@ -1121,7 +1162,7 @@ vH
 aW
 aW
 aW
-aW
+nQ
 tc
 tc
 aW
@@ -1183,10 +1224,10 @@ in
 GT
 KV
 Qf
-pk
+be
 QF
 yK
-Ii
+Ug
 Ii
 hG
 DJ
@@ -1201,15 +1242,15 @@ tc
 (32,1,1) = {"
 tc
 aW
-hG
+Vt
 Pf
 Ak
 AF
 YP
 oX
-Gx
-Gx
-Gx
+nk
+nk
+nk
 nP
 zl
 aW
@@ -1229,11 +1270,11 @@ FE
 Vn
 HT
 jj
-hG
+Ox
 jI
 nP
-Gx
-Gx
+nk
+nk
 kb
 aW
 vH
@@ -1257,7 +1298,7 @@ uJ
 Yu
 Yu
 hX
-yz
+uH
 aW
 dW
 tc
@@ -1479,8 +1520,8 @@ tc
 aW
 DJ
 aW
-tc
-tc
+aW
+aW
 aW
 aW
 DJ
@@ -1501,10 +1542,10 @@ tc
 tc
 tc
 tc
-aW
-aW
-aW
-aW
+tc
+tc
+tc
+tc
 tc
 tc
 tc
