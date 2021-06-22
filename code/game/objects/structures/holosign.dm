@@ -228,9 +228,9 @@
 	var/team_allow
 
 /obj/structure/holosign/barrier/ctf/red
-	team_allow = ARENA_RED_TEAM
+	//team_allow = ARENA_RED_TEAM
 	icon_state = "trap-fire"
 
 /obj/structure/holosign/barrier/ctf/green
-	team_allow = ARENA_GREEN_TEAM
+	//team_allow = ARENA_GREEN_TEAM
 	icon_state = "trap-earth"
