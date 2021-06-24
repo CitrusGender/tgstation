@@ -1,6 +1,9 @@
 
 //holographic signs and barriers
 
+#define ARENA_RED_TEAM "red" // team1
+#define ARENA_GREEN_TEAM "green" //team2
+
 /obj/structure/holosign
 	name = "holo sign"
 	icon = 'icons/effects/effects.dmi'
@@ -216,3 +219,24 @@
 	M.electrocute_act(15,"Energy Barrier")
 	shockcd = TRUE
 	addtimer(CALLBACK(src, .proc/cooldown), 5)
+
+/obj/structure/holosign/barrier/ctf
+	name = "Spawn protection"
+	desc = "Stay outta the enemy spawn!"
+	icon = 'icons/obj/hand_of_god_structures.dmi'
+	icon_state = "trap"
+	max_integrity = 99999
+	damage_deflection = 100
+	/// What team we allow through
+	var/team_allow
+
+/obj/structure/holosign/barrier/ctf/red
+	team_allow = ARENA_RED_TEAM
+	icon_state = "trap-fire"
+
+/obj/structure/holosign/barrier/ctf/green
+	team_allow = ARENA_GREEN_TEAM
+	icon_state = "trap-earth"
+
+#undef ARENA_GREEN_TEAM
+#undef ARENA_RED_TEAM

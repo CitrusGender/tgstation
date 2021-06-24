@@ -51,6 +51,13 @@
 	var/loading_id = ""
 
 /area/centcom/supplypod/loading/Initialize()
+	#ifdef EVENTMODE
+	// A messy hack to fix special event map pod bays
+	if(loading_id && text2num(loading_id) < 5) // ERT centcom bay is safe (for now)
+		for(var/turf/T in src)
+			if(T.z == 1) // hardcoded magic number for centcom turfs since ZTRAIT_CENTCOM is unreliable for this case
+				contents -= T
+	#endif
 	. = ..()
 	if(!loading_id)
 		CRASH("[type] created without a loading_id")
@@ -87,14 +94,46 @@
 	has_gravity = STANDARD_GRAVITY
 	flags_1 = NONE
 	eventarea = TRUE
+	
 
-/area/tdome
-	eventareaair = TRUE
+/*For the battle royale zone area map*/
 
 /area/tdome/arena
 	name = "Thunderdome Arena"
 	icon_state = "thunder"
 	dynamic_lighting = DYNAMIC_LIGHTING_DISABLED
+
+/area/tdome/arena/one
+
+/area/tdome/arena/two
+
+/area/tdome/arena/three
+
+/area/tdome/arena/four
+
+/area/tdome/arena/five
+
+/area/tdome/arena/six
+
+/area/tdome/arena/seven
+
+/area/tdome/arena/eight
+
+/area/tdome/arena/nine
+
+/area/tdome/arena/ten
+
+/area/tdome/arena/eleven
+
+/area/tdome/arena/twelve
+
+/area/tdome/arena/thirteen
+
+/area/tdome/arena/fourteen
+
+/area/tdome/arena/fifteen
+
+/area/tdome/arena/sixteen
 
 /area/tdome/arena_source
 	name = "Thunderdome Arena Template"
