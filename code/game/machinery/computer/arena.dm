@@ -139,6 +139,7 @@
 	var/datum/roster/the_roster = GLOB.global_roster
 	the_roster.spawns_team1 = null
 	the_roster.spawns_team2 = null
+	the_roster.spawns_team3 = null
 	the_roster.spawns_br = null
 
 	for(var/obj/machinery/arena_spawn/iter_spawn in GLOB.machines)
@@ -150,6 +151,8 @@
 			LAZYADD(the_roster.spawns_team1, iter_spawn)
 		else if(iter_spawn.team == ARENA_GREEN_TEAM)
 			LAZYADD(the_roster.spawns_team2, iter_spawn)
+		else if(iter_spawn.team == ARENA_GREEN_TEAM)
+			LAZYADD(the_roster.spawns_team3, iter_spawn)
 
 	message_admins("[LAZYLEN(the_roster.spawns_br)] spawns for BR, [LAZYLEN(the_roster.spawns_team1)] spawns for team 1, [LAZYLEN(the_roster.spawns_team2)] spawns for team 2.")
 	log_admin("[LAZYLEN(the_roster.spawns_br)] spawns for BR, [LAZYLEN(the_roster.spawns_team1)] spawns for team 1, [LAZYLEN(the_roster.spawns_team2)] spawns for team 2.")
@@ -352,8 +355,8 @@
 		else
 			GLOB.global_roster.spawn_team(usr)
 
-	//if(href_list["despawn_all"])
-		//GLOB.global_roster.despawn_everyone(usr)
+	if(href_list["despawn_all"])
+		GLOB.global_roster.despawn_everyone(usr)
 
 	if(href_list["select_team_slot"])
 		GLOB.global_roster.try_load_team_slot(usr, text2num(href_list["select_team_slot"]))
@@ -472,6 +475,7 @@
 
 			var/datum/event_team/team1 = GLOB.global_roster.team1
 			var/datum/event_team/team2 = GLOB.global_roster.team2
+			var/datum/event_team/team3 = GLOB.global_roster.team3
 			dat += ""
 
 			if(team1)
@@ -498,6 +502,18 @@
 					dat += "\t\tMember #[i]: [iter_member] ([the_guy]) <a href='?src=[REF(src)];unteam_member=[REF(iter_member)];unteam_team_target=[REF(team2)]'>Remove Member</a>"
 			else
 				dat += "<a href='?src=[REF(src)];select_team_slot=2'>Select Team 2</a>"
+
+			if(GLOB.global_roster.three_team_round)
+				if(team3)
+					dat += "\tTeam 3 ([team3.rostered_id]): <a href='?src=[REF(src)];remove_team_slot=3'>Remove [team3] <a href='?src=[REF(src)];spawn_team=[REF(team3)]'>Spawn Team (BLUE)</a>"
+					dat += "\t\t<a href='?src=[REF(src)];set_freeze=[REF(team3)]'><b>[team3.frozen ? "Unfreeze" : "Freeze"]</span></b></a> <a href='?src=[REF(src)];set_godmode=[REF(team3)]'><b>[team3.godmode ? "Disable Godmode" : "Enable Godmode"]</span></b></a>"
+					var/i = 0
+					for(var/datum/contestant/iter_member in team3.members)
+						i++
+						var/mob/the_guy = iter_member.get_mob()
+						dat += "\t\tMember #[i]: [iter_member] ([the_guy]) <a href='?src=[REF(src)];unteam_member=[REF(iter_member)];unteam_team_target=[REF(team3)]'>Remove Member</a>"
+				else
+					dat += "<a href='?src=[REF(src)];select_team_slot=3'>Select Team 3</a>"
 
 			if(istype(team1) ||istype(team2))
 				//dat += "<a href='?src=[REF(src)];set_freeze_all=on'><b>Freeze All</b></a><a href='?src=[REF(src)];set_freeze_all=off'><b>Unfreeze All</b></a>"
@@ -663,6 +679,11 @@
 	name = "Green Team Spawnpoint"
 	color = "green"
 	team = ARENA_GREEN_TEAM
+
+/obj/machinery/arena_spawn/blue
+	name = "Blue Team Spawnpoint"
+	color = "blue"
+	team = ARENA_BLUE_TEAM
 
 /obj/machinery/arena_spawn/battle_royale
 	name = "Battle Royale Spawnpoint"

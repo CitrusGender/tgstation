@@ -20,6 +20,8 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 	var/datum/event_team/team1
 	/// Hardcoded slot 2 for the 2 team match system (GREEN TEAM)
 	var/datum/event_team/team2
+	/// Hardcoded slot 3 for the 2 team match system (BLUE TEAM)
+	var/datum/event_team/team3
 	/// Counter for how many team datums we've made, each team gets a unique number, even if a lower numbered team has already been deleated
 	var/team_id_tracker = 0
 
@@ -29,10 +31,14 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 	var/list/spawns_team1
 	/// Holds the list of /obj/machinery/arena_spawn objects for the currently loaded arena keyed for the GREEN team (team2)
 	var/list/spawns_team2
+	/// Holds the list of /obj/machinery/arena_spawn objects for the currently loaded arena keyed for the BLUE team (team3)
+	var/list/spawns_team3
 	/// Holds the list of /obj/machinery/arena_spawn/battle_royale objects for the currently loaded arena keyed for the BR team (im lazy)
 	var/list/spawns_br
 	/// If FALSE, bodyparts cannot suffer wounds by receiving damage. Wounds can still be manually applied as per normal
 	var/enable_random_wounds = FALSE
+	/// My desperate attempt to accomodate the three team cooking event
+	var/three_team_round = FALSE
 
 	/// Once we're down to this many people in the battle royale round, stop the carnage
 	var/br_end_population = 16
@@ -54,11 +60,11 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 
 	// antag hud stuff stolen wholesale from the arena computer so they now live here
 	/// List of team ids
-	var/list/teams = list(ARENA_RED_TEAM,ARENA_GREEN_TEAM)
+	var/list/teams = list(ARENA_RED_TEAM,ARENA_GREEN_TEAM,ARENA_BLUE_TEAM)
 	/// List of hud instances indedxed by team id
 	var/static/list/team_huds = list()
 	/// List of hud colors indexed by team id
-	var/static/list/team_colors = list(ARENA_RED_TEAM = "red", ARENA_GREEN_TEAM = "green")
+	var/static/list/team_colors = list(ARENA_RED_TEAM = "red", ARENA_GREEN_TEAM = "green", ARENA_BLUE_TEAM = "blue")
 	/// Team hud index in GLOB.huds indexed by team id
 	var/static/list/team_hud_index = list()
 
@@ -417,7 +423,7 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 /datum/roster/proc/try_load_team_slot(mob/user, slot)
 	if(!slot  || !length(unrostered_teams))
 		return
-	if((slot == 1 && team1) || (slot == 2 && team2))
+	if((slot == 1 && team1) || (slot == 2 && team2) || (slot == 3 && team3))
 		testing("already a team in slot [slot]")
 		return
 
@@ -445,6 +451,10 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 		team1 = the_team
 	else if(slot == 2)
 		team2 = the_team
+	else if(slot == 3)
+		if(!three_team_round)
+			message_admins("TRYING TO LOAD TEAM3 WHEN IT'S NOT MARKED AS A 3 TEAM ROUND! I'LL ALLOW IT, BUT TREAD CAREFULLY")
+		team3 = the_team
 
 	message_admins("[key_name_admin(user)] has loaded team [the_team] into slot [slot]!") // log which they chose
 	log_game("[key_name_admin(user)] has loaded team [the_team] into slot [slot]!")
@@ -459,6 +469,9 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 	else if(slot == 2)
 		removed_team = team2
 		team2 = null
+	else if(slot == 3)
+		removed_team = team3
+		team3 = null
 
 	if(removed_team)
 		if(user)
@@ -482,7 +495,8 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 			"team_event" = list("desc" = "Team Event? (Set to No for BR)", "type" = "boolean", "value" = "Yes"),
 			"team_num_instead_of_size" = list("desc" = "If teams, divvy by team number instead of team size?", "type" = "boolean", "value" = "Yes"),
 			"team_divvy_factor" = list("desc" = "If teams, what's the divvy factor? (ask if you don't know!)", "type" = "number", "value" = 2),
-			"br_pop_goal" = list("desc" = "If this is a BR round, how many people should we stop the fighting at?", "type" = "number", "value" = 16)
+			"br_pop_goal" = list("desc" = "If this is a BR round, how many people should we stop the fighting at?", "type" = "number", "value" = 16),
+			"three_team" = list("desc" = "Enable third team for the cooking round???", "type" = "boolean", "value" = "No")
 		)
 	)
 
@@ -503,8 +517,11 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 	var/teams = prefs["team_event"]["value"] == "Yes"
 	var/divvy_teams_by_num_not_size = prefs["team_num_instead_of_size"]["value"] == "Yes"
 	var/team_divvy_factor = prefs["team_divvy_factor"]["value"]
+	var/three_team = prefs["three_team"]["value"]
 
-	testing("[user] is setting up match with values: Team event: [teams], [divvy_teams_by_num_not_size] divvy mode, [team_divvy_factor] divvy factor")
+	three_team_round = three_team
+
+	testing("[user] is setting up match with values: Team event: [teams] (Three Team: [three_team]), [divvy_teams_by_num_not_size] divvy mode, [team_divvy_factor] divvy factor")
 	if(!teams)
 		br_end_population = prefs["br_pop_goal"]["value"]
 		setup_battle_royale(user)
@@ -574,13 +591,33 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 
 	if(spawning_team.battle_royale)
 		spawn_battle_royale(user)
-	if(team2 && spawning_team != team1)
-		team2.spawn_members(user, spawns_team2)
-	if(team1 && spawning_team != team2)
+
+	if(!istype(spawning_team))
+		team1?.spawn_members(user, spawns_team1)
+		team2?.spawn_members(user, spawns_team2)
+		if(three_team_round)
+			team3?.spawn_members(user, spawns_team3)
+	else if(spawning_team == team1)
 		team1.spawn_members(user, spawns_team1)
+	else if(spawning_team == team2)
+		team2.spawn_members(user, spawns_team2)
+	else if(spawning_team == team3)
+		team3.spawn_members(user, spawns_team3)
 
 	message_admins("[key_name_admin(user)] has spawned [spawning_team ? "[spawning_team]" : "all slotted teams!"]")
 	log_game("[key_name_admin(user)] has spawned [spawning_team ? "[spawning_team]" : "all slotted teams!"]")
+
+/// Get rid of everyone who's currently spawned, disables mark for elimination on death for all of them
+/datum/roster/proc/despawn_everyone(mob/user)
+	for(var/datum/contestant/iter_contestant in live_contestants)
+		iter_contestant.set_flag_on_death(FALSE)
+		var/mob/living/iter_mob = iter_contestant.get_mob()
+		if(istype(iter_mob))
+			iter_mob.dust()
+		iter_contestant.despawn()
+
+	message_admins("[key_name_admin(user)] has dusted and despawned everyone!")
+	log_game("[key_name_admin(user)] has dusted and despawned everyone!")
 
 /datum/roster/proc/generate_antag_huds()
 	for(var/team in teams)
@@ -601,6 +638,8 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 		return team_huds[ARENA_RED_TEAM]
 	else if(check_team == team2)
 		return team_huds[ARENA_GREEN_TEAM]
+	else if(check_team == team3)
+		return team_huds[ARENA_BLUE_TEAM]
 
 /datum/roster/proc/get_team_slot(datum/event_team/check_team)
 	if(!check_team)
@@ -608,6 +647,8 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 
 	if(check_team == team1)
 		return ARENA_RED_TEAM
+	else if(check_team == team2)
+		return ARENA_GREEN_TEAM
 	else if(check_team == team2)
 		return ARENA_GREEN_TEAM
 
@@ -619,6 +660,8 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 		return team_huds[ARENA_RED_TEAM]
 	else if(check_team == team2)
 		return team_huds[ARENA_GREEN_TEAM]
+	else if(check_team == team2)
+		return team_huds[ARENA_BLUE_TEAM]
 
 /*
 /obj/machinery/computer/arena/proc/spawn_member(obj/machinery/arena_spawn/spawnpoint,ckey,team)
