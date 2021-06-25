@@ -139,7 +139,7 @@
 	log_admin("[key_name(user)] loaded [arena_template] event arena for [arena_id] arena.")
 
 /// A proc for looping through all the machines and finding the spawns we need
-/obj/machinery/computer/arena/proc/find_spawns(ignore_different_id = FALSE)
+/obj/machinery/computer/arena/proc/find_spawns(allow_different_ids = FALSE)
 	var/datum/roster/the_roster = GLOB.global_roster
 	the_roster.spawns_team1 = null
 	the_roster.spawns_team2 = null
@@ -147,7 +147,7 @@
 	the_roster.spawns_br = null
 
 	for(var/obj/machinery/arena_spawn/iter_spawn in GLOB.machines)
-		if(!ignore_different_id && (iter_spawn.arena_id != arena_id))
+		if(!allow_different_ids && (iter_spawn.arena_id != arena_id))
 			continue
 		if(istype(iter_spawn, /obj/machinery/arena_spawn/battle_royale))
 			LAZYADD(the_roster.spawns_br, iter_spawn)
@@ -412,6 +412,16 @@
 
 	if(href_list["upload"])
 		add_new_arena_template(user)
+	if(href_list["refind_spawns"])
+		var/allow_different_ids = input(usr, "Only include spawns that came with the arena?", "???") as null|anything in list("Yes, only loaded map spawns.", "No, include all found spawns.", "Cancel.")
+
+		switch(allow_different_ids)
+			if("Yes, only loaded map spawns.")
+				find_spawns()
+			if("No, include all found spawns.")
+				find_spawns(TRUE)
+			else
+
 	if(href_list["change_arena"])
 		load_arena(href_list["change_arena"],user)
 	if(href_list["special"])
@@ -627,6 +637,7 @@
 			dat += "<a href='?src=[REF(src)];upload=1'>Upload new arena</a><br>"
 			dat += "<hr>"
 			//Special actions
+			dat += "<a href='?src=[REF(src)];refind_spawns=1'>Refind Spawns.</a><br>"
 			dat += "<a href='?src=[REF(src)];special=reset'>Reset Arena.</a><br>"
 			dat += "<a href='?src=[REF(src)];special=randomarena'>Load random arena.</a><br>"
 
