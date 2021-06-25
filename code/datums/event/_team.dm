@@ -104,7 +104,7 @@
 	message_admins("[key_name_admin(user)] randomly eliminated a member of team [src]: [dead_kid]!")
 	log_game("[key_name_admin(user)] randomly eliminated a member of team [src]: [dead_kid]!")
 	remove_member(dead_kid)
-	GLOB.global_roster.eliminate_contestant(dead_kid)
+	GLOB.global_roster.eliminate_contestant(null, dead_kid)
 
 /// If the arg is TRUE, mark the team and members as successfully completing a round. If the arg is FALSE, mark them for elimination
 /datum/event_team/proc/match_result(victorious)
