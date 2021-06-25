@@ -376,7 +376,14 @@
 		if(!istype(elim_team) || !LAZYLEN(elim_team.members))
 			testing("failed to find team")
 			return
-		GLOB.global_roster.eliminate_team(usr, elim_team)
+		var/how_many = input(usr, "How many to eliminate?", "How many?") as null|anything in list("Whole Team", "One Random Member", "Cancel")
+		switch(how_many)
+			if("Whole Team")
+				GLOB.global_roster.eliminate_team(usr, elim_team)
+			if("One Random Member")
+				elim_team.eliminate_random_member(usr)
+			else
+				return
 
 	if(href_list["unmark_team"])
 		var/datum/event_team/unmark_team = locate(href_list["unmark_team"]) in GLOB.global_roster.active_teams

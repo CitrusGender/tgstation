@@ -205,7 +205,9 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 	if(team1 == the_team)
 		team1 = null
 	else if(team2 == the_team)
-		team1 = null
+		team2 = null
+	else if(team3 == the_team)
+		team3 = null
 
 	log_game("Team: [the_team] has been eliminated. Eliminated members are as follows:")
 	the_team.eliminated = TRUE
@@ -343,6 +345,10 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 	LAZYREMOVE(active_contestants, target)
 	LAZYADD(losers, target)
 	target.eliminated = TRUE
+
+	var/mob/loser = target.get_mob()
+	to_chat(loser, span_narsiesmall("YOU HAVE BEEN ELIMINATED! Better luck next time!"))
+
 	message_admins("[key_name_admin(user)] has eliminated [target]!") // log which they chose
 	log_game("[key_name_admin(user)] has eliminated [target]!")
 
@@ -370,6 +376,7 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 		testing("already a loser")
 		return
 
+	target.flagged_for_elimination = FALSE // should be a proc
 	message_admins("[key_name_admin(user)] has unmarked for elimination [target]!") // log which they chose
 	log_game("[key_name_admin(user)] has unmarked for elimination [target]!")
 
@@ -535,9 +542,12 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 	message_admins("[key_name_admin(user)] is resolving the current match...")
 	log_game("[key_name_admin(user)] is resolving the current match.")
 
-	var/winner = input(user, "Which teams won?", "Winner!", null) as null|anything in list("Both Lose", "Team 1 Wins", "Team 2 Wins", "Both Win")
+	var/winner
+
 	if(three_team_round)
 		winner = input(user, "Which team lost?", "Loser!", null) as null|anything in list("All Lose", "Team 1 Lost", "Team 2 Lost", "Team 3 Lost")
+	else
+		winner = input(user, "Which teams won?", "Winner!", null) as null|anything in list("Both Lose", "Team 1 Wins", "Team 2 Wins", "Both Win")
 
 	switch(winner)
 		if("Both Lose")
