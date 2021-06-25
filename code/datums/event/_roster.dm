@@ -532,25 +532,18 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 
 /// Try to resolve a match, this manually asks you which of the two teams won (neither, either, or both). Losing teams will be marked for elimination, winning teams will be marked as proven. Both match team slots will be cleared
 /datum/roster/proc/try_resolve_match(mob/user)
-	var/list/the_teams = list()
-
-	var/team_iterator_count = 0
 	message_admins("[key_name_admin(user)] is resolving the current match...")
 	log_game("[key_name_admin(user)] is resolving the current match.")
-	for(var/datum/event_team/iter_team in unrostered_teams)
-		team_iterator_count++
-		testing("adding [team_iterator_count] | team [iter_team.rostered_id]")
-		var/i = iter_team.rostered_id
-		the_teams["Team [i]"] = iter_team
-		//the_teams[team_iterator_count] = iter_team
-		//the_team_nums[team_iterator_count] = i
 
 	var/winner = input(user, "Which teams won?", "Winner!", null) as null|anything in list("Both Lose", "Team 1 Wins", "Team 2 Wins", "Both Win")
+	if(three_team_round)
+		winner = input(user, "Which team lost?", "Loser!", null) as null|anything in list("All Lose", "Team 1 Lost", "Team 2 Lost", "Team 3 Lost")
 
 	switch(winner)
 		if("Both Lose")
 			team1.match_result(FALSE)
 			team2.match_result(FALSE)
+			team3?.match_result(FALSE)
 		if("Team 1 Wins")
 			team1.match_result(TRUE)
 			team2.match_result(FALSE)
@@ -560,11 +553,26 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 		if("Both Win")
 			team1.match_result(TRUE)
 			team2.match_result(TRUE)
+		if("Team 1 Lost")
+			team1.match_result(FALSE)
+			team2.match_result(TRUE)
+			team3.match_result(TRUE)
+		if("Team 2 Lost")
+			team1.match_result(TRUE)
+			team2.match_result(FALSE)
+			team3.match_result(TRUE)
+		if("Team 3 Lost")
+			team1.match_result(TRUE)
+			team2.match_result(TRUE)
+			team3.match_result(FALSE)
 		else
 			return
 
 	try_remove_team_slot(user, 1)
 	try_remove_team_slot(user, 2)
+	if(team3)
+		try_remove_team_slot(user, 3)
+
 	message_admins("[key_name_admin(user)] has resolved the current match! Result: [winner]")
 	log_game("[key_name_admin(user)] has resolved the current match! Result: [winner]")
 
@@ -586,10 +594,9 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
  * * spawning_team: If you want to specify one of the 2 team slots you're spawning, pass the team datum here. If there's no argument for this, we try spawning both teams (assuming there's a team for each slot)
  */
 /datum/roster/proc/spawn_team(mob/user, datum/event_team/spawning_team)
-	var/who_spawned = ""
 	log_game("[key_name_admin(user)] has tried spawning teams!")
 
-	if(spawning_team.battle_royale)
+	if(istype(spawning_team) && spawning_team.battle_royale)
 		spawn_battle_royale(user)
 
 	if(!istype(spawning_team))
@@ -609,15 +616,17 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 
 /// Get rid of everyone who's currently spawned, disables mark for elimination on death for all of them
 /datum/roster/proc/despawn_everyone(mob/user)
+	var/deletes = 0
 	for(var/datum/contestant/iter_contestant in live_contestants)
 		iter_contestant.set_flag_on_death(FALSE)
 		var/mob/living/iter_mob = iter_contestant.get_mob()
 		if(istype(iter_mob))
 			iter_mob.dust()
 		iter_contestant.despawn()
+		deletes++
 
-	message_admins("[key_name_admin(user)] has dusted and despawned everyone!")
-	log_game("[key_name_admin(user)] has dusted and despawned everyone!")
+	message_admins("[key_name_admin(user)] has dusted and despawned everyone ([deletes] contestants)!")
+	log_game("[key_name_admin(user)] has dusted and despawned everyone ([deletes] contestants)!")
 
 /datum/roster/proc/generate_antag_huds()
 	for(var/team in teams)
@@ -649,8 +658,8 @@ GLOBAL_DATUM_INIT(global_roster, /datum/roster, new)
 		return ARENA_RED_TEAM
 	else if(check_team == team2)
 		return ARENA_GREEN_TEAM
-	else if(check_team == team2)
-		return ARENA_GREEN_TEAM
+	else if(check_team == team3)
+		return ARENA_BLUE_TEAM
 
 /datum/roster/proc/add_contestant_to_antag_hud(datum/event_team/check_team)
 	if(!check_team)
