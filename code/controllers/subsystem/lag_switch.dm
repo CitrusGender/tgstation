@@ -22,6 +22,10 @@ SUBSYSTEM_DEF(lag_switch)
 		auto_switch = TRUE
 		trigger_pop = auto_switch_pop
 		RegisterSignal(SSdcs, COMSIG_GLOB_CLIENT_CONNECT, .proc/client_connected)
+
+	#ifdef EVENTMODE
+	measures[DISABLE_NON_OBSJOBS] = TRUE // disable late-join spawns by deafult
+	#endif
 	return ..()
 
 /datum/controller/subsystem/lag_switch/proc/client_connected(datum/source, client/connected)
