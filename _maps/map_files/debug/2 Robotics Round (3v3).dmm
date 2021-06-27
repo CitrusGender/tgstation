@@ -23,7 +23,9 @@
 /obj/structure/railing/corner{
 	dir = 8
 	},
-/obj/machinery/computer/mech_bay_power_console,
+/obj/machinery/computer/mech_bay_power_console{
+	dir = 4
+	},
 /turf/open/floor/iron/dark,
 /area/tdome/arena)
 "aV" = (
@@ -72,6 +74,20 @@
 	},
 /turf/open/floor/mech_bay_recharge_floor,
 /area/tdome/arena)
+"cN" = (
+/obj/effect/turf_decal/tile/red,
+/obj/effect/turf_decal/tile/red{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 4
+	},
+/obj/effect/turf_decal/tile/red{
+	dir = 8
+	},
+/obj/effect/turf_decal/box/red,
+/turf/open/floor/mech_bay_recharge_floor,
+/area/tdome/arena)
 "cS" = (
 /obj/machinery/door/airlock/research{
 	name = "Robotics Lab"
@@ -88,15 +104,22 @@
 /turf/open/floor/iron/dark,
 /area/tdome/arena)
 "de" = (
-/obj/machinery/mech_bay_recharge_port{
-	dir = 2
+/obj/effect/turf_decal/tile/blue,
+/obj/effect/turf_decal/tile/blue{
+	dir = 4
 	},
-/turf/open/floor/plating,
-/area/tdome/arena)
-"dl" = (
+/obj/effect/turf_decal/tile/blue{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/blue{
+	dir = 8
+	},
 /obj/effect/turf_decal/box/white{
 	color = "#52B4E9"
 	},
+/turf/open/floor/mech_bay_recharge_floor,
+/area/tdome/arena)
+"dl" = (
 /obj/effect/turf_decal/tile/blue{
 	dir = 4
 	},
@@ -107,7 +130,7 @@
 /obj/effect/turf_decal/tile/blue{
 	dir = 1
 	},
-/turf/open/floor/mech_bay_recharge_floor,
+/turf/open/floor/iron,
 /area/tdome/arena)
 "dE" = (
 /obj/effect/turf_decal/trimline/red/filled/line{
@@ -132,10 +155,10 @@
 /turf/open/floor/mech_bay_recharge_floor,
 /area/tdome/arena)
 "dL" = (
-/obj/machinery/computer/mech_bay_power_console{
+/obj/machinery/mech_bay_recharge_port{
 	dir = 1
 	},
-/turf/open/floor/iron,
+/turf/open/floor/plating,
 /area/tdome/arena)
 "dT" = (
 /obj/effect/turf_decal/stripes/line{
@@ -277,18 +300,18 @@
 /obj/effect/turf_decal/tile/neutral,
 /turf/open/floor/iron/dark,
 /area/tdome/arena)
+"kC" = (
+/obj/machinery/computer/mech_bay_power_console{
+	dir = 1
+	},
+/turf/open/floor/iron,
+/area/tdome/arena)
 "kF" = (
 /obj/effect/turf_decal/stripes/full,
 /obj/machinery/conveyor/auto{
 	dir = 1;
 	mouse_opacity = 0;
 	resistance_flags = 64
-	},
-/turf/open/floor/iron/dark,
-/area/tdome/arena)
-"kV" = (
-/obj/machinery/computer/mech_bay_power_console{
-	dir = 1
 	},
 /turf/open/floor/iron/dark,
 /area/tdome/arena)
@@ -637,8 +660,10 @@
 /turf/open/floor/iron/dark,
 /area/tdome/arena)
 "xV" = (
-/obj/machinery/computer/mech_bay_power_console,
-/turf/open/floor/iron,
+/obj/machinery/mech_bay_recharge_port{
+	dir = 2
+	},
+/turf/open/floor/plating,
 /area/tdome/arena)
 "xY" = (
 /obj/effect/turf_decal/tile/neutral,
@@ -811,7 +836,9 @@
 /turf/open/floor/iron/dark,
 /area/tdome/arena)
 "CB" = (
-/obj/machinery/computer/mech_bay_power_console,
+/obj/machinery/computer/mech_bay_power_console{
+	dir = 8
+	},
 /turf/open/floor/iron/dark,
 /area/tdome/arena)
 "CO" = (
@@ -832,7 +859,7 @@
 	dir = 1
 	},
 /obj/machinery/computer/mech_bay_power_console{
-	dir = 1
+	dir = 4
 	},
 /turf/open/floor/iron/dark,
 /area/tdome/arena)
@@ -1199,10 +1226,8 @@
 /turf/open/floor/carpet,
 /area/tdome/arena)
 "NS" = (
-/obj/machinery/mech_bay_recharge_port{
-	dir = 1
-	},
-/turf/open/floor/plating,
+/obj/machinery/computer/mech_bay_power_console,
+/turf/open/floor/iron,
 /area/tdome/arena)
 "Os" = (
 /obj/machinery/door/airlock/research{
@@ -1471,8 +1496,7 @@
 	dir = 8
 	},
 /obj/effect/turf_decal/tile/red,
-/obj/effect/turf_decal/box/red,
-/turf/open/floor/mech_bay_recharge_floor,
+/turf/open/floor/iron,
 /area/tdome/arena)
 "TY" = (
 /obj/effect/turf_decal/tile/red{
@@ -3935,11 +3959,11 @@ Uc
 "}
 (33,1,1) = {"
 Uc
-de
+Xv
 dl
 xV
-MD
-Xv
+de
+NS
 MD
 Xv
 MD
@@ -3992,11 +4016,11 @@ Xv
 UK
 Xv
 UK
-Xv
-UK
+kC
+cN
 dL
 TC
-NS
+Xv
 Uc
 "}
 (34,1,1) = {"
@@ -4127,7 +4151,7 @@ FD
 FD
 FD
 FD
-kV
+CB
 ja
 Uc
 "}
