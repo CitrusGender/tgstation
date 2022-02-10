@@ -36,12 +36,15 @@
 	to_chat(owner, text_gain_indication)
 	var/mob/new_mob
 	if(prob(95))
-		if(prob(50))
-			new_mob = owner.easy_randmut(NEGATIVE + MINOR_NEGATIVE)
-		else
-			new_mob = owner.randmuti()
+		switch(rand(1,3))
+			if(1)
+				new_mob = owner.easy_random_mutate(NEGATIVE + MINOR_NEGATIVE)
+			if(2)
+				new_mob = owner.random_mutate_unique_identity()
+			if(3)
+				new_mob = owner.random_mutate_unique_features()
 	else
-		new_mob = owner.easy_randmut(POSITIVE)
+		new_mob = owner.easy_random_mutate(POSITIVE)
 	if(new_mob && ismob(new_mob))
 		owner = new_mob
 	. = owner
@@ -86,7 +89,7 @@
 	quality = POSITIVE
 	difficulty = 16
 	instability = 5
-	conflicts = list(GIGANTISM)
+	conflicts = list(/datum/mutation/human/gigantism)
 	locked = TRUE    // Default intert species for now, so locked from regular pool.
 
 /datum/mutation/human/dwarfism/on_acquiring(mob/living/carbon/human/owner)
@@ -137,7 +140,6 @@
 
 /datum/mutation/human/tourettes/on_life(delta_time, times_fired)
 	if(DT_PROB(5 * GET_MUTATION_SYNCHRONIZER(src), delta_time) && owner.stat == CONSCIOUS && !owner.IsStun())
-		owner.Stun(200)
 		switch(rand(1, 3))
 			if(1)
 				owner.emote("twitch")
@@ -179,16 +181,20 @@
 	time_coeff = 2
 	locked = TRUE //Species specific, keep out of actual gene pool
 	var/datum/species/original_species = /datum/species/human
+	var/original_name
 
 /datum/mutation/human/race/on_acquiring(mob/living/carbon/human/owner)
 	if(..())
 		return
 	if(!ismonkey(owner))
 		original_species = owner.dna.species.type
+		original_name = owner.real_name
+		owner.fully_replace_character_name(null, "monkey ([rand(1,999)])")
 	. = owner.monkeyize()
 
 /datum/mutation/human/race/on_losing(mob/living/carbon/human/owner)
 	if(owner && owner.stat != DEAD && (owner.dna.mutations.Remove(src)) && ismonkey(owner))
+		owner.fully_replace_character_name(null, original_name)
 		. = owner.humanize(original_species)
 
 /datum/mutation/human/glow
@@ -354,7 +360,7 @@
 	desc = "The cells within the subject spread out to cover more area, making the subject appear larger."
 	quality = MINOR_NEGATIVE
 	difficulty = 12
-	conflicts = list(DWARFISM)
+	conflicts = list(/datum/mutation/human/dwarfism)
 
 /datum/mutation/human/gigantism/on_acquiring(mob/living/carbon/human/owner)
 	if(..())
@@ -383,12 +389,12 @@
 /datum/mutation/human/spastic/on_acquiring()
 	if(..())
 		return
-	owner.apply_status_effect(STATUS_EFFECT_SPASMS)
+	owner.apply_status_effect(/datum/status_effect/spasms)
 
 /datum/mutation/human/spastic/on_losing()
 	if(..())
 		return
-	owner.remove_status_effect(STATUS_EFFECT_SPASMS)
+	owner.remove_status_effect(/datum/status_effect/spasms)
 
 /datum/mutation/human/extrastun
 	name = "Two Left Feet"
@@ -451,7 +457,7 @@
 	for(var/obj/item/organ/I in organs)
 		qdel(I)
 
-	explosion(owner, light_impact_range = 2, adminlog = TRUE)
+	explosion(owner, light_impact_range = 2, adminlog = TRUE, explosion_cause = src)
 	for(var/mob/living/carbon/human/H in view(2,owner))
 		var/obj/item/organ/eyes/eyes = H.getorganslot(ORGAN_SLOT_EYES)
 		if(eyes)

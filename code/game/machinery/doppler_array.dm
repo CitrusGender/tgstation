@@ -18,15 +18,14 @@
 	/// List of all explosion records in the form of /datum/data/tachyon_record
 	var/list/records = list()
 
-/obj/machinery/doppler_array/Initialize()
+/obj/machinery/doppler_array/Initialize(mapload)
 	. = ..()
 	RegisterSignal(SSdcs, COMSIG_GLOB_EXPLOSION, .proc/sense_explosion)
 	RegisterSignal(src, COMSIG_MOVABLE_SET_ANCHORED, .proc/power_change)
 	printer_ready = world.time + PRINTER_TIMEOUT
-
-/obj/machinery/doppler_array/ComponentInitialize()
-	. = ..()
-	AddComponent(/datum/component/simple_rotation,ROTATION_ALTCLICK | ROTATION_CLOCKWISE,null,null,CALLBACK(src,.proc/rot_message))
+	// Alt clicking when unwrenched does not rotate. (likely from UI not returning the mouse click)
+	// Also there is no sprite change for rotation dir, this shouldn't even have a rotate component tbh
+	AddComponent(/datum/component/simple_rotation, AfterRotation = CALLBACK(src, .proc/RotationMessage))
 
 /datum/data/tachyon_record
 	name = "Log Recording"
@@ -75,7 +74,7 @@
 			records -= record
 			return TRUE
 		if("print_record")
-			var/datum/data/tachyon_record/record  = locate(params["ref"]) in records
+			var/datum/data/tachyon_record/record = locate(params["ref"]) in records
 			if(!records || !(record in records))
 				return
 			print(usr, record)
@@ -126,7 +125,7 @@
 		return
 	return ..()
 
-/obj/machinery/doppler_array/proc/rot_message(mob/user)
+/obj/machinery/doppler_array/proc/RotationMessage(mob/user)
 	to_chat(user, span_notice("You adjust [src]'s dish to face to the [dir2text(dir)]."))
 	playsound(src, 'sound/items/screwdriver2.ogg', 50, TRUE)
 
@@ -194,7 +193,7 @@
 	circuit = /obj/item/circuitboard/machine/doppler_array
 	var/datum/techweb/linked_techweb
 
-/obj/machinery/doppler_array/research/Initialize()
+/obj/machinery/doppler_array/research/Initialize(mapload)
 	..()
 	linked_techweb = SSresearch.science_tech
 	return INITIALIZE_HINT_LATELOAD
@@ -226,11 +225,11 @@
 	var/cash_gain = 0
 
 	/*****The Point Calculator*****/
-	if(orig_light_range < 10)
+	if(orig_light_range < TECHWEB_BOMB_MIN_RANGE)
 		say("Explosion not large enough for profitability.")
 		return
-	else if(orig_light_range < 4500)
-		cash_gain = (83300 * orig_light_range) / (orig_light_range + 3000)
+	else if(orig_light_range < TECHWEB_BOMB_MAX_RANGE)
+		cash_gain = (TECHWEB_BOMB_SCALE_CONST * orig_light_range) / (TECHWEB_BOMB_SCALE_DIVISOR + orig_light_range)
 	else
 		cash_gain = TECHWEB_BOMB_CASHCAP
 
@@ -240,19 +239,19 @@
 			var/old_tech_largest_bomb_value = linked_techweb.largest_bomb_value //held so we can pull old before we do math
 			linked_techweb.largest_bomb_value = cash_gain
 			cash_gain -= old_tech_largest_bomb_value
-			cash_gain = min(cash_gain,TECHWEB_BOMB_CASHCAP)
+			cash_gain = min(cash_gain, TECHWEB_BOMB_CASHCAP)
 		else
 			linked_techweb.largest_bomb_value = TECHWEB_BOMB_CASHCAP
 			cash_gain = 1000
 		var/datum/bank_account/D = SSeconomy.get_dep_account(ACCOUNT_SCI)
 		if(D)
 			D.adjust_money(cash_gain)
-			say("Explosion details and mixture analyzed and sold to the highest bidder for [cash_gain] cr.")
+			say("Explosion details and mixture analysis sold to the highest bidder for [cash_gain] cr.")
 	else //you've made smaller bombs
 		say("Data already captured. Aborting.")
 		return
 
-/obj/machinery/doppler_array/research/science/Initialize()
+/obj/machinery/doppler_array/research/science/Initialize(mapload)
 	. = ..()
 	linked_techweb = SSresearch.science_tech
 

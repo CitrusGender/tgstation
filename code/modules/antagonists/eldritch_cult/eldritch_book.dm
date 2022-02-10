@@ -10,7 +10,7 @@
 	///how many charges do we have?
 	var/charge = 1
 	///Where we cannot create the rune?
-	var/static/list/blacklisted_turfs = typecacheof(list(/turf/closed,/turf/open/space,/turf/open/lava))
+	var/static/list/blacklisted_turfs = typecacheof(list(/turf/closed, /turf/open/space, /turf/open/lava))
 
 /obj/item/forbidden_book/Destroy()
 	last_user = null
@@ -144,3 +144,6 @@
 
 /obj/item/forbidden_book/debug
 	charge = 100
+
+/obj/item/forbidden_book/ritual
+	charge = 0

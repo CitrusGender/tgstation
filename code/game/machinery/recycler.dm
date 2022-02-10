@@ -6,6 +6,7 @@
 	icon = 'icons/obj/recycling.dmi'
 	icon_state = "grinder-o0"
 	layer = ABOVE_ALL_MOB_LAYER // Overhead
+	plane = ABOVE_GAME_PLANE
 	density = TRUE
 	circuit = /obj/item/circuitboard/machine/recycler
 	var/safety_mode = FALSE // Temporarily stops machine if it detects a mob
@@ -17,7 +18,7 @@
 	var/eat_victim_items = TRUE
 	var/item_recycle_sound = 'sound/items/welder.ogg'
 
-/obj/machinery/recycler/Initialize()
+/obj/machinery/recycler/Initialize(mapload)
 	var/list/allowed_materials = list(
 		/datum/material/iron,
 		/datum/material/glass,
@@ -43,7 +44,7 @@
 	var/static/list/loc_connections = list(
 		COMSIG_ATOM_ENTERED = .proc/on_entered,
 	)
-	AddElement(/datum/element/connect_loc, src, loc_connections)
+	AddElement(/datum/element/connect_loc, loc_connections)
 
 /obj/machinery/recycler/RefreshParts()
 	var/amt_made = 0
@@ -99,12 +100,11 @@
 	icon_state = icon_name + "[is_powered]" + "[(bloody ? "bld" : "")]" // add the blood tag at the end
 	return ..()
 
-/obj/machinery/recycler/CanAllowThrough(atom/movable/AM)
+/obj/machinery/recycler/CanAllowThrough(atom/movable/mover, border_dir)
 	. = ..()
 	if(!anchored)
 		return
-	var/move_dir = get_dir(loc, AM.loc)
-	if(move_dir == eat_dir)
+	if(border_dir == eat_dir)
 		return TRUE
 
 /obj/machinery/recycler/proc/on_entered(datum/source, atom/movable/AM)
@@ -121,7 +121,7 @@
 	if(!isturf(AM0.loc))
 		return //I don't know how you called Crossed() but stop it.
 
-	var/list/to_eat = AM0.GetAllContents()
+	var/list/to_eat = AM0.get_all_contents()
 
 	var/living_detected = FALSE //technically includes silicons as well but eh
 	var/list/nom = list()
@@ -155,7 +155,7 @@
 		playsound(src, 'sound/machines/buzz-sigh.ogg', (50 + not_eaten*5), FALSE, not_eaten, ignore_walls = (not_eaten - 10)) // Ditto.
 	if(!ismob(AM0))
 		qdel(AM0)
-	else // Lets not move a mob to nullspace and qdel it, yes?
+	else // Lets not qdel a mob, yes?
 		for(var/i in AM0.contents)
 			var/atom/movable/content = i
 			content.moveToNullspace()
@@ -176,6 +176,7 @@
 			return
 		materials.insert_item(I, material_amount, multiplier = (amount_produced / 100), breakdown_flags=BREAKDOWN_FLAGS_RECYCLER)
 		materials.retrieve_all()
+	qdel(I)
 
 
 /obj/machinery/recycler/proc/emergency_stop()

@@ -34,7 +34,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 	if(world.time < next_hallucination)
 		return
 
-	var/halpick = pickweight(GLOB.hallucination_list)
+	var/halpick = pick_weight(GLOB.hallucination_list)
 	new halpick(src, FALSE)
 
 	next_hallucination = world.time + rand(100, 600)
@@ -103,6 +103,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 	var/col_mod = null
 	var/image/current_image = null
 	var/image_layer = MOB_LAYER
+	var/image_plane = GAME_PLANE
 	var/active = TRUE //qdelery
 
 /obj/effect/hallucination/singularity_pull()
@@ -113,6 +114,9 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 
 /obj/effect/hallucination/simple/Initialize(mapload, mob/living/carbon/T)
 	. = ..()
+	if(!T)
+		stack_trace("A hallucination was created with no target")
+		return INITIALIZE_HINT_QDEL
 	target = T
 	current_image = GetImage()
 	if(target.client)
@@ -120,6 +124,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 
 /obj/effect/hallucination/simple/proc/GetImage()
 	var/image/I = image(image_icon,src,image_state,image_layer,dir=src.dir)
+	I.plane = image_plane
 	I.pixel_x = px
 	I.pixel_y = py
 	if(col_mod)
@@ -165,7 +170,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 	icon_state = "nothing"
 	anchored = TRUE
 	layer = FLY_LAYER
-	plane = GAME_PLANE
+	plane = ABOVE_GAME_PLANE
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 
 /datum/hallucination/fake_flood
@@ -192,7 +197,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 	var/obj/effect/plasma_image_holder/pih = new(center)
 	var/image/plasma_image = image(image_icon, pih, image_state, FLY_LAYER)
 	plasma_image.alpha = 50
-	plasma_image.plane = GAME_PLANE
+	plasma_image.plane = ABOVE_GAME_PLANE
 	flood_images += plasma_image
 	flood_image_holders += pih
 	flood_turfs += center
@@ -209,7 +214,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 			return
 		Expand()
 		if((get_turf(target) in flood_turfs) && !target.internal)
-			new /datum/hallucination/fake_alert(target, TRUE, "too_much_tox")
+			new /datum/hallucination/fake_alert(target, TRUE, "too_much_plas")
 		next_expand = world.time + FAKE_FLOOD_EXPAND_TIME
 
 /datum/hallucination/fake_flood/proc/Expand()
@@ -223,7 +228,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 			var/obj/effect/plasma_image_holder/pih = new(T)
 			var/image/new_plasma = image(image_icon, pih, image_state, FLY_LAYER)
 			new_plasma.alpha = 50
-			new_plasma.plane = GAME_PLANE
+			new_plasma.plane = ABOVE_GAME_PLANE
 			flood_images += new_plasma
 			flood_image_holders += pih
 			flood_turfs += T
@@ -566,7 +571,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 				else
 					image_file = 'icons/mob/inhands/weapons/swords_lefthand.dmi'
 				target.playsound_local(H, 'sound/weapons/saberon.ogg',35,1)
-				A = image(image_file,H,"swordred", layer=ABOVE_MOB_LAYER)
+				A = image(image_file,H,"e_sword_on_red", layer=ABOVE_MOB_LAYER)
 			if("dual_esword")
 				if(side == "right")
 					image_file = 'icons/mob/inhands/weapons/swords_righthand.dmi'
@@ -651,7 +656,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 				A = image('icons/effects/effects.dmi',H,"nothing")
 				A.name = "..."
 			if("monkey")//Monkey
-				A = image('icons/mob/monkey.dmi',H,"monkey1")
+				A = image('icons/mob/human.dmi',H,"monkey")
 				A.name = "Monkey ([rand(1,999)])"
 			if("carp")//Carp
 				A = image('icons/mob/carp.dmi',H,"carp")
@@ -695,7 +700,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 	feedback_details += "Type: [kind]"
 	switch(kind)
 		if("monkey")//Monkey
-			A = image('icons/mob/monkey.dmi',target,"monkey1")
+			A = image('icons/mob/human.dmi',target,"monkey")
 		if("carp")//Carp
 			A = image('icons/mob/animal.dmi',target,"carp")
 		if("corgi")//Corgi
@@ -787,6 +792,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 
 /obj/effect/hallucination/fake_door_lock
 	layer = CLOSED_DOOR_LAYER + 1 //for Bump priority
+	plane = GAME_PLANE
 	var/image/bolt_light
 	var/obj/machinery/door/airlock/airlock
 
@@ -802,7 +808,7 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 		target.playsound_local(get_turf(airlock), 'sound/machines/boltsup.ogg',30,0,3)
 	qdel(src)
 
-/obj/effect/hallucination/fake_door_lock/CanAllowThrough(atom/movable/mover, turf/_target)
+/obj/effect/hallucination/fake_door_lock/CanAllowThrough(atom/movable/mover, border_dir)
 	. = ..()
 	if(mover == target && airlock.density)
 		return FALSE
@@ -859,10 +865,10 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 	feedback_details += "Type: [is_radio ? "Radio" : "Talk"], Source: [person.real_name], Message: [message]"
 
 	// Display message
-	if (!is_radio && !target.client?.prefs.chat_on_map)
+	if (!is_radio && !target.client?.prefs.read_preference(/datum/preference/toggle/enable_runechat))
 		var/image/speech_overlay = image('icons/mob/talk.dmi', person, "default0", layer = ABOVE_MOB_LAYER)
 		INVOKE_ASYNC(GLOBAL_PROC, /proc/flick_overlay, speech_overlay, list(target.client), 30)
-	if (target.client?.prefs.chat_on_map)
+	if (target.client?.prefs.read_preference(/datum/preference/toggle/enable_runechat))
 		target.create_chat_message(person, understood_language, chosen, spans)
 	to_chat(target, message)
 	qdel(src)
@@ -1106,23 +1112,23 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 /datum/hallucination/fake_alert/New(mob/living/carbon/C, forced = TRUE, specific, duration = 150)
 	set waitfor = FALSE
 	..()
-	alert_type = pick("not_enough_oxy","not_enough_tox","not_enough_co2","too_much_oxy","too_much_co2","too_much_tox","newlaw","nutrition","charge","gravity","fire","locked","hacked","temphot","tempcold","pressure")
+	alert_type = pick("not_enough_oxy","not_enough_plas","not_enough_co2","too_much_oxy","too_much_co2","too_much_plas","newlaw","nutrition","charge","gravity","fire","locked","hacked","temphot","tempcold","pressure")
 	if(specific)
 		alert_type = specific
 	feedback_details += "Type: [alert_type]"
 	switch(alert_type)
 		if("not_enough_oxy")
 			target.throw_alert(alert_type, /atom/movable/screen/alert/not_enough_oxy, override = TRUE)
-		if("not_enough_tox")
-			target.throw_alert(alert_type, /atom/movable/screen/alert/not_enough_tox, override = TRUE)
+		if("not_enough_plas")
+			target.throw_alert(alert_type, /atom/movable/screen/alert/not_enough_plas, override = TRUE)
 		if("not_enough_co2")
 			target.throw_alert(alert_type, /atom/movable/screen/alert/not_enough_co2, override = TRUE)
 		if("too_much_oxy")
 			target.throw_alert(alert_type, /atom/movable/screen/alert/too_much_oxy, override = TRUE)
 		if("too_much_co2")
 			target.throw_alert(alert_type, /atom/movable/screen/alert/too_much_co2, override = TRUE)
-		if("too_much_tox")
-			target.throw_alert(alert_type, /atom/movable/screen/alert/too_much_tox, override = TRUE)
+		if("too_much_plas")
+			target.throw_alert(alert_type, /atom/movable/screen/alert/too_much_plas, override = TRUE)
 		if("nutrition")
 			if(prob(50))
 				target.throw_alert(alert_type, /atom/movable/screen/alert/fat, override = TRUE)
@@ -1256,8 +1262,8 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 					halitem.icon_state = "plasticx40"
 			if(3) //sword
 				halitem.icon = 'icons/obj/transforming_energy.dmi'
-				halitem.icon_state = "sword0"
-				halitem.name = "Energy Sword"
+				halitem.icon_state = "e_sword"
+				halitem.name = "energy sword"
 			if(4) //stun baton
 				halitem.icon = 'icons/obj/items_and_weapons.dmi'
 				halitem.icon_state = "stunbaton"
@@ -1329,10 +1335,11 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 	var/static/list/loc_connections = list(
 		COMSIG_ATOM_ENTERED = .proc/on_entered,
 	)
-	AddElement(/datum/element/connect_loc, src, loc_connections)
+	AddElement(/datum/element/connect_loc, loc_connections)
 
 /obj/effect/hallucination/danger/lava/show_icon()
-	image = image('icons/turf/floors/lava.dmi', src, "lava-0", TURF_LAYER)
+	var/turf/danger_turf = get_turf(src)
+	image = image('icons/turf/floors/lava.dmi', src, "lava-[danger_turf.smoothing_junction || 0]", TURF_LAYER)
 	if(target.client)
 		target.client.images += image
 
@@ -1350,11 +1357,11 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 	var/static/list/loc_connections = list(
 		COMSIG_ATOM_ENTERED = .proc/on_entered,
 	)
-	AddElement(/datum/element/connect_loc, src, loc_connections)
+	AddElement(/datum/element/connect_loc, loc_connections)
 
 /obj/effect/hallucination/danger/chasm/show_icon()
-	var/turf/target_loc = get_turf(target)
-	image = image('icons/turf/floors/chasms.dmi', src, "chasms-[target_loc.smoothing_junction]", TURF_LAYER)
+	var/turf/danger_turf = get_turf(src)
+	image = image('icons/turf/floors/chasms.dmi', src, "chasms-[danger_turf.smoothing_junction || 0]", TURF_LAYER)
 	if(target.client)
 		target.client.images += image
 
@@ -1371,13 +1378,13 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 /obj/effect/hallucination/danger/anomaly
 	name = "flux wave anomaly"
 
-/obj/effect/hallucination/danger/anomaly/Initialize()
+/obj/effect/hallucination/danger/anomaly/Initialize(mapload)
 	. = ..()
 	START_PROCESSING(SSobj, src)
 	var/static/list/loc_connections = list(
 		COMSIG_ATOM_ENTERED = .proc/on_entered,
 	)
-	AddElement(/datum/element/connect_loc, src, loc_connections)
+	AddElement(/datum/element/connect_loc, loc_connections)
 
 /obj/effect/hallucination/danger/anomaly/process(delta_time)
 	if(DT_PROB(45, delta_time))

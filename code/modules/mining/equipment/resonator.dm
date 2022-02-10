@@ -52,6 +52,7 @@
 	desc = "A resonating field that significantly damages anything inside of it when the field eventually ruptures. More damaging in low pressure environments."
 	icon_state = "shield1"
 	layer = ABOVE_ALL_MOB_LAYER
+	plane = ABOVE_GAME_PLANE
 	duration = 60 SECONDS
 	var/resonance_damage = 20
 	var/damage_multiplier = 1
@@ -69,7 +70,7 @@
 		var/static/list/loc_connections = list(
 			COMSIG_ATOM_ENTERED = .proc/burst,
 		)
-		AddElement(/datum/element/connect_loc, src, loc_connections)
+		AddElement(/datum/element/connect_loc, loc_connections)
 	. = ..()
 	creator = set_creator
 	res = set_resonator
@@ -125,9 +126,10 @@
 /obj/effect/temp_visual/resonance_crush
 	icon_state = "shield1"
 	layer = ABOVE_ALL_MOB_LAYER
+	plane = ABOVE_GAME_PLANE
 	duration = 4
 
-/obj/effect/temp_visual/resonance_crush/Initialize()
+/obj/effect/temp_visual/resonance_crush/Initialize(mapload)
 	. = ..()
 	transform = matrix()*1.5
 	animate(src, transform = matrix()*0.1, alpha = 50, time = 4)

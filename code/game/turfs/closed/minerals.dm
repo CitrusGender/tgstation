@@ -14,6 +14,7 @@
 	opacity = TRUE
 	density = TRUE
 	layer = EDGED_TURF_LAYER
+	plane = GAME_PLANE_UPPER
 	base_icon_state = "smoothrocks"
 	temperature = TCMB
 	var/smooth_icon = 'icons/turf/smoothrocks.dmi'
@@ -27,7 +28,7 @@
 	// If true you can mine the mineral turf with your hands
 	var/weak_turf = FALSE
 
-/turf/closed/mineral/Initialize()
+/turf/closed/mineral/Initialize(mapload)
 	. = ..()
 	var/matrix/M = new
 	M.Translate(-4, -4)
@@ -143,21 +144,21 @@
 		gets_drilled(H)
 	return TRUE
 
-/turf/closed/mineral/Bumped(atom/movable/AM)
-	..()
-	if(ishuman(AM))
-		var/mob/living/carbon/human/H = AM
-		var/obj/item/I = H.is_holding_tool_quality(TOOL_MINING)
-		if(I)
-			attackby(I, H)
+/turf/closed/mineral/Bumped(atom/movable/movable)
+	. = ..()
+	if(!isliving(movable))
 		return
-	else if(iscyborg(AM))
-		var/mob/living/silicon/robot/R = AM
-		if(R.module_active && R.module_active.tool_behaviour == TOOL_MINING)
-			attackby(R.module_active, R)
-			return
-	else
+	var/mob/living/miner = movable
+	if(!ISADVANCEDTOOLUSER(miner)) // Unadvanced tool users can't mine anyway. This just prevents message spam from attackby()
 		return
+	if(iscyborg(miner))
+		var/mob/living/silicon/robot/robot = miner
+		if(robot.module_active?.tool_behaviour == TOOL_MINING)
+			attackby(robot.module_active, robot)
+		return
+	var/obj/item/mining_item = miner.is_holding_tool_quality(TOOL_MINING)
+	if(mining_item)
+		attackby(mining_item, miner)
 
 /turf/closed/mineral/acid_melt()
 	ScrapeAway()
@@ -182,7 +183,7 @@
 		//Currently, Adamantine won't spawn as it has no uses. -Durandan
 	var/mineralChance = 13
 
-/turf/closed/mineral/random/Initialize()
+/turf/closed/mineral/random/Initialize(mapload)
 	if(SSevents.holidays && SSevents.holidays[APRIL_FOOLS])
 		mineralSpawnChanceList[/obj/item/stack/ore/bananium] = 3
 
@@ -190,7 +191,7 @@
 
 	. = ..()
 	if (prob(mineralChance))
-		var/path = pickweight(mineralSpawnChanceList)
+		var/path = pick_weight(mineralSpawnChanceList)
 		if(ispath(path, /turf))
 			var/stored_flags = 0
 			if(turf_flags & NO_RUINS)
@@ -229,7 +230,7 @@
 	defer_change = TRUE
 	mineralSpawnChanceList = list(
 		/obj/item/stack/ore/uranium = 35, /obj/item/stack/ore/diamond = 30, /obj/item/stack/ore/gold = 45, /obj/item/stack/ore/titanium = 45,
-		/obj/item/stack/ore/silver = 50, /obj/item/stack/ore/plasma = 50, /obj/item/stack/ore/bluespace_crystal)
+		/obj/item/stack/ore/silver = 50, /obj/item/stack/ore/plasma = 50, /obj/item/stack/ore/bluespace_crystal = 1)
 
 /turf/closed/mineral/random/low_chance
 	icon_state = "rock_lowchance"
@@ -301,7 +302,7 @@
 
 /turf/closed/mineral/random/snow/high_chance
 	mineralSpawnChanceList = list(
-		/obj/item/stack/ore/uranium = 35, /obj/item/stack/ore/diamond  = 30, /obj/item/stack/ore/gold = 45, /obj/item/stack/ore/titanium = 45,
+		/obj/item/stack/ore/uranium = 35, /obj/item/stack/ore/diamond = 30, /obj/item/stack/ore/gold = 45, /obj/item/stack/ore/titanium = 45,
 		/obj/item/stack/ore/silver = 50, /obj/item/stack/ore/plasma = 50, /obj/item/stack/ore/bluespace_crystal = 20)
 
 /turf/closed/mineral/random/labormineral
@@ -517,6 +518,16 @@
 	smooth_icon = 'icons/turf/walls/red_wall.dmi'
 	base_icon_state = "red_wall"
 
+/turf/closed/mineral/random/stationside/asteroid/porus
+	name = "porous iron rock"
+	desc = "This rock is filled with pockets of breathable air."
+	baseturfs = /turf/open/floor/plating/asteroid
+
+/turf/closed/mineral/asteroid/porous
+	name = "porous rock"
+	desc = "This rock is filled with pockets of breathable air."
+	baseturfs = /turf/open/floor/plating/asteroid
+
 //GIBTONITE
 
 /turf/closed/mineral/gibtonite
@@ -528,7 +539,7 @@
 	var/activated_name = null
 	var/mutable_appearance/activated_overlay
 
-/turf/closed/mineral/gibtonite/Initialize()
+/turf/closed/mineral/gibtonite/Initialize(mapload)
 	det_time = rand(8,10) //So you don't know exactly when the hot potato will explode
 	. = ..()
 
@@ -541,6 +552,7 @@
 /turf/closed/mineral/gibtonite/proc/explosive_reaction(mob/user = null, triggered_by_explosion = 0)
 	if(stage == GIBTONITE_UNSTRUCK)
 		activated_overlay = mutable_appearance('icons/turf/smoothrocks.dmi', "rock_Gibtonite_inactive", ON_EDGED_TURF_LAYER) //shows in gaps between pulses if there are any
+		activated_overlay.plane = GAME_PLANE_UPPER
 		add_overlay(activated_overlay)
 		name = "gibtonite deposit"
 		desc = "An active gibtonite reserve. Run!"
@@ -567,7 +579,7 @@
 			var/turf/bombturf = get_turf(src)
 			mineralAmt = 0
 			stage = GIBTONITE_DETONATE
-			explosion(bombturf, devastation_range = 1, heavy_impact_range = 3, light_impact_range = 5, adminlog = notify_admins)
+			explosion(bombturf, devastation_range = 1, heavy_impact_range = 3, light_impact_range = 5, adminlog = notify_admins, explosion_cause = src)
 
 /turf/closed/mineral/gibtonite/proc/defuse()
 	if(stage == GIBTONITE_ACTIVE)
@@ -589,7 +601,7 @@
 		var/turf/bombturf = get_turf(src)
 		mineralAmt = 0
 		stage = GIBTONITE_DETONATE
-		explosion(bombturf, devastation_range = 1, heavy_impact_range = 2, light_impact_range = 5, adminlog = FALSE)
+		explosion(bombturf, devastation_range = 1, heavy_impact_range = 2, light_impact_range = 5, adminlog = FALSE, explosion_cause = src)
 	if(stage == GIBTONITE_STABLE) //Gibtonite deposit is now benign and extractable. Depending on how close you were to it blowing up before defusing, you get better quality ore.
 		var/obj/item/gibtonite/G = new (src)
 		if(det_time <= 0)

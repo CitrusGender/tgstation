@@ -24,7 +24,7 @@
 	attack_verb_simple = list("attack", "slash", "stab", "slice", "tear", "lacerate", "rip", "dice", "cut")
 	block_chance = 75
 	max_integrity = 200
-	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 0, RAD = 0, FIRE = 100, ACID = 70)
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 0, FIRE = 100, ACID = 70)
 	resistance_flags = FIRE_PROOF
 	wound_bonus = -10
 	bare_wound_bonus = 20
@@ -45,7 +45,7 @@
 	SIGNAL_HANDLER
 
 	if(user?.has_dna())
-		if(user.dna.check_mutation(HULK))
+		if(user.dna.check_mutation(/datum/mutation/human/hulk))
 			to_chat(user, span_warning("You lack the grace to wield this!"))
 			return COMPONENT_TWOHANDED_BLOCK_WIELD
 	wielded = TRUE
@@ -98,7 +98,7 @@
 		user.visible_message(span_suicide("[user] begins beating [user.p_them()]self to death with \the [src]'s handle! It probably would've been cooler if [user.p_they()] turned it on first!"))
 	return BRUTELOSS
 
-/obj/item/dualsaber/Initialize()
+/obj/item/dualsaber/Initialize(mapload)
 	. = ..()
 	RegisterSignal(src, COMSIG_TWOHANDED_WIELD, .proc/on_wield)
 	RegisterSignal(src, COMSIG_TWOHANDED_UNWIELD, .proc/on_unwield)
@@ -120,7 +120,7 @@
 
 /obj/item/dualsaber/attack(mob/target, mob/living/carbon/human/user)
 	if(user.has_dna())
-		if(user.dna.check_mutation(HULK))
+		if(user.dna.check_mutation(/datum/mutation/human/hulk))
 			to_chat(user, span_warning("You grip the blade too hard and accidentally drop it!"))
 			if(wielded)
 				user.dropItemToGround(src, force=TRUE)
@@ -160,7 +160,7 @@
 		return 1
 
 /obj/item/dualsaber/ignition_effect(atom/A, mob/user)
-	// same as /obj/item/melee/transforming/energy, mostly
+	// same as /obj/item/melee/energy, mostly
 	if(!wielded)
 		return ""
 	var/in_mouth = ""

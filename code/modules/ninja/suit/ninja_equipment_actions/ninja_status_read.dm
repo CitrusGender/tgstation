@@ -19,7 +19,7 @@
 	info_list += "[span_info("SpiderOS Status: [s_initialized ? "Initialized" : "Disabled"]")]\n"
 	info_list += "[span_info("Current Time: [station_time_timestamp()]")]\n"
 	//Ninja status
-	info_list += "[span_info("Fingerprints: [md5(ninja.dna.uni_identity)]")]\n"
+	info_list += "[span_info("Fingerprints: [md5(ninja.dna.unique_identity)]")]\n"
 	info_list += "[span_info("Unique Identity: [ninja.dna.unique_enzymes]")]\n"
 	info_list += "[span_info("Overall Status: [ninja.stat > 1 ? "dead" : "[ninja.health]% healthy"]")]\n"
 	info_list += "[span_info("Nutrition Status: [ninja.nutrition]")]\n"
@@ -27,7 +27,6 @@
 	info_list += "[span_info("Toxin Levels: [ninja.getToxLoss()]")]\n"
 	info_list += "[span_info("Burn Severity: [ninja.getFireLoss()]")]\n"
 	info_list += "[span_info("Brute Trauma: [ninja.getBruteLoss()]")]\n"
-	info_list += "[span_info("Radiation Levels: [ninja.radiation] rad")]\n"
 	info_list += "[span_info("Body Temperature: [ninja.bodytemperature-T0C] degrees C ([ninja.bodytemperature*1.8-459.67] degrees F)")]\n"
 
 	//Diseases

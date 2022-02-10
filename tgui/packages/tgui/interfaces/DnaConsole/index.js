@@ -5,7 +5,7 @@ import { DnaConsoleEnzymes } from './DnaConsoleEnzymes';
 import { DnaConsoleSequencer } from './DnaConsoleSequencer';
 import { DnaConsoleStorage } from './DnaConsoleStorage';
 import { DnaScanner } from './DnaScanner';
-import { CONSOLE_MODE_ENZYMES, CONSOLE_MODE_SEQUENCER, CONSOLE_MODE_STORAGE, STORAGE_MODE_CONSOLE } from './constants';
+import { CONSOLE_MODE_ENZYMES, CONSOLE_MODE_FEATURES, CONSOLE_MODE_SEQUENCER, CONSOLE_MODE_STORAGE, STORAGE_MODE_CONSOLE } from './constants';
 
 const DnaConsoleCommands = (props, context) => {
   const { data, act } = useBackend(context);
@@ -42,6 +42,12 @@ const DnaConsoleCommands = (props, context) => {
             onClick={() => act('set_view', {
               consoleMode: CONSOLE_MODE_ENZYMES,
             })} />
+          <Button
+            content="Features"
+            selected={consoleMode === CONSOLE_MODE_FEATURES}
+            onClick={() => act('set_view', {
+              consoleMode: CONSOLE_MODE_FEATURES,
+            })} />
         </LabeledList.Item>
         {!!hasDisk && (
           <LabeledList.Item label="Disk">
@@ -64,8 +70,10 @@ const DnaConsoleCommands = (props, context) => {
 export const DnaConsole = (props, context) => {
   const { data, act } = useBackend(context);
   const {
-    isPulsingRads,
-    radPulseSeconds,
+    isPulsing,
+    timeToPulse,
+    subjectUNI,
+    subjectUF,
   } = data;
   const { consoleMode } = data.view;
   return (
@@ -73,7 +81,7 @@ export const DnaConsole = (props, context) => {
       title="DNA Console"
       width={539}
       height={710}>
-      {!!isPulsingRads && (
+      {!!isPulsing && (
         <Dimmer
           fontSize="14px"
           textAlign="center">
@@ -81,9 +89,9 @@ export const DnaConsole = (props, context) => {
             mr={1}
             name="spinner"
             spin />
-          Radiation pulse in progress...
+          Pulse in progress...
           <Box mt={1} />
-          {radPulseSeconds}s
+          {timeToPulse}s
         </Dimmer>
       )}
       <Window.Content scrollable>
@@ -96,7 +104,16 @@ export const DnaConsole = (props, context) => {
           <DnaConsoleSequencer />
         )}
         {consoleMode === CONSOLE_MODE_ENZYMES && (
-          <DnaConsoleEnzymes />
+          <DnaConsoleEnzymes
+            subjectBlock={subjectUNI}
+            type="ui"
+            name="Enzymes" />
+        )}
+        {consoleMode === CONSOLE_MODE_FEATURES && (
+          <DnaConsoleEnzymes
+            subjectBlock={subjectUF}
+            type="uf"
+            name="Features" />
         )}
       </Window.Content>
     </Window>

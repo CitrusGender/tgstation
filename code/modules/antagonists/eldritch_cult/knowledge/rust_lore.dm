@@ -4,7 +4,7 @@
 	gain_text = "'Let me tell you a story', said the Blacksmith, as he gazed deep into his rusty blade."
 	banned_knowledge = list(/datum/eldritch_knowledge/base_ash,/datum/eldritch_knowledge/base_flesh,/datum/eldritch_knowledge/final/ash_final,/datum/eldritch_knowledge/final/flesh_final,/datum/eldritch_knowledge/final/void_final,/datum/eldritch_knowledge/base_void)
 	next_knowledge = list(/datum/eldritch_knowledge/rust_fist)
-	required_atoms = list(/obj/item/kitchen/knife,/obj/item/trash)
+	required_atoms = list(/obj/item/knife,/obj/item/trash)
 	result_atoms = list(/obj/item/melee/sickly_blade/rust)
 	cost = 1
 	route = PATH_RUST
@@ -21,7 +21,6 @@
 		/turf/open/space,
 		/turf/open/lava,
 		/turf/open/chasm,
-		/turf/open/floor/plating/rust
 	))
 	route = PATH_RUST
 
@@ -42,13 +41,13 @@
 	. = ..()
 	if(ishuman(target))
 		var/mob/living/carbon/human/victim = target
-		var/datum/status_effect/eldritch/effect = victim.has_status_effect(/datum/status_effect/eldritch/rust) || victim.has_status_effect(/datum/status_effect/eldritch/ash) || victim.has_status_effect(/datum/status_effect/eldritch/flesh)  || victim.has_status_effect(/datum/status_effect/eldritch/void)
+		var/datum/status_effect/eldritch/effect = victim.has_status_effect(/datum/status_effect/eldritch/rust) || victim.has_status_effect(/datum/status_effect/eldritch/ash) || victim.has_status_effect(/datum/status_effect/eldritch/flesh) || victim.has_status_effect(/datum/status_effect/eldritch/void)
 		if(effect)
 			effect.on_effect()
 			victim.adjustOrganLoss(pick(ORGAN_SLOT_BRAIN,ORGAN_SLOT_EARS,ORGAN_SLOT_EYES,ORGAN_SLOT_LIVER,ORGAN_SLOT_LUNGS,ORGAN_SLOT_STOMACH,ORGAN_SLOT_HEART),25)
 
 /datum/eldritch_knowledge/spell/area_conversion
-	name = "Agressive Spread"
+	name = "Aggressive Spread"
 	desc = "Spreads rust to nearby surfaces. Already rusted surfaces are destroyed."
 	gain_text = "All wise men know well not to touch the Bound King."
 	cost = 1
@@ -68,27 +67,30 @@
 	next_knowledge = list(
 		/datum/eldritch_knowledge/rust_mark,
 		/datum/eldritch_knowledge/armor,
-		/datum/eldritch_knowledge/essence
+		/datum/eldritch_knowledge/essence,
 	)
 	route = PATH_RUST
 
 /datum/eldritch_knowledge/rust_regen/on_gain(mob/user)
 	. = ..()
-	RegisterSignal(user,COMSIG_MOVABLE_MOVED,.proc/on_move)
+	RegisterSignal(user, COMSIG_MOVABLE_MOVED, .proc/on_move)
 
 /datum/eldritch_knowledge/rust_regen/proc/on_move(mob/mover)
 	SIGNAL_HANDLER
 
-	if(istype(get_turf(mover),/turf/open/floor/plating/rust))
-		ADD_TRAIT(mover,TRAIT_STUNRESISTANCE,type)
-	else
-		REMOVE_TRAIT(mover,TRAIT_STUNRESISTANCE,type)
+	var/turf/mover_turf = get_turf(mover)
+	if(HAS_TRAIT(mover_turf, TRAIT_RUSTY))
+		ADD_TRAIT(mover, TRAIT_STUNRESISTANCE, type)
+		return
+
+	REMOVE_TRAIT(mover, TRAIT_STUNRESISTANCE, type)
 
 /datum/eldritch_knowledge/rust_regen/on_life(mob/user)
 	. = ..()
-	var/turf/user_loc_turf = get_turf(user)
-	if(!istype(user_loc_turf, /turf/open/floor/plating/rust) || !isliving(user))
+	var/turf/our_turf = get_turf(user)
+	if(!HAS_TRAIT(our_turf, TRAIT_RUSTY) || !isliving(user))
 		return
+
 	var/mob/living/living_user = user
 	living_user.adjustBruteLoss(-2, FALSE)
 	living_user.adjustFireLoss(-2, FALSE)
@@ -178,7 +180,8 @@
 
 /datum/eldritch_knowledge/final/rust_final/proc/on_move(mob/mover)
 	SIGNAL_HANDLER
-	var/mover_on_rust = istype(get_turf(mover),/turf/open/floor/plating/rust)
+	var/atom/mover_turf = get_turf(mover)
+	var/mover_on_rust = HAS_TRAIT(mover_turf, TRAIT_RUSTY)
 
 	//We check if we are currently standing on a rust tile, but the immunities are not active, if so apply immunities, set immunities_active to TRUE
 	if(mover_on_rust && !immunities_active)
@@ -197,7 +200,7 @@
 /datum/eldritch_knowledge/final/rust_final/on_life(mob/user)
 	. = ..()
 	var/turf/user_loc_turf = get_turf(user)
-	if(!istype(user_loc_turf, /turf/open/floor/plating/rust) || !isliving(user) || !finished)
+	if(!HAS_TRAIT(user_loc_turf, TRAIT_RUSTY) || !isliving(user) || !finished)
 		return
 	var/mob/living/carbon/human/human_user = user
 	human_user.adjustBruteLoss(-4, FALSE)
@@ -209,69 +212,74 @@
 /**
  * #Rust spread datum
  *
- * Simple datum that automatically spreads rust around it
+ * Simple datum that automatically spreads rust around it.
  *
- * Simple implementation of automatically growing entity
+ * Simple implementation of automatically growing entity.
  */
 /datum/rust_spread
-	var/list/edge_turfs = list()
-	var/list/turfs = list()
+	/// The rate of spread every tick.
+	var/spread_per_sec = 6
+	/// The very center of the spread.
 	var/turf/centre
+	/// List of turfs at the edge of our rust (but not yet rusted).
+	var/list/edge_turfs = list()
+	/// List of all turfs we've afflicted.
+	var/list/rusted_turfs = list()
+	/// Static blacklist of turfs we can't spread to.
 	var/static/list/blacklisted_turfs = typecacheof(list(
 		/turf/open/indestructible,
 		/turf/closed/indestructible,
 		/turf/open/space,
 		/turf/open/lava,
-		/turf/open/chasm
+		/turf/open/chasm,
 	))
-	var/spread_per_sec = 6
-
 
 /datum/rust_spread/New(loc)
-	. = ..()
 	centre = get_turf(loc)
 	centre.rust_heretic_act()
-	turfs += centre
-	START_PROCESSING(SSprocessing,src)
+	rusted_turfs += centre
+	START_PROCESSING(SSprocessing, src)
 
 /datum/rust_spread/Destroy(force, ...)
-	STOP_PROCESSING(SSprocessing,src)
+	centre = null
+	edge_turfs.Cut()
+	rusted_turfs.Cut()
+	STOP_PROCESSING(SSprocessing, src)
 	return ..()
 
 /datum/rust_spread/process(delta_time)
-	var/spread_am = round(spread_per_sec * delta_time)
+	var/spread_amount = round(spread_per_sec * delta_time)
 
-	if(edge_turfs.len < spread_am)
+	if(length(edge_turfs) < spread_amount)
 		compile_turfs()
 
-	var/turf/rust_affected
-	for(var/i in 0 to spread_am)
-		if(!edge_turfs.len)
-			continue
-		rust_affected = pick(edge_turfs - turfs)
-		rust_affected.rust_heretic_act()
-		turfs += rust_affected
-
+	for(var/i in 0 to spread_amount)
+		if(!length(edge_turfs))
+			break
+		var/turf/afflicted_turf = pick_n_take(edge_turfs)
+		afflicted_turf.rust_heretic_act()
+		rusted_turfs |= afflicted_turf
 
 /**
  * Compile turfs
  *
- * Recreates all edge_turfs as well as normal turfs.
+ * Recreates the edge_turfs list.
+ * Updates the rusted_turfs list, in case any turfs within were un-rusted.
  */
 /datum/rust_spread/proc/compile_turfs()
-	edge_turfs = list()
-	var/list/removal_list = list()
-	var/max_dist = 1
-	for(var/turfie in turfs)
-		if(!istype(turfie,/turf/closed/wall/rust) && !istype(turfie,/turf/closed/wall/r_wall/rust) && !istype(turfie,/turf/open/floor/plating/rust))
-			removal_list += turfie
-		max_dist = max(max_dist, get_dist(turfie,centre) +1)
-	turfs -= removal_list
-	for(var/turfie in spiral_range_turfs(max_dist,centre,FALSE))
+	edge_turfs.Cut()
 
-		if(turfie in turfs || is_type_in_typecache(turfie,blacklisted_turfs))
+	var/max_dist = 1
+	for(var/turf/found_turf as anything in rusted_turfs)
+		if(!HAS_TRAIT(found_turf, TRAIT_RUSTY))
+			rusted_turfs -= found_turf
+		max_dist = max(max_dist, get_dist(found_turf, centre) + 1)
+
+	for(var/turf/nearby_turf as anything in spiral_range_turfs(max_dist, centre, FALSE))
+		if(nearby_turf in rusted_turfs || is_type_in_typecache(nearby_turf, blacklisted_turfs))
 			continue
-		for(var/line_turfie_owo in getline(turfie,centre))
-			if(get_dist(turfie,line_turfie_owo) <= 1)
-				edge_turfs += turfie
+
+		for(var/turf/line_turf as anything in get_line(nearby_turf, centre))
+			if(get_dist(nearby_turf, line_turf) <= 1)
+				edge_turfs |= nearby_turf
 		CHECK_TICK

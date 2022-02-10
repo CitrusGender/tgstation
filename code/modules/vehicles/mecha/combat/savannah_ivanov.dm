@@ -22,11 +22,13 @@
 	icon = 'icons/mecha/coop_mech.dmi'
 	base_icon_state = "savannah_ivanov"
 	icon_state = "savannah_ivanov_0_0"
+	//does not include mmi compatibility
+	mecha_flags = ADDING_ACCESS_POSSIBLE | CANSTRAFE | IS_ENCLOSED | HAS_LIGHTS
 	movedelay = 3
 	dir_in = 2 //Facing South.
 	max_integrity = 450 //really tanky, like damn
 	deflect_chance = 25
-	armor = list(MELEE = 45, BULLET = 40, LASER = 30, ENERGY = 30, BOMB = 40, BIO = 0, RAD = 80, FIRE = 100, ACID = 100)
+	armor = list(MELEE = 45, BULLET = 40, LASER = 30, ENERGY = 30, BOMB = 40, BIO = 0, FIRE = 100, ACID = 100)
 	max_temperature = 30000
 	infra_luminosity = 3
 	wreckage = /obj/structure/mecha_wreckage/savannah_ivanov
@@ -136,7 +138,8 @@
 	phasing = "flying"
 	movedelay = 1
 	density = FALSE
-	layer = FLY_LAYER
+	layer = ABOVE_ALL_MOB_LAYER
+	plane = GAME_PLANE_UPPER_FOV_HIDDEN
 	animate(src, alpha = 0, time = 8, easing = QUAD_EASING|EASE_IN, flags = ANIMATION_PARALLEL)
 	animate(src, pixel_z = 400, time = 10, easing = QUAD_EASING|EASE_IN, flags = ANIMATION_PARALLEL) //Animate our rising mech (just like pods hehe)
 	addtimer(CALLBACK(src, .proc/begin_landing, pilot), 2 SECONDS)
@@ -171,6 +174,7 @@
 	movedelay = initial(movedelay)
 	density = TRUE
 	layer = initial(layer)
+	plane = initial(plane)
 	skyfall_charge_level = 0
 	update_icon_state()
 	for(var/mob/living/shaken in range(7, src))
@@ -302,7 +306,7 @@
 	name = "Savannah Skyfall"
 	button_icon_state = "mech_savannah"
 
-/datum/action/vehicle/sealed/mecha/skyfall/Trigger()
+/datum/action/vehicle/sealed/mecha/skyfall/Trigger(trigger_flags)
 	if(!owner || !chassis || !(owner in chassis.occupants))
 		return
 	var/obj/vehicle/sealed/mecha/combat/savannah_ivanov/savannah_mecha = chassis
@@ -331,7 +335,7 @@
 	name = "Ivanov Strike"
 	button_icon_state = "mech_ivanov"
 
-/datum/action/vehicle/sealed/mecha/ivanov_strike/Trigger()
+/datum/action/vehicle/sealed/mecha/ivanov_strike/Trigger(trigger_flags)
 	if(!owner || !chassis || !(owner in chassis.occupants))
 		return
 	var/obj/vehicle/sealed/mecha/combat/savannah_ivanov/ivanov_mecha = chassis
@@ -370,6 +374,9 @@
 
 /obj/effect/skyfall_landingzone/Initialize(mapload, obj/vehicle/sealed/mecha/combat/mecha)
 	. = ..()
+	if(!mecha)
+		stack_trace("Skyfall landing zone created without mecha")
+		return INITIALIZE_HINT_QDEL
 	src.mecha = mecha
 	animate(src, alpha = 255, TOTAL_SKYFALL_LEAP_TIME/2, easing = CIRCULAR_EASING|EASE_OUT)
 	RegisterSignal(mecha, COMSIG_MOVABLE_MOVED, .proc/follow)

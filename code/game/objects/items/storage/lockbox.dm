@@ -57,12 +57,12 @@
 			visible_message(span_warning("\The [src] is broken by [user] with an electromagnetic card!"))
 			return
 
-/obj/item/storage/lockbox/Entered()
+/obj/item/storage/lockbox/Entered(atom/movable/arrived, atom/old_loc, list/atom/old_locs)
 	. = ..()
 	open = TRUE
 	update_appearance()
 
-/obj/item/storage/lockbox/Exited()
+/obj/item/storage/lockbox/Exited(atom/movable/gone, direction)
 	. = ..()
 	open = TRUE
 	update_appearance()
@@ -173,6 +173,15 @@
 	name = "security medal box"
 	desc = "A locked box used to store medals to be given to members of the security department."
 	req_access = list(ACCESS_HOS)
+	
+/obj/item/storage/lockbox/medal/med
+	name = "medical medal box"
+	desc = "A locked box used to store medals to be given to members of the medical department."
+	req_access = list(ACCESS_CMO)
+	
+/obj/item/storage/lockbox/medal/med/PopulateContents()
+	new /obj/item/clothing/accessory/medal/med_medal(src)
+	new /obj/item/clothing/accessory/medal/med_medal2(src)
 
 /obj/item/storage/lockbox/medal/sec/PopulateContents()
 	for(var/i in 1 to 3)
@@ -228,7 +237,7 @@
 		add_fingerprint(user)
 
 	if(id_card.registered_account != buyer_account)
-		to_chat(user, "<span class='notice'>Bank account does not match with buyer!</span")
+		to_chat(user, span_warning("Bank account does not match with buyer!"))
 		return
 
 	SEND_SIGNAL(src, COMSIG_TRY_STORAGE_SET_LOCKSTATE, !privacy_lock)

@@ -65,7 +65,7 @@
 /obj/machinery/power/apc{
 	dir = 4;
 	name = "Cargo Bay APC";
-	pixel_x = 24;
+	pixel_x = 25;
 	start_charge = 0
 	},
 /obj/structure/cable,
@@ -137,7 +137,7 @@
 /turf/closed/wall,
 /area/ruin/space/has_grav/derelictoutpost/powerstorage)
 "aB" = (
-/obj/machinery/door/airlock/external,
+/obj/machinery/door/airlock/external/ruin,
 /obj/effect/mapping_helpers/airlock/cyclelink_helper,
 /turf/open/floor/plating,
 /area/ruin/space/has_grav/derelictoutpost/powerstorage)
@@ -187,7 +187,7 @@
 /turf/open/floor/plating,
 /area/ruin/space/has_grav/derelictoutpost)
 "aL" = (
-/obj/machinery/door/airlock/external,
+/obj/machinery/door/airlock/external/ruin,
 /obj/effect/mapping_helpers/airlock/cyclelink_helper,
 /turf/open/floor/plating,
 /area/ruin/space/has_grav/derelictoutpost)
@@ -360,10 +360,8 @@
 /turf/open/floor/iron,
 /area/ruin/space/has_grav/derelictoutpost)
 "bq" = (
-/obj/effect/mob_spawn/human/corpse/nanotrasensoldier{
-	head = null;
-	name = "Tradeport Officer";
-	random = 1
+/obj/effect/mob_spawn/corpse/human/nanotrasensoldier{
+	outfit_override = list("head" = null)
 	},
 /obj/item/paper/crumpled/ruins/bigderelict1/coward,
 /obj/effect/decal/cleanable/blood/old{
@@ -660,8 +658,7 @@
 /obj/machinery/power/apc{
 	dir = 4;
 	name = "Power Storage APC";
-	pixel_x = 24;
-	pixel_y = 2;
+	pixel_x = 25;
 	start_charge = 0
 	},
 /obj/structure/cable,
@@ -672,7 +669,7 @@
 /turf/open/floor/iron,
 /area/ruin/space/has_grav/derelictoutpost/cargobay)
 "cc" = (
-/obj/effect/spawner/structure/window/shuttle,
+/obj/effect/spawner/structure/window/reinforced/shuttle,
 /turf/open/floor/plating,
 /area/ruin/space/has_grav/derelictoutpost/dockedship)
 "cd" = (
@@ -743,7 +740,7 @@
 "ck" = (
 /obj/machinery/power/apc{
 	name = "Tradepost APC";
-	pixel_y = -23;
+	pixel_y = -25;
 	start_charge = 0
 	},
 /obj/structure/cable,
@@ -1458,7 +1455,7 @@
 /obj/machinery/power/apc{
 	dir = 4;
 	name = "Cargo Storage APC";
-	pixel_x = 24;
+	pixel_x = 25;
 	start_charge = 0
 	},
 /obj/structure/cable,
@@ -1482,7 +1479,7 @@
 /obj/structure/closet/crate{
 	icon_state = "crateopen"
 	},
-/obj/effect/spawner/lootdrop/space/fancytool,
+/obj/effect/spawner/random/exotic/tool,
 /turf/open/floor/iron,
 /area/ruin/space/has_grav/derelictoutpost/cargostorage)
 "er" = (
@@ -1560,7 +1557,7 @@
 	},
 /obj/machinery/light/directional/south,
 /obj/effect/turf_decal/delivery,
-/obj/effect/spawner/lootdrop/space/fancytech,
+/obj/effect/spawner/random/exotic/technology,
 /turf/open/floor/iron,
 /area/ruin/space/has_grav/derelictoutpost/cargostorage)
 "eC" = (
@@ -1640,14 +1637,14 @@
 /turf/open/floor/plating,
 /area/ruin/space/has_grav/derelictoutpost/cargobay)
 "uV" = (
-/obj/machinery/door/airlock/external,
+/obj/machinery/door/airlock/external/ruin,
 /obj/effect/mapping_helpers/airlock/cyclelink_helper{
 	dir = 1
 	},
 /turf/open/floor/plating,
 /area/ruin/space/has_grav/derelictoutpost/powerstorage)
 "LB" = (
-/obj/machinery/door/airlock/external,
+/obj/machinery/door/airlock/external/ruin,
 /obj/effect/mapping_helpers/airlock/cyclelink_helper{
 	dir = 1
 	},

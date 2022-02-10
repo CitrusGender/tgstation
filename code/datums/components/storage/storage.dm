@@ -98,8 +98,8 @@
 	RegisterSignal(parent, COMSIG_MOVABLE_POST_THROW, .proc/close_all)
 	RegisterSignal(parent, COMSIG_MOVABLE_MOVED, .proc/on_move)
 
-	RegisterSignal(parent, COMSIG_CLICK_ALT, .proc/on_alt_click)
-	RegisterSignal(parent, COMSIG_CLICK_RIGHT, .proc/on_right_click)
+	RegisterSignal(parent, list(COMSIG_CLICK_ALT, COMSIG_ATOM_ATTACK_HAND_SECONDARY), .proc/on_open_storage_click)
+	RegisterSignal(parent, COMSIG_PARENT_ATTACKBY_SECONDARY, .proc/on_open_storage_attackby)
 	RegisterSignal(parent, COMSIG_MOUSEDROP_ONTO, .proc/mousedrop_onto)
 	RegisterSignal(parent, COMSIG_MOUSEDROPPED_ONTO, .proc/mousedrop_receive)
 
@@ -115,14 +115,33 @@
 /datum/component/storage/PreTransfer()
 	update_actions()
 
-/datum/component/storage/proc/set_holdable(can_hold_list, cant_hold_list)
-	can_hold_description = generate_hold_desc(can_hold_list)
+/// Almost 100% of the time the lists passed into set_holdable are reused for each instance of the component
+/// Just fucking cache it 4head
+/// Yes I could generalize this, but I don't want anyone else using it. in fact, DO NOT COPY THIS
+/// If you find yourself needing this pattern, you're likely better off using static typecaches
+/// I'm not because I do not trust implementers of the storage component to use them, BUT
+/// IF I FIND YOU USING THIS PATTERN IN YOUR CODE I WILL BREAK YOU ACROSS MY KNEES
+/// ~Lemon
+GLOBAL_LIST_EMPTY(cached_storage_typecaches)
 
-	if (can_hold_list != null)
-		can_hold = string_list(typecacheof(can_hold_list))
+/datum/component/storage/proc/set_holdable(list/can_hold_list, list/cant_hold_list)
+	if(!islist(can_hold_list))
+		can_hold_list = list(can_hold_list)
+	if(!islist(cant_hold_list))
+		cant_hold_list = list(cant_hold_list)
+
+	can_hold_description = generate_hold_desc(can_hold_list)
+	if (can_hold_list)
+		var/unique_key = can_hold_list.Join("-")
+		if(!GLOB.cached_storage_typecaches[unique_key])
+			GLOB.cached_storage_typecaches[unique_key] = typecacheof(can_hold_list)
+		can_hold = GLOB.cached_storage_typecaches[unique_key]
 
 	if (cant_hold_list != null)
-		cant_hold = string_list(typecacheof(cant_hold_list))
+		var/unique_key = cant_hold_list.Join("-")
+		if(!GLOB.cached_storage_typecaches[unique_key])
+			GLOB.cached_storage_typecaches[unique_key] = typecacheof(cant_hold_list)
+		cant_hold = GLOB.cached_storage_typecaches[unique_key]
 
 /datum/component/storage/proc/generate_hold_desc(can_hold_list)
 	var/list/desc = list()
@@ -134,13 +153,15 @@
 	return "\n\t[span_notice("[desc.Join("\n\t")]")]"
 
 /datum/component/storage/proc/update_actions()
+	SIGNAL_HANDLER
+
 	QDEL_NULL(modeswitch_action)
 	if(!isitem(parent) || !allow_quick_gather)
 		return
 	var/obj/item/I = parent
 	modeswitch_action = new(I)
 	RegisterSignal(modeswitch_action, COMSIG_ACTION_TRIGGER, .proc/action_trigger)
-	if(I.obj_flags & IN_INVENTORY)
+	if(I.item_flags & IN_INVENTORY)
 		var/mob/M = I.loc
 		if(!istype(M))
 			return
@@ -467,10 +488,10 @@
 		return FALSE
 	return master._removal_reset(thing)
 
-/datum/component/storage/proc/_remove_and_refresh(datum/source, atom/movable/thing)
+/datum/component/storage/proc/_remove_and_refresh(datum/source, atom/movable/gone, direction)
 	SIGNAL_HANDLER
 
-	_removal_reset(thing)
+	_removal_reset(gone)
 	refresh_mob_views()
 
 //Call this proc to handle the removal of an item from the storage item. The item will be moved to the new_location target, if that is null it's being deleted
@@ -503,8 +524,8 @@
 //Tries to dump content
 /datum/component/storage/proc/dump_content_at(atom/dest_object, mob/M)
 	var/atom/A = parent
-	var/atom/dump_destination = dest_object.get_dumping_location()
-	if(A.Adjacent(M) && dump_destination && M.Adjacent(dump_destination))
+	var/atom/dump_destination = get_dumping_location(dest_object)
+	if(M.CanReach(A) && dump_destination && M.CanReach(dump_destination))
 		if(locked)
 			to_chat(M, span_warning("[parent] seems to be locked!"))
 			return FALSE
@@ -513,14 +534,18 @@
 			return TRUE
 	return FALSE
 
+/datum/component/storage/proc/get_dumping_location(atom/dest_object)
+	var/datum/component/storage/storage = dest_object.GetComponent(/datum/component/storage)
+	if(storage)
+		return storage.real_location()
+	return dest_object.get_dumping_location()
+
 //This proc is called when you want to place an item into the storage item.
 /datum/component/storage/proc/attackby(datum/source, obj/item/I, mob/M, params)
 	SIGNAL_HANDLER
 
-	if(istype(I, /obj/item/hand_labeler))
-		var/obj/item/hand_labeler/labeler = I
-		if(labeler.mode)
-			return FALSE
+	if(!I.attackby_storage_insert(src, parent, M))
+		return FALSE
 	. = TRUE //no afterattack
 	if(iscyborg(M))
 		return
@@ -839,22 +864,18 @@
 
 	return hide_from(target)
 
-/datum/component/storage/proc/on_alt_click(datum/source, mob/user)
-	SIGNAL_HANDLER
 
-	if(on_right_click(source, user))
-		to_chat(user,span_warning("This action is being moved from alt-click to right-click."))
-
-/datum/component/storage/proc/on_right_click(datum/source, mob/user)
-	SIGNAL_HANDLER
-
-	if(!isliving(user) || !user.CanReach(parent) || user.incapacitated())
-		return
+/datum/component/storage/proc/open_storage(mob/user)
+	if(!user.CanReach(parent))
+		user.balloon_alert(user, "can't reach!")
+		return FALSE
+	if(!isliving(user) || user.incapacitated())
+		return FALSE
 	if(locked)
 		to_chat(user, span_warning("[parent] seems to be locked!"))
-		return
+		return FALSE
 
-	. = COMPONENT_CANCEL_CLICK_RIGHT
+	. = TRUE
 	var/atom/A = parent
 	if(!quickdraw)
 		A.add_fingerprint(user)
@@ -867,6 +888,20 @@
 		return
 
 	INVOKE_ASYNC(src, .proc/attempt_put_in_hands, to_remove, user)
+
+/datum/component/storage/proc/on_open_storage_click(datum/source, mob/user, list/modifiers)
+	SIGNAL_HANDLER
+
+	if(open_storage(user))
+		return COMPONENT_CANCEL_ATTACK_CHAIN
+	if(LAZYACCESS(modifiers, RIGHT_CLICK))
+		return COMPONENT_SECONDARY_CANCEL_ATTACK_CHAIN
+
+/datum/component/storage/proc/on_open_storage_attackby(datum/source, obj/item/weapon, mob/user, params)
+	SIGNAL_HANDLER
+
+	if(open_storage(user))
+		return COMPONENT_SECONDARY_CANCEL_ATTACK_CHAIN
 
 ///attempt to put an item from contents into the users hands
 /datum/component/storage/proc/attempt_put_in_hands(obj/item/to_remove, mob/user)

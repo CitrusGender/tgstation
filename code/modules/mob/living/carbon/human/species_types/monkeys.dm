@@ -1,6 +1,6 @@
 /datum/species/monkey
 	name = "Monkey"
-	id = "monkey"
+	id = SPECIES_MONKEY
 	say_mod = "chimpers"
 	attack_verb = "bite"
 	attack_effect = ATTACK_EFFECT_BITE
@@ -10,6 +10,7 @@
 	mutant_bodyparts = list("tail_monkey" = "Monkey")
 	skinned_type = /obj/item/stack/sheet/animalhide/monkey
 	meat = /obj/item/food/meat/slab/monkey
+	allowed_animal_origin = MONKEY_BODY
 	knife_butcher_results = list(/obj/item/food/meat/slab/monkey = 5, /obj/item/stack/sheet/animalhide/monkey = 1)
 	species_traits = list(HAS_FLESH,HAS_BONE,NO_UNDERWEAR,LIPS,NOEYESPRITES,NOBLOODOVERLAY,NOTRANSSTING, NOAUGMENTS)
 	inherent_traits = list(
@@ -37,10 +38,12 @@
 	BODY_ZONE_L_LEG = /obj/item/bodypart/l_leg/monkey,\
 	BODY_ZONE_R_LEG = /obj/item/bodypart/r_leg/monkey,\
 	BODY_ZONE_CHEST = /obj/item/bodypart/chest/monkey)
+	fire_overlay = "Monkey_burning"
 	dust_anim = "dust-m"
 	gib_anim = "gibbed-m"
 
 	payday_modifier = 1.5
+
 
 
 /datum/species/monkey/random_name(gender,unique,lastname)
@@ -56,15 +59,15 @@
 		H.dna.features["tail_monkey"] = "Monkey"
 		handle_mutant_bodyparts(H)
 
-	H.dna.add_mutation(RACEMUT, MUT_NORMAL)
-	H.dna.activate_mutation(RACEMUT)
+	H.dna.add_mutation(/datum/mutation/human/race, MUT_NORMAL)
+	H.dna.activate_mutation(/datum/mutation/human/race)
 
 
 /datum/species/monkey/on_species_loss(mob/living/carbon/C)
 	. = ..()
 	C.pass_flags = initial(C.pass_flags)
 	C.butcher_results = null
-	C.dna.remove_mutation(RACEMUT)
+	C.dna.remove_mutation(/datum/mutation/human/race)
 
 /datum/species/monkey/spec_unarmedattack(mob/living/carbon/human/user, atom/target, modifiers)
 	. = ..()
@@ -97,13 +100,16 @@
 	target.attack_paw(user, modifiers)
 	return TRUE
 
-/datum/species/monkey/handle_mutations_and_radiation(mob/living/carbon/human/source, delta_time, times_fired)
-	. = ..()
-	if(source.radiation > RAD_MOB_MUTATE * 2 && DT_PROB(0.25, delta_time))
-		source.gorillize()
-		return
-
 /datum/species/monkey/check_roundstart_eligible()
 	if(SSevents.holidays && SSevents.holidays[MONKEYDAY])
 		return TRUE
 	return ..()
+
+/datum/species/monkey/get_scream_sound(mob/living/carbon/human/monkey)
+		return pick('sound/creatures/monkey/monkey_screech_1.ogg',
+					'sound/creatures/monkey/monkey_screech_2.ogg',
+					'sound/creatures/monkey/monkey_screech_3.ogg',
+					'sound/creatures/monkey/monkey_screech_4.ogg',
+					'sound/creatures/monkey/monkey_screech_5.ogg',
+					'sound/creatures/monkey/monkey_screech_6.ogg',
+					'sound/creatures/monkey/monkey_screech_7.ogg')

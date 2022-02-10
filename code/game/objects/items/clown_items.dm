@@ -88,7 +88,7 @@
 /obj/item/paper/fluff/stations/soap
 	name = "ancient janitorial poem"
 	desc = "An old paper that has passed many hands."
-	info = "The legend of the omega soap</B><BR><BR> Essence of <B>potato</B>. Juice, not grind.<BR><BR> A <B>lizard's</B> tail, turned into <B>wine</B>.<BR><BR> <B>powder of monkey</B>, to help the workload.<BR><BR> Some <B>Krokodil</B>, because meth would explode.<BR><BR> <B>Nitric acid</B> and <B>Baldium</B>, for organic dissolving.<BR><BR> A cup filled with <B>Hooch</B>, for sinful absolving<BR><BR> Some <B>Bluespace Dust</B>, for removal of stains.<BR><BR> A syringe full of <B>Pump-up</B>, it's security's bane.<BR><BR> Add a can of <B>Space Cola</B>, because we've been paid.<BR><BR> <B>Heat</B> as hot as you can, let the soap be your blade.<BR><BR> <B>Ten units of each regent create a soap that could topple all others.</B>"
+	info = "The legend of the omega soap</B><BR><BR> Essence of <B>potato</B>. Juice, not grind.<BR><BR> A <B>lizard's</B> tail, turned into <B>wine</B>.<BR><BR> <B>powder of monkey</B>, to help the workload.<BR><BR> Some <B>Krokodil</B>, because meth would explode.<BR><BR> <B>Nitric acid</B> and <B>Baldium</B>, for organic dissolving.<BR><BR> A cup filled with <B>Hooch</B>, for sinful absolving<BR><BR> Some <B>Bluespace Dust</B>, for removal of stains.<BR><BR> A syringe full of <B>Pump-up</B>, it's security's bane.<BR><BR> Add a can of <B>Space Cola</B>, because we've been paid.<BR><BR> <B>Heat</B> as hot as you can, let the soap be your blade.<BR><BR> <B>Ten units of each reagent create a soap that could topple all others.</B>"
 
 
 /obj/item/soap/suicide_act(mob/user)
@@ -148,6 +148,12 @@
 			to_chat(user, span_notice("You clean \the [target.name]."))
 			target.remove_atom_colour(WASHABLE_COLOUR_PRIORITY)
 			target.set_opacity(initial(target.opacity))
+			var/obj/structure/window/our_window = target
+			if(our_window.bloodied)
+				for(var/obj/effect/decal/cleanable/blood/iter_blood in our_window)
+					our_window.vis_contents -= iter_blood
+					qdel(iter_blood)
+					our_window.bloodied = FALSE
 			user.mind?.adjust_experience(/datum/skill/cleaning, CLEAN_SKILL_GENERIC_WASH_XP)
 			decreaseUses(user)
 	else
@@ -188,7 +194,7 @@
 	///sound file given to the squeaky component we make in Initialize() so sub-types can specify their own sound
 	var/sound_file = 'sound/items/bikehorn.ogg'
 
-/obj/item/bikehorn/Initialize()
+/obj/item/bikehorn/Initialize(mapload)
 	. = ..()
 	var/list/sound_list = list()
 	sound_list[sound_file] = 1

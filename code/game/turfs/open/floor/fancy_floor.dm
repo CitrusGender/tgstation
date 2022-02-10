@@ -1,5 +1,6 @@
 /* In this file:
  * Wood floor
+ * Bamboo floor
  * Grass floor
  * Fake Basalt
  * Carpet floor
@@ -89,6 +90,24 @@
 /turf/open/floor/wood/large/setup_broken_states()
 	return list("wood_large-broken", "wood_large-broken2", "wood_large-broken3")
 
+/turf/open/floor/bamboo
+	desc = "A bamboo mat with a decorative trim."
+	icon = 'icons/turf/floors/bamboo_mat.dmi'
+	icon_state = "mat-0"
+	base_icon_state = "mat"
+	floor_tile = /obj/item/stack/tile/bamboo
+	smoothing_flags = SMOOTH_BITMASK
+	smoothing_groups = list(SMOOTH_GROUP_TURF_OPEN, SMOOTH_GROUP_BAMBOO_FLOOR)
+	canSmoothWith = list(SMOOTH_GROUP_BAMBOO_FLOOR)
+	flags_1 = NONE
+	footstep = FOOTSTEP_WOOD
+	barefootstep = FOOTSTEP_WOOD_BAREFOOT
+	clawfootstep = FOOTSTEP_WOOD_CLAW
+	heavyfootstep = FOOTSTEP_GENERIC_HEAVY
+
+/turf/open/floor/bamboo/setup_broken_states()
+	return list("damaged")
+
 /turf/open/floor/grass
 	name = "grass patch"
 	desc = "You can't tell if this is real grass or just cheap plastic imitation."
@@ -107,7 +126,7 @@
 /turf/open/floor/grass/setup_broken_states()
 	return list("sand")
 
-/turf/open/floor/grass/Initialize()
+/turf/open/floor/grass/Initialize(mapload)
 	. = ..()
 	spawniconchange()
 
@@ -185,6 +204,11 @@
 	slowdown = 1.5
 	planetary_atmos = FALSE
 
+/turf/open/floor/grass/snow/actually_safe
+	slowdown = 0
+	planetary_atmos = FALSE
+	initial_gas_mix = OPENTURF_DEFAULT_ATMOS
+
 
 /turf/open/floor/grass/fakebasalt //Heart is not a real planeteer power
 	name = "aesthetic volcanic flooring"
@@ -230,7 +254,7 @@
 	. = ..()
 	. += span_notice("There's a <b>small crack</b> on the edge of it.")
 
-/turf/open/floor/carpet/Initialize()
+/turf/open/floor/carpet/Initialize(mapload)
 	. = ..()
 	update_appearance()
 
@@ -439,7 +463,7 @@
 	/// The alpha used for the emissive decal.
 	var/emissive_alpha = 150
 
-/turf/open/floor/carpet/neon/Initialize()
+/turf/open/floor/carpet/neon/Initialize(mapload)
 	. = ..()
 	AddElement(/datum/element/decal, neon_icon || icon, neon_icon_state || base_icon_state, dir, null, null, alpha, neon_color, smoothing_junction)
 	AddElement(/datum/element/decal, neon_icon || icon, neon_icon_state || base_icon_state, dir, EMISSIVE_PLANE, null, emissive_alpha, EMISSIVE_COLOR, smoothing_junction)
@@ -785,7 +809,7 @@
 /turf/open/floor/fakespace/setup_broken_states()
 	return list("damaged")
 
-/turf/open/floor/fakespace/Initialize()
+/turf/open/floor/fakespace/Initialize(mapload)
 	. = ..()
 	icon_state = SPACE_ICON_STATE
 

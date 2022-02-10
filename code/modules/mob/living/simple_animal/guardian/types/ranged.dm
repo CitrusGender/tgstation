@@ -84,7 +84,7 @@
 	set name = "Set Surveillance Snare"
 	set category = "Guardian"
 	set desc = "Set an invisible snare that will alert you when living creatures walk over it. Max of 5"
-	if(snares.len <6)
+	if(length(snares) < 6)
 		var/turf/snare_loc = get_turf(loc)
 		var/obj/effect/snare/S = new /obj/effect/snare(snare_loc)
 		S.spawner = src
@@ -98,11 +98,12 @@
 	set name = "Remove Surveillance Snare"
 	set category = "Guardian"
 	set desc = "Disarm unwanted surveillance snares."
-	var/picked_snare = input(src, "Pick which snare to remove", "Remove Snare") as null|anything in sortNames(snares)
-	if(picked_snare)
-		snares -= picked_snare
-		qdel(picked_snare)
-		to_chat(src, "[span_danger("<B>Snare disarmed.")]</B>")
+	var/picked_snare = tgui_input_list(src, "Pick which snare to remove", "Remove Snare", sort_names(snares))
+	if(isnull(picked_snare))
+		return
+	snares -= picked_snare
+	qdel(picked_snare)
+	to_chat(src, "[span_danger("<B>Snare disarmed.")]</B>")
 
 /obj/effect/snare
 	name = "snare"
@@ -115,7 +116,7 @@
 	var/static/list/loc_connections = list(
 		COMSIG_ATOM_ENTERED = .proc/on_entered,
 	)
-	AddElement(/datum/element/connect_loc, src, loc_connections)
+	AddElement(/datum/element/connect_loc, loc_connections)
 
 /obj/effect/snare/proc/on_entered(datum/source, AM as mob|obj)
 	SIGNAL_HANDLER

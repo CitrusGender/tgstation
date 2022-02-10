@@ -152,13 +152,6 @@
 
 	return ..()
 
-/obj/item/reagent_containers/ex_act(severity)
-	if(reagents)
-		for(var/datum/reagent/R in reagents.reagent_list)
-			R.on_ex_act(severity)
-	if(!QDELETED(src))
-		return ..()
-
 /obj/item/reagent_containers/fire_act(exposed_temperature, exposed_volume)
 	reagents.expose_temperature(exposed_temperature)
 	..()
@@ -170,7 +163,7 @@
 /obj/item/reagent_containers/proc/bartender_check(atom/target)
 	. = FALSE
 	var/mob/thrown_by = thrownby?.resolve()
-	if(target.CanPass(src, get_turf(src)) && thrown_by && HAS_TRAIT(thrown_by, TRAIT_BOOZE_SLIDER))
+	if(target.CanPass(src, get_dir(target, src)) && thrown_by && HAS_TRAIT(thrown_by, TRAIT_BOOZE_SLIDER))
 		. = TRUE
 
 /obj/item/reagent_containers/proc/SplashReagents(atom/target, thrown = FALSE, override_spillable = FALSE)

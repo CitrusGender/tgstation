@@ -71,14 +71,44 @@
 		C.adjustBruteLoss(10)
 		C.AdjustKnockdown(5 SECONDS)
 		C.adjustStaminaLoss(80)
-	var/list/knowledge = cultie.get_all_knowledge()
+	var/list/researched_knowledge = cultie.get_all_knowledge()
 
-	for(var/X in knowledge)
-		var/datum/eldritch_knowledge/EK = knowledge[X]
-		if(EK.on_mansus_grasp(target, user, proximity_flag, click_parameters))
+	for(var/knowledge in researched_knowledge)
+		var/datum/eldritch_knowledge/eldritch_knowledge = researched_knowledge[knowledge]
+		if(eldritch_knowledge.on_mansus_grasp(target, user, proximity_flag, click_parameters))
 			use_charge = TRUE
 	if(use_charge)
 		return ..()
+
+/obj/item/melee/touch_attack/mansus_fist/suicide_act(mob/user)
+	user.visible_message(span_suicide("[user] covers [user.p_their()] face with [user.p_their()] sickly-looking hand! It looks like [user.p_theyre()] trying to commit suicide!"))
+	var/mob/living/carbon/carbon_user = user	//iscarbon already used in spell's parent
+	var/datum/antagonist/heretic/cultie = carbon_user.mind.has_antag_datum(/datum/antagonist/heretic)
+	var/list/researched_knowledge = cultie.get_all_knowledge()
+	var/escape_our_torment = 0
+	while(carbon_user.stat == CONSCIOUS)
+		if(QDELETED(src) || QDELETED(user))
+			return SHAME
+		if(escape_our_torment > 20) //Stops us from infinitely stunning ourselves if we're just not taking the damage
+			return FIRELOSS
+
+		if(prob(70))
+			carbon_user.adjustFireLoss(20)
+			playsound(carbon_user, 'sound/effects/wounds/sizzle1.ogg', 70, vary = TRUE)
+			if(prob(50))
+				carbon_user.emote("scream")
+				carbon_user.stuttering += 13
+
+		for(var/knowledge in researched_knowledge)
+			var/datum/eldritch_knowledge/eldritch_knowledge = researched_knowledge[knowledge]
+			eldritch_knowledge.on_mansus_grasp(carbon_user, carbon_user)
+
+		carbon_user.adjustBruteLoss(10)
+		carbon_user.AdjustKnockdown(5 SECONDS)
+		carbon_user.adjustStaminaLoss(80)
+		escape_our_torment++
+		stoplag(0.4 SECONDS)
+	return FIRELOSS
 
 /obj/effect/proc_holder/spell/aoe_turf/rust_conversion
 	name = "Aggressive Spread"
@@ -275,7 +305,7 @@
 	school = SCHOOL_FORBIDDEN
 	charge_max = 150
 	clothes_req = FALSE
-	invocation_type = "none"
+	invocation_type = INVOCATION_NONE
 	range = 2
 	action_icon = 'icons/mob/actions/actions_ecult.dmi'
 	action_icon_state = "mad_touch"
@@ -341,7 +371,7 @@
 		if(!check)
 			break
 		T = check
-	return (getline(user, T) - get_turf(user))
+	return (get_line(user, T) - get_turf(user))
 
 /obj/effect/proc_holder/spell/pointed/ash_final/proc/fire_line(atom/source, list/turfs)
 	var/list/hit_list = list()
@@ -413,7 +443,7 @@
 /obj/effect/proc_holder/spell/aoe_turf/fire_cascade/proc/fire_cascade(atom/centre,max_range)
 	playsound(get_turf(centre), 'sound/items/welder.ogg', 75, TRUE)
 	var/_range = 1
-	for(var/i = 0, i <= max_range,i++)
+	for(var/i in 0 to max_range)
 		for(var/turf/T in spiral_range_turfs(_range,centre))
 			new /obj/effect/hotspot(T)
 			T.hotspot_expose(700,50,1)
@@ -474,7 +504,7 @@
 /obj/effect/proc_holder/spell/targeted/worm_contract
 	name = "Force Contract"
 	desc = "Forces your body to contract onto a single tile."
-	invocation_type = "none"
+	invocation_type = INVOCATION_NONE
 	school = SCHOOL_FORBIDDEN
 	clothes_req = FALSE
 	action_background_icon_state = "bg_ecult"
@@ -542,7 +572,7 @@
 	charge_max = 300
 	clothes_req = FALSE
 	invocation = "PI'RC' TH' M'ND"
-	invocation_type = "whisper"
+	invocation_type = INVOCATION_WHISPER
 	range = 10
 	action_icon = 'icons/mob/actions/actions_ecult.dmi'
 	action_icon_state = "mansus_link"
@@ -586,7 +616,9 @@
 	if(!originator?.linked_mobs[living_owner])
 		CRASH("Uh oh the mansus link got somehow activated without it being linked to a raw prophet or the mob not being in a list of mobs that should be able to do it.")
 
-	var/message = sanitize(input("Message:", "Telepathy from the Manse") as text|null)
+	var/message = sanitize(tgui_input_text(living_owner, "Enter your message", "Telepathy from the Manse"))
+	if(!message)
+		return
 
 	if(QDELETED(living_owner))
 		return
@@ -595,14 +627,14 @@
 		to_chat(living_owner, span_warning("The link seems to have been severed..."))
 		Remove(living_owner)
 		return
-	if(message)
-		var/msg = "<i><font color=#568b00>\[Mansus Link\] <b>[living_owner]:</b> [message]</font></i>"
-		log_directed_talk(living_owner, originator, msg, LOG_SAY, "Mansus Link")
-		to_chat(originator.linked_mobs, msg)
 
-		for(var/dead_mob in GLOB.dead_mob_list)
-			var/link = FOLLOW_LINK(dead_mob, living_owner)
-			to_chat(dead_mob, "[link] [msg]")
+	var/msg = "<i><font color=#568b00>\[Mansus Link\] <b>[living_owner]:</b> [message]</font></i>"
+	log_directed_talk(living_owner, originator, msg, LOG_SAY, "Mansus Link")
+	to_chat(originator.linked_mobs, msg)
+
+	for(var/dead_mob in GLOB.dead_mob_list)
+		var/link = FOLLOW_LINK(dead_mob, living_owner)
+		to_chat(dead_mob, "[link] [msg]")
 
 /obj/effect/proc_holder/spell/pointed/trigger/blind/eldritch
 	range = 10
@@ -633,8 +665,9 @@
 	icon_state = "small_rune_1"
 	duration = 1 MINUTES
 	layer = LOW_SIGIL_LAYER
+	plane = GAME_PLANE
 
-/obj/effect/temp_visual/glowing_rune/Initialize()
+/obj/effect/temp_visual/glowing_rune/Initialize(mapload)
 	. = ..()
 	pixel_y = rand(-6,6)
 	pixel_x = rand(-6,6)
@@ -667,8 +700,8 @@
 	. = ..()
 	if(victim.anti_magic_check() || IS_HERETIC(victim) || IS_HERETIC_MONSTER(victim))
 		return
-	victim.apply_status_effect(STATUS_EFFECT_AMOK)
-	victim.apply_status_effect(STATUS_EFFECT_CLOUDSTRUCK, (level*10))
+	victim.apply_status_effect(/datum/status_effect/amok)
+	victim.apply_status_effect(/datum/status_effect/cloudstruck, (level*10))
 	if(iscarbon(victim))
 		var/mob/living/carbon/carbon_victim = victim
 		carbon_victim.reagents.add_reagent(/datum/reagent/eldritch, min(1, 6-level))
@@ -705,7 +738,7 @@
 		var/mob/living/simple_animal/hostile/eldritch/armsy/prime/outside = new(user.loc,TRUE,segment_length)
 		target.mind.transfer_to(outside, TRUE)
 		target.forceMove(outside)
-		target.apply_status_effect(STATUS_EFFECT_STASIS,STASIS_ASCENSION_EFFECT)
+		target.apply_status_effect(/datum/status_effect/grouped/stasis, STASIS_ASCENSION_EFFECT)
 		for(var/mob/living/carbon/human/humie in view(9,outside)-target)
 			if(IS_HERETIC(humie) || IS_HERETIC_MONSTER(humie))
 				continue
@@ -718,7 +751,7 @@
 
 	if(iscarbon(mob_inside))
 		var/mob/living/simple_animal/hostile/eldritch/armsy/prime/armsy = target
-		if(mob_inside.remove_status_effect(STATUS_EFFECT_STASIS,STASIS_ASCENSION_EFFECT))
+		if(mob_inside.remove_status_effect(/datum/status_effect/grouped/stasis, STASIS_ASCENSION_EFFECT))
 			mob_inside.forceMove(armsy.loc)
 		armsy.mind.transfer_to(mob_inside, TRUE)
 		segment_length = armsy.get_length()

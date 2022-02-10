@@ -7,10 +7,10 @@
 	add_points(-cost)
 	return TRUE
 
-/mob/camera/blob/proc/place_blob_core(placement_override, pop_override = FALSE)
-	if(placed && placement_override != -1)
+/mob/camera/blob/proc/place_blob_core(placement_override = BLOB_NORMAL_PLACEMENT, pop_override = FALSE)
+	if(placed && placement_override != BLOB_FORCE_PLACEMENT)
 		return TRUE
-	if(!placement_override)
+	if(placement_override == BLOB_NORMAL_PLACEMENT)
 		if(!pop_override)
 			for(var/mob/living/M in range(7, src))
 				if(ROLE_BLOB in M.faction)
@@ -28,8 +28,7 @@
 		if(T.density)
 			to_chat(src, span_warning("This spot is too dense to place a blob core on!"))
 			return FALSE
-		var/area/A = get_area(T)
-		if(isspaceturf(T) || A && !(A.area_flags & BLOBS_ALLOWED))
+		if(!is_valid_turf(T))
 			to_chat(src, span_warning("You cannot place your core here!"))
 			return FALSE
 		for(var/obj/O in T)
@@ -45,7 +44,7 @@
 		if(!pop_override && world.time <= manualplace_min_time && world.time <= autoplace_max_time)
 			to_chat(src, span_warning("It is too early to place your blob core!"))
 			return FALSE
-	else if(placement_override == 1)
+	else if(placement_override == BLOB_RANDOM_PLACEMENT)
 		var/turf/T = pick(GLOB.blobstart)
 		forceMove(T) //got overrided? you're somewhere random, motherfucker
 	if(placed && blob_core)
@@ -71,7 +70,11 @@
 		for(var/i in 1 to GLOB.blob_nodes.len)
 			var/obj/structure/blob/special/node/B = GLOB.blob_nodes[i]
 			nodes["Blob Node #[i] ([get_area_name(B)])"] = B
-		var/node_name = input(src, "Choose a node to jump to.", "Node Jump") in nodes
+		var/node_name = tgui_input_list(src, "Choose a node to jump to", "Node Jump", nodes)
+		if(isnull(node_name))
+			return FALSE
+		if(isnull(nodes[node_name]))
+			return FALSE
 		var/obj/structure/blob/special/node/chosen_node = nodes[node_name]
 		if(chosen_node)
 			forceMove(chosen_node.loc)
@@ -142,7 +145,7 @@
 
 	B.naut = TRUE //temporary placeholder to prevent creation of more than one per factory.
 	to_chat(src, span_notice("You attempt to produce a blobbernaut."))
-	var/list/mob/dead/observer/candidates = pollGhostCandidates("Do you want to play as a [blobstrain.name] blobbernaut?", ROLE_BLOB, ROLE_BLOB, 50) //players must answer rapidly
+	var/list/mob/dead/observer/candidates = poll_ghost_candidates("Do you want to play as a [blobstrain.name] blobbernaut?", ROLE_BLOB, ROLE_BLOB, 50) //players must answer rapidly
 	if(LAZYLEN(candidates)) //if we got at least one candidate, they're a blobbernaut now.
 		B.modify_max_integrity(initial(B.max_integrity) * 0.25) //factories that produced a blobbernaut have much lower health
 		B.update_appearance()

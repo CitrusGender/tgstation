@@ -35,6 +35,7 @@
 	panel.icon = icon
 	panel.icon_state = "solar_panel"
 	panel.layer = FLY_LAYER
+	panel.plane = ABOVE_GAME_PLANE
 	Make(S)
 	connect_to_network()
 	RegisterSignal(SSsun, COMSIG_SUN_MOVED, .proc/queue_update_solar_exposure)
@@ -68,7 +69,7 @@
 		S.forceMove(src)
 	if(S.glass_type == /obj/item/stack/sheet/rglass) //if the panel is in reinforced glass
 		max_integrity *= 2  //this need to be placed here, because panels already on the map don't have an assembly linked to
-		obj_integrity = max_integrity
+		atom_integrity = max_integrity
 
 /obj/machinery/power/solar/crowbar_act(mob/user, obj/item/I)
 	playsound(src.loc, 'sound/machines/click.ogg', 50, TRUE)
@@ -90,7 +91,7 @@
 			playsound(loc, 'sound/items/welder.ogg', 100, TRUE)
 
 
-/obj/machinery/power/solar/obj_break(damage_flag)
+/obj/machinery/power/solar/atom_break(damage_flag)
 	. = ..()
 	if(.)
 		playsound(loc, 'sound/effects/glassbr3.ogg', 100, TRUE)
@@ -252,6 +253,10 @@
 		if(!anchored)
 			to_chat(user, span_warning("You need to secure the assembly before you can add glass."))
 			return
+		var/turf/solarturf = get_turf(src)
+		if(locate(/obj/machinery/power/solar) in solarturf)
+			to_chat(user, span_warning("A solar panel is already assembled here."))
+			return
 		var/obj/item/stack/sheet/S = W
 		if(S.use(2))
 			glass_type = W.type
@@ -309,7 +314,7 @@
 	var/obj/machinery/power/tracker/connected_tracker = null
 	var/list/connected_panels = list()
 
-/obj/machinery/power/solar_control/Initialize()
+/obj/machinery/power/solar_control/Initialize(mapload)
 	. = ..()
 	azimuth_rate = SSsun.base_rotation
 	RegisterSignal(SSsun, COMSIG_SUN_MOVED, .proc/timed_track)
@@ -445,7 +450,7 @@
 		if(BURN)
 			playsound(src.loc, 'sound/items/welder.ogg', 100, TRUE)
 
-/obj/machinery/power/solar_control/obj_break(damage_flag)
+/obj/machinery/power/solar_control/atom_break(damage_flag)
 	. = ..()
 	if(.)
 		playsound(loc, 'sound/effects/glassbr3.ogg', 100, TRUE)

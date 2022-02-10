@@ -804,60 +804,92 @@
 /////////////////////////////////////
 */
 
-/datum/sprite_accessory/hair_gradient
+/datum/sprite_accessory/gradient
 	icon = 'icons/mob/hair_gradients.dmi'
+	///whether this gradient applies to hair and/or beards. Some gradients do not work well on beards.
+	var/gradient_category = GRADIENT_APPLIES_TO_HAIR|GRADIENT_APPLIES_TO_FACIAL_HAIR
 
-/datum/sprite_accessory/hair_gradient/none
+/datum/sprite_accessory/gradient/none
 	name = "None"
 	icon_state = "none"
 
-/datum/sprite_accessory/hair_gradient/fadeup
+/datum/sprite_accessory/gradient/fadeup
 	name = "Fade Up"
 	icon_state = "fadeup"
 
-/datum/sprite_accessory/hair_gradient/fadedown
+/datum/sprite_accessory/gradient/fadedown
 	name = "Fade Down"
 	icon_state = "fadedown"
 
-/datum/sprite_accessory/hair_gradient/vertical_split
+/datum/sprite_accessory/gradient/vertical_split
 	name = "Vertical Split"
 	icon_state = "vsplit"
 
-/datum/sprite_accessory/hair_gradient/_split
+/datum/sprite_accessory/gradient/horizontal_split
 	name = "Horizontal Split"
 	icon_state = "bottomflat"
 
-/datum/sprite_accessory/hair_gradient/reflected
+/datum/sprite_accessory/gradient/reflected
 	name = "Reflected"
 	icon_state = "reflected_high"
+	gradient_category = GRADIENT_APPLIES_TO_HAIR
 
-/datum/sprite_accessory/hair_gradient/reflected_inverse
+/datum/sprite_accessory/gradient/reflected/beard
+	icon_state = "reflected_high_beard"
+	gradient_category = GRADIENT_APPLIES_TO_FACIAL_HAIR
+
+/datum/sprite_accessory/gradient/reflected_inverse
 	name = "Reflected Inverse"
 	icon_state = "reflected_inverse_high"
+	gradient_category = GRADIENT_APPLIES_TO_HAIR
 
-/datum/sprite_accessory/hair_gradient/wavy
+/datum/sprite_accessory/gradient/reflected_inverse/beard
+	icon_state = "reflected_inverse_high_beard"
+	gradient_category = GRADIENT_APPLIES_TO_FACIAL_HAIR
+
+/datum/sprite_accessory/gradient/wavy
 	name = "Wavy"
 	icon_state = "wavy"
+	gradient_category = GRADIENT_APPLIES_TO_HAIR
 
-/datum/sprite_accessory/hair_gradient/long_fade_up
+/datum/sprite_accessory/gradient/long_fade_up
 	name = "Long Fade Up"
 	icon_state = "long_fade_up"
 
-/datum/sprite_accessory/hair_gradient/long_fade_down
+/datum/sprite_accessory/gradient/long_fade_down
 	name = "Long Fade Down"
 	icon_state = "long_fade_down"
 
-/datum/sprite_accessory/hair_gradient/short_fade_up
+/datum/sprite_accessory/gradient/short_fade_up
 	name = "Short Fade Up"
 	icon_state = "short_fade_up"
+	gradient_category = GRADIENT_APPLIES_TO_HAIR
 
-/datum/sprite_accessory/hair_gradient/short_fade_down
-	name = "Short Fade Down"
+/datum/sprite_accessory/gradient/short_fade_up/beard
 	icon_state = "short_fade_down"
+	gradient_category = GRADIENT_APPLIES_TO_FACIAL_HAIR
 
-/datum/sprite_accessory/hair_gradient/wavy_spike
+/datum/sprite_accessory/gradient/short_fade_down
+	name = "Short Fade Down"
+	icon_state = "short_fade_down_beard"
+	gradient_category = GRADIENT_APPLIES_TO_HAIR
+
+/datum/sprite_accessory/gradient/short_fade_down/beard
+	icon_state = "short_fade_down_beard"
+	gradient_category = GRADIENT_APPLIES_TO_FACIAL_HAIR
+
+/datum/sprite_accessory/gradient/wavy_spike
 	name = "Spiked Wavy"
 	icon_state = "wavy_spiked"
+	gradient_category = GRADIENT_APPLIES_TO_HAIR
+
+/datum/sprite_accessory/gradient/striped
+	name = "striped"
+	icon_state = "striped"
+
+/datum/sprite_accessory/gradient/striped_vertical
+	name = "Striped Vertical"
+	icon_state = "striped_vertical"
 
 /////////////////////////////
 // Facial Hair Definitions //
@@ -997,6 +1029,14 @@
 /datum/sprite_accessory/facial_hair/watson
 	name = "Moustache (Watson)"
 	icon_state = "facial_watson"
+
+/datum/sprite_accessory/facial_hair/handlebar
+	name = "Moustache (Handlebar)"
+	icon_state = "facial_handlebar"
+
+/datum/sprite_accessory/facial_hair/handlebar2
+	name = "Moustache (Handlebar 2)"
+	icon_state = "facial_handlebar2"
 
 /datum/sprite_accessory/facial_hair/elvis
 	name = "Sideburns (Elvis)"
@@ -1492,6 +1532,14 @@
 
 // please make sure they're sorted alphabetically and categorized
 
+/datum/sprite_accessory/socks/ace_knee
+	name = "Knee-high (Ace)"
+	icon_state = "ace_knee"
+
+/datum/sprite_accessory/socks/bee_knee
+	name = "Knee-high (Bee)"
+	icon_state = "bee_knee"
+
 /datum/sprite_accessory/socks/black_knee
 	name = "Knee-high (Black)"
 	icon_state = "black_knee"
@@ -1523,10 +1571,6 @@
 /datum/sprite_accessory/socks/white_knee
 	name = "Knee-high (White)"
 	icon_state = "white_knee"
-
-/datum/sprite_accessory/socks/bee_knee
-	name = "Knee-high (Bee)"
-	icon_state = "bee_knee"
 
 /datum/sprite_accessory/socks/black_norm
 	name = "Normal (Black)"
@@ -1580,6 +1624,14 @@
 	name = "Stockings (Yellow)"
 	icon_state = "stockings_yellow"
 
+/datum/sprite_accessory/socks/ace_thigh
+	name = "Thigh-high (Ace)"
+	icon_state = "ace_thigh"
+
+/datum/sprite_accessory/socks/bee_thigh
+	name = "Thigh-high (Bee)"
+	icon_state = "bee_thigh"
+
 /datum/sprite_accessory/socks/black_thigh
 	name = "Thigh-high (Black)"
 	icon_state = "black_thigh"
@@ -1611,10 +1663,6 @@
 /datum/sprite_accessory/socks/white_thigh
 	name = "Thigh-high (White)"
 	icon_state = "white_thigh"
-
-/datum/sprite_accessory/socks/bee_thigh
-	name = "Thigh-high (Bee)"
-	icon_state = "bee_thigh"
 
 /datum/sprite_accessory/socks/thocks
 	name = "Thocks"
@@ -1786,7 +1834,7 @@
 /datum/sprite_accessory/wings/angel
 	name = "Angel"
 	icon_state = "angel"
-	color_src = 0
+	color_src = FALSE
 	dimension_x = 46
 	center = TRUE
 	dimension_y = 34
@@ -1795,7 +1843,7 @@
 /datum/sprite_accessory/wings_open/angel
 	name = "Angel"
 	icon_state = "angel"
-	color_src = 0
+	color_src = FALSE
 	dimension_x = 46
 	center = TRUE
 	dimension_y = 34
@@ -1818,7 +1866,7 @@
 /datum/sprite_accessory/wings/megamoth
 	name = "Megamoth"
 	icon_state = "megamoth"
-	color_src = 0
+	color_src = FALSE
 	dimension_x = 96
 	center = TRUE
 	dimension_y = 32
@@ -1827,7 +1875,7 @@
 /datum/sprite_accessory/wings_open/megamoth
 	name = "Megamoth"
 	icon_state = "megamoth"
-	color_src = 0
+	color_src = FALSE
 	dimension_x = 96
 	center = TRUE
 	dimension_y = 32
@@ -1835,7 +1883,7 @@
 /datum/sprite_accessory/wings/mothra
 	name = "Mothra"
 	icon_state = "mothra"
-	color_src = 0
+	color_src = FALSE
 	dimension_x = 96
 	center = TRUE
 	dimension_y = 32
@@ -1844,7 +1892,7 @@
 /datum/sprite_accessory/wings_open/mothra
 	name = "Mothra"
 	icon_state = "mothra"
-	color_src = 0
+	color_src = FALSE
 	dimension_x = 96
 	center = TRUE
 	dimension_y = 32
@@ -1852,6 +1900,7 @@
 /datum/sprite_accessory/wings/skeleton
 	name = "Skeleton"
 	icon_state = "skele"
+	color_src = FALSE
 	dimension_x = 96
 	center = TRUE
 	dimension_y = 32
@@ -1860,6 +1909,7 @@
 /datum/sprite_accessory/wings_open/skeleton
 	name = "Skeleton"
 	icon_state = "skele"
+	color_src = FALSE
 	dimension_x = 96
 	center = TRUE
 	dimension_y = 32
@@ -1867,6 +1917,7 @@
 /datum/sprite_accessory/wings/robotic
 	name = "Robotic"
 	icon_state = "robotic"
+	color_src = FALSE
 	dimension_x = 96
 	center = TRUE
 	dimension_y = 32
@@ -1875,6 +1926,24 @@
 /datum/sprite_accessory/wings_open/robotic
 	name = "Robotic"
 	icon_state = "robotic"
+	color_src = FALSE
+	dimension_x = 96
+	center = TRUE
+	dimension_y = 32
+
+/datum/sprite_accessory/wings/fly
+	name = "Fly"
+	icon_state = "fly"
+	color_src = FALSE
+	dimension_x = 96
+	center = TRUE
+	dimension_y = 32
+	locked = TRUE
+
+/datum/sprite_accessory/wings_open/fly
+	name = "Fly"
+	icon_state = "fly"
+	color_src = FALSE
 	dimension_x = 96
 	center = TRUE
 	dimension_y = 32
@@ -2055,6 +2124,22 @@
 	name = "Witch Wing"
 	icon_state = "witchwing"
 
+/datum/sprite_accessory/moth_wings/rosy
+	name = "Rosy"
+	icon_state = "rosy"
+
+/datum/sprite_accessory/moth_wings/feathery
+	name = "Feathery"
+	icon_state = "feathery"
+
+/datum/sprite_accessory/moth_wings/brown
+	name = "Brown"
+	icon_state = "brown"
+
+/datum/sprite_accessory/moth_wings/plasmafire
+	name = "Plasmafire"
+	icon_state = "plasmafire"
+
 /datum/sprite_accessory/moth_antennae //Finally splitting the sprite
 	icon = 'icons/mob/moth_antennae.dmi'
 	color_src = null
@@ -2122,6 +2207,21 @@
 /datum/sprite_accessory/moth_antennae/regal
 	name = "Regal"
 	icon_state = "regal"
+/datum/sprite_accessory/moth_antennae/rosy
+	name = "Rosy"
+	icon_state = "rosy"
+
+/datum/sprite_accessory/moth_antennae/feathery
+	name = "Feathery"
+	icon_state = "feathery"
+
+/datum/sprite_accessory/moth_antennae/brown
+	name = "Brown"
+	icon_state = "brown"
+
+/datum/sprite_accessory/moth_antennae/plasmafire
+	name = "Plasmafire"
+	icon_state = "plasmafire"
 
 /datum/sprite_accessory/moth_markings // the markings that moths can have. finally something other than the boring tan
 	icon = 'icons/mob/moth_markings.dmi'

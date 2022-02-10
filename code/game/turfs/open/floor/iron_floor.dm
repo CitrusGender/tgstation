@@ -19,7 +19,6 @@
 		new /obj/effect/temp_visual/glowing_rune(src)
 	ChangeTurf(/turf/open/floor/plating/rust)
 
-
 /turf/open/floor/iron/update_icon_state()
 	if(broken || burnt)
 		return ..()
@@ -368,11 +367,3 @@
 	base_icon_state = "sepia"
 	desc = "Well, the flow of time is normal on these tiles, weird."
 	floor_tile = /obj/item/stack/tile/iron/sepia
-
-/turf/open/floor/iron/yellowsiding
-	icon_state = "yellowsiding"
-	base_icon_state = "yellowsiding"
-
-/turf/open/floor/iron/yellowsiding/corner
-	icon_state = "yellowcornersiding"
-	base_icon_state = "yellowcornersiding"
